@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Debug Express (TS) - sem reload",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--nolazy",
+        "-r",
+        "ts-node/register/transpile-only",
+        "-r",
+        "tsconfig-paths/register"
+      ],
+      "args": ["${workspaceFolder}/src/main/server.ts"],
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true
+    },
+    {
+      "type": "pwa-node",
+      "request": "attach",
+      "name": "Attach (ts-node-dev) 9229 - com reload",
+      "port": 9229,
+      "restart": true,
+      "protocol": "inspector",
+      "cwd": "${workspaceFolder}",
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true
+    }
+  ]
+}
