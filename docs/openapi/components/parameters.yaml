@@ -1,0 +1,9 @@
+CsrfHeader:
+  name: x-csrf-token
+  in: header
+  required: false
+  schema:
+    type: string
+  description: >
+    Quando CSRF_ENABLED=true e você usa autenticação via cookie (ou está chamando /auth/login ou /auth/logout),
+    envie este header com o MESMO valor do cookie csrfToken (ou CSRF_COOKIE_NAME). O middleware também aceita x-xsrf-token.

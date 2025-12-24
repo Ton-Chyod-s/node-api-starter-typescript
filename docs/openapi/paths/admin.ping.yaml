@@ -1,0 +1,34 @@
+get:
+  tags: [Admin]
+  summary: Ping (ADMIN)
+  operationId: adminPing
+  security:
+    - cookieAuth: []
+    - bearerAuth: []
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/AdminPingResponseData
+          examples:
+            ok:
+              value:
+                statusCode: 200
+                message: 'OK'
+                data:
+                  user:
+                    id: 'u1'
+                    role: ADMIN
+    '401':
+      $ref: ../openapi.yaml#/components/responses/Unauthorized
+    '403':
+      $ref: ../openapi.yaml#/components/responses/Forbidden
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

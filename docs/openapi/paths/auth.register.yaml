@@ -1,0 +1,31 @@
+post:
+  tags: [Auth Web, Auth Mobile]
+  summary: Criar usuário
+  operationId: registerUser
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../openapi.yaml#/components/schemas/RegisterRequest
+  responses:
+    '201':
+      description: Criado
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/RegisterResponseData
+      headers: {}
+    '400':
+      $ref: ../openapi.yaml#/components/responses/BadRequestValidation
+    '409':
+      $ref: ../openapi.yaml#/components/responses/ConflictAlreadyExists
+    '429':
+      $ref: ../openapi.yaml#/components/responses/TooManyRequests
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

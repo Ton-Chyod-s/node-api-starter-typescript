@@ -1,0 +1,17 @@
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique @db.Citext
+  passwordHash String
+  role         Role     @default(USER)
+
+  passwordResetTokens PasswordResetToken[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

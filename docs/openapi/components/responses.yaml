@@ -1,0 +1,106 @@
+BadRequestInvalidJson:
+  description: Body JSON inválido (erro do body-parser)
+  content:
+    application/json:
+      schema:
+        allOf:
+          - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+      examples:
+        invalidJson:
+          value:
+            statusCode: 400
+            message: 'JSON inválido no body'
+
+BadRequestValidation:
+  description: Dados inválidos / payload inválido
+  content:
+    application/json:
+      schema:
+        allOf:
+          - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          - type: object
+            properties:
+              data:
+                $ref: ../openapi.yaml#/components/schemas/ValidationErrorData
+      examples:
+        invalidBody:
+          value:
+            statusCode: 400
+            message: 'Invalid request body'
+            data:
+              issues:
+                - path: ['email']
+                  message: 'Invalid email'
+
+Unauthorized:
+  description: Token ausente, inválido ou expirado
+  content:
+    application/json:
+      schema:
+        $ref: ../openapi.yaml#/components/schemas/ApiResponse
+      examples:
+        unauthorized:
+          value:
+            statusCode: 401
+            message: 'Unauthorized'
+
+ForbiddenCsrf:
+  description: Invalid or missing CSRF token (when CSRF_ENABLED=true and applicable)
+  content:
+    application/json:
+      schema:
+        $ref: ../openapi.yaml#/components/schemas/ApiResponse
+      examples:
+        csrf:
+          value:
+            statusCode: 403
+            message: 'Invalid or missing CSRF token'
+            code: 'CSRF_INVALID_TOKEN'
+
+Forbidden:
+  description: Usuário autenticado, porém sem permissão (role insuficiente)
+  content:
+    application/json:
+      schema:
+        $ref: ../openapi.yaml#/components/schemas/ApiResponse
+      examples:
+        forbidden:
+          value:
+            statusCode: 403
+            message: 'Forbidden'
+
+TooManyRequests:
+  description: Rate limit
+  content:
+    application/json:
+      schema:
+        $ref: ../openapi.yaml#/components/schemas/ApiResponse
+      examples:
+        rateLimit:
+          value:
+            statusCode: 429
+            message: 'Too many requests, please try again later'
+
+ConflictAlreadyExists:
+  description: Email já cadastrado (Prisma P2002)
+  content:
+    application/json:
+      schema:
+        $ref: ../openapi.yaml#/components/schemas/ApiResponse
+      examples:
+        conflict:
+          value:
+            statusCode: 409
+            message: 'Resource already exists'
+
+InternalServerError:
+  description: Erro inesperado (em produção, message tende a ser genérica)
+  content:
+    application/json:
+      schema:
+        $ref: ../openapi.yaml#/components/schemas/ApiResponse
+      examples:
+        generic:
+          value:
+            statusCode: 500
+            message: 'Erro interno do servidor'

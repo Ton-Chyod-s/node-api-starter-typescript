@@ -1,0 +1,7 @@
+get:
+  tags: [Debug]
+  summary: Disparar erro para testar Sentry/GlitchTip (development com DEBUG_ROUTES_ENABLED=true)
+  operationId: debugSentry
+  responses:
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

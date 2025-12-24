@@ -1,0 +1,53 @@
+post:
+  tags: [Auth Web]
+  summary: Login Web (cookie HttpOnly)
+  operationId: loginCookie
+  parameters:
+    - $ref: ../components/parameters.yaml#/CsrfHeader
+  description: >
+    Faz login e seta o cookie HttpOnly `token`.
+    Quando CSRF_ENABLED=true e a autenticação é via cookie, este endpoint valida o header `x-csrf-token`
+    com o mesmo valor do cookie `csrfToken` (ou CSRF_COOKIE_NAME).
+    chame /auth/csrf antes do login para obter o cookie de CSRF.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../openapi.yaml#/components/schemas/LoginRequest
+  responses:
+    '200':
+      description: OK (Set-Cookie token)
+      headers:
+        Set-Cookie:
+          schema:
+            type: string
+          description: Cookie HttpOnly com o JWT (token)
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/LoginCookieResponseData
+    '400':
+      $ref: ../openapi.yaml#/components/responses/BadRequestValidation
+    '401':
+      description: Credenciais inválidas
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            invalidCredentials:
+              value:
+                statusCode: 401
+                message: 'Invalid credentials'
+    '403':
+      $ref: ../openapi.yaml#/components/responses/ForbiddenCsrf
+    '429':
+      $ref: ../openapi.yaml#/components/responses/TooManyRequests
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

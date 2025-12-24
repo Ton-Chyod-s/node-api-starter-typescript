@@ -1,0 +1,122 @@
+openapi: 3.0.3
+info:
+  title: clean-arch-backend API
+  version: 1.0.0
+  description: >
+    API em Node.js + TypeScript + Express + Prisma (PostgreSQL).
+    Respostas seguem o padrão createResponse: { statusCode, message, data?, elapsedTime? }.
+
+servers:
+  - url: /api
+    description: Base path da API
+
+tags:
+  - name: Health
+    description: Health check
+
+  - name: Auth Web
+    description: Autenticação via cookie HttpOnly + CSRF
+
+  - name: Auth Mobile
+    description: Autenticação via Bearer JWT (Authorization)
+
+  - name: Auth Common
+    description: Rotas de autenticação comuns para Web e Mobile
+
+  - name: Debug
+    description: Rotas de debug
+
+  - name: Admin
+    description: Rotas restritas (role ADMIN)
+
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: ./components/securitySchemes.yaml#/cookieAuth
+
+    bearerAuth:
+      $ref: ./components/securitySchemes.yaml#/bearerAuth
+
+  schemas:
+    ApiResponse:
+      $ref: ./components/schemas.yaml#/ApiResponse
+    HealthResponseData:
+      $ref: ./components/schemas.yaml#/HealthResponseData
+    PublicUser:
+      $ref: ./components/schemas.yaml#/PublicUser
+    AuthUserMinimal:
+      $ref: ./components/schemas.yaml#/AuthUserMinimal
+    AdminPingResponseData:
+      $ref: ./components/schemas.yaml#/AdminPingResponseData
+    RegisterRequest:
+      $ref: ./components/schemas.yaml#/RegisterRequest
+    LoginRequest:
+      $ref: ./components/schemas.yaml#/LoginRequest
+    ValidationIssue:
+      $ref: ./components/schemas.yaml#/ValidationIssue
+    ValidationErrorData:
+      $ref: ./components/schemas.yaml#/ValidationErrorData
+    RegisterResponseData:
+      $ref: ./components/schemas.yaml#/RegisterResponseData
+    LoginCookieResponseData:
+      $ref: ./components/schemas.yaml#/LoginCookieResponseData
+    LoginTokenResponseData:
+      $ref: ./components/schemas.yaml#/LoginTokenResponseData
+    MeResponseData:
+      $ref: ./components/schemas.yaml#/MeResponseData
+    ForgotPasswordRequest:
+      $ref: ./components/schemas.yaml#/ForgotPasswordRequest
+    ResetPasswordRequest:
+      $ref: ./components/schemas.yaml#/ResetPasswordRequest
+
+  responses:
+    BadRequestInvalidJson:
+      $ref: ./components/responses.yaml#/BadRequestInvalidJson
+    BadRequestValidation:
+      $ref: ./components/responses.yaml#/BadRequestValidation
+    Unauthorized:
+      $ref: ./components/responses.yaml#/Unauthorized
+    ForbiddenCsrf:
+      $ref: ./components/responses.yaml#/ForbiddenCsrf
+    Forbidden:
+      $ref: ./components/responses.yaml#/Forbidden
+    TooManyRequests:
+      $ref: ./components/responses.yaml#/TooManyRequests
+    ConflictAlreadyExists:
+      $ref: ./components/responses.yaml#/ConflictAlreadyExists
+    InternalServerError:
+      $ref: ./components/responses.yaml#/InternalServerError
+
+paths:
+  /health:
+    $ref: ./paths/health.yaml
+
+  /auth/register:
+    $ref: ./paths/auth.register.yaml
+
+  /auth/login:
+    $ref: ./paths/auth.login.yaml
+
+  /auth/token:
+    $ref: ./paths/auth.token.yaml
+
+  /auth/logout:
+    $ref: ./paths/auth.logout.yaml
+
+  /auth/me:
+    $ref: ./paths/auth.me.yaml
+
+  /auth/csrf:
+    $ref: ./paths/auth.csrf.yaml
+
+  /auth/forgot-password:
+    $ref: ./paths/auth.forgot-password.yaml
+
+  /auth/reset-password:
+    $ref: ./paths/auth.reset-password.yaml
+
+  /debug-sentry:
+    $ref: ./paths/debug-sentry.yaml
+
+  /admin/ping:
+    $ref: ./paths/admin.ping.yaml

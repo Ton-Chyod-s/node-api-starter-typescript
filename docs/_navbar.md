@@ -1,0 +1,4 @@
+- [Início](README.md)
+- [Setup](SETUP.md)
+- [API](API.md)
+- [Arquitetura](ARCHITECTURE.md)

@@ -1,0 +1,114 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: clean-arch-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: clean-arch-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+
+      # Dentro do compose, o host do Postgres é "db".
+      DATABASE_URL: postgresql://postgres:123@db:5432/postgres
+
+      # Obrigatórias (pode sobrescrever via .env do compose)
+      KEY_JWT: ${KEY_JWT:-troque-esta-chave-por-um-segredo-forte}
+      JWT_ISSUER: ${JWT_ISSUER:-clean-arch-backend}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-clean-arch-backend}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+
+      # Recomendações para dev
+      CSRF_ENABLED: ${CSRF_ENABLED:-true}
+      CSRF_COOKIE_NAME: ${CSRF_COOKIE_NAME:-csrfToken}
+      COOKIE_SAMESITE: ${COOKIE_SAMESITE:-lax}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+
+      # Rotas de debug (somente em development)
+      DEBUG_ROUTES_ENABLED: ${DEBUG_ROUTES_ENABLED:-false}
+
+      # Sentry opcional
+      SENTRY_DSN: ''
+      SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0}
+
+      # Seed admin (opcional)
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@local.test}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-ChangeMe!123}
+      SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-Admin}
+
+      # Password reset (opcional)
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3001}
+
+      # Windows/WSL às vezes precisa de polling para watch
+      CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-false}
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./:/app
+      - node_modules:/app/node_modules
+    command: >
+      sh -c "npx prisma migrate deploy && npm run db:seed && npm run dev"
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'node -e "fetch(''http://127.0.0.1:3000/api/health'').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api-prod:
+    profiles: ['prod']
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    container_name: clean-arch-api-prod
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:123@db:5432/postgres
+      KEY_JWT: ${KEY_JWT:-troque-esta-chave-por-um-segredo-forte}
+      JWT_ISSUER: ${JWT_ISSUER:-clean-arch-backend}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-clean-arch-backend}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      CSRF_ENABLED: ${CSRF_ENABLED:-true}
+      CSRF_COOKIE_NAME: ${CSRF_COOKIE_NAME:-csrfToken}
+      COOKIE_SAMESITE: ${COOKIE_SAMESITE:-lax}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+
+      DEBUG_ROUTES_ENABLED: ${DEBUG_ROUTES_ENABLED:-false}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0}
+    ports:
+      - '3000:3000'
+
+volumes:
+  db-data:
+  node_modules:

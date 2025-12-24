@@ -1,0 +1,56 @@
+get:
+  tags: [Health]
+  summary: Health check
+  operationId: healthCheck
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/HealthResponseData
+          examples:
+            ok:
+              value:
+                statusCode: 200
+                message: 'OK'
+                data:
+                  status: 'ok'
+                  timestamp: '2025-12-23T23:59:59.000Z'
+                  uptimeSeconds: 123.45
+                  app:
+                    name: 'clean-arch-backend'
+                    version: '1.0.0'
+                    nodeEnv: 'production'
+                  runtime:
+                    node: 'v20.0.0'
+                    pid: 123
+                    platform: 'linux'
+                    arch: 'x64'
+                  system:
+                    hostname: 'server-1'
+                    memory:
+                      rssBytes: 123
+                      heapUsedBytes: 123
+                      heapTotalBytes: 123
+                  checks:
+                    database:
+                      status: 'up'
+                      latencyMs: 10
+
+    '503':
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/HealthResponseData

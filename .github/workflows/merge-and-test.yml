@@ -1,0 +1,80 @@
+name: CI (lint, build, test)
+
+on:
+  pull_request:
+    branches: [develop]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: dipemax
+          POSTGRES_PASSWORD: 123
+          POSTGRES_DB: dipemax
+        options: >-
+          --health-cmd="pg_isready -U dipemax -d dipemax -h 127.0.0.1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://dipemax:123@localhost:5432/dipemax
+      KEY_JWT: test-secret
+      JWT_ISSUER: test-issuer
+      JWT_AUDIENCE: test-audience
+      CORS_ORIGIN: http://localhost:3000
+      CI: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format
+
+      - name: Validate OpenAPI spec
+        run: npm run openapi:validate
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Apply migrations (if any)
+        if: ${{ hashFiles('prisma/migrations/**') != '' }}
+        run: npx prisma migrate deploy
+
+      - name: Sync schema (no migrations)
+        if: ${{ hashFiles('prisma/migrations/**') == '' }}
+        run: npx prisma db push
+
+      - name: Build
+        run: npm run build
+
+      - name: Tests
+        run: npm test -- --runInBand

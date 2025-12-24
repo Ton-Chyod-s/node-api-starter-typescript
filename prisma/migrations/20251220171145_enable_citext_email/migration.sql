@@ -1,0 +1,7 @@
+CREATE EXTENSION IF NOT EXISTS citext;
+
+ALTER TABLE "User"
+  ALTER COLUMN "email" TYPE CITEXT;
+
+DROP INDEX IF EXISTS "User_email_key";
+CREATE UNIQUE INDEX "User_email_key" ON "User" ("email");

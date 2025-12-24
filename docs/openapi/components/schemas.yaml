@@ -1,0 +1,261 @@
+ApiResponse:
+  type: object
+  properties:
+    statusCode:
+      type: integer
+      example: 200
+    message:
+      type: string
+      example: OK
+    code:
+      type: string
+      nullable: true
+      description: Código estável (machine-readable), recomendado para erros.
+    data:
+      nullable: true
+    elapsedTime:
+      type: string
+      nullable: true
+      description: Opcional, caso algum middleware injete esse valor.
+  required: [statusCode, message]
+
+HealthResponseData:
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [ok, degraded, down]
+      example: ok
+    timestamp:
+      type: string
+      format: date-time
+      example: '2025-12-23T23:59:59.000Z'
+    uptimeSeconds:
+      type: number
+      example: 123.45
+    app:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'clean-arch-backend'
+        version:
+          type: string
+          example: '1.0.0'
+        nodeEnv:
+          type: string
+          example: 'production'
+      required: [name, version, nodeEnv]
+    runtime:
+      type: object
+      properties:
+        node:
+          type: string
+          example: 'v20.0.0'
+        pid:
+          type: integer
+          example: 123
+        platform:
+          type: string
+          example: 'linux'
+        arch:
+          type: string
+          example: 'x64'
+      required: [node, pid, platform, arch]
+    system:
+      type: object
+      properties:
+        hostname:
+          type: string
+          example: 'server-1'
+        memory:
+          type: object
+          properties:
+            rssBytes:
+              type: integer
+              example: 123
+            heapUsedBytes:
+              type: integer
+              example: 123
+            heapTotalBytes:
+              type: integer
+              example: 123
+          required: [rssBytes, heapUsedBytes, heapTotalBytes]
+      required: [hostname, memory]
+    checks:
+      type: object
+      properties:
+        database:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [up, timeout, down]
+              example: up
+            latencyMs:
+              type: integer
+              nullable: true
+              example: 10
+          required: [status]
+      required: [database]
+  required: [status, timestamp, uptimeSeconds, app, runtime, system, checks]
+
+PublicUser:
+  type: object
+  properties:
+    id:
+      type: string
+      example: 'u1'
+    name:
+      type: string
+      example: 'João Silva'
+    email:
+      type: string
+      format: email
+      example: 'joao@exemplo.com'
+    role:
+      type: string
+      enum: [USER, ADMIN]
+      example: USER
+  required: [id, name, email, role]
+
+AuthUserMinimal:
+  type: object
+  properties:
+    id:
+      type: string
+      example: 'u1'
+    role:
+      type: string
+      enum: [USER, ADMIN]
+      example: USER
+  required: [id, role]
+
+AdminPingResponseData:
+  type: object
+  properties:
+    user:
+      $ref: ../openapi.yaml#/components/schemas/AuthUserMinimal
+  required: [user]
+
+RegisterRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      minLength: 2
+      maxLength: 100
+      example: 'João'
+    email:
+      type: string
+      format: email
+      example: 'joao@example.com'
+    password:
+      type: string
+      minLength: 8
+      maxLength: 72
+      example: 'SenhaForte123'
+  required: [name, email, password]
+
+LoginRequest:
+  type: object
+  properties:
+    email:
+      type: string
+      format: email
+      example: 'joao@example.com'
+    password:
+      type: string
+      minLength: 8
+      maxLength: 72
+      example: 'SenhaForte123'
+  required: [email, password]
+
+ValidationIssue:
+  type: object
+  description: >
+    Formato pode variar: em alguns controllers a issue vem simplificada (path + message),
+    em outros pode vir no formato do Zod (code, expected, received etc).
+  properties:
+    path:
+      type: array
+      items:
+        oneOf:
+          - type: string
+          - type: integer
+      example: ['email']
+    message:
+      type: string
+      example: 'Invalid email'
+    code:
+      type: string
+      example: 'invalid_string'
+  additionalProperties: true
+
+ValidationErrorData:
+  type: object
+  properties:
+    issues:
+      type: array
+      items:
+        $ref: ../openapi.yaml#/components/schemas/ValidationIssue
+  required: [issues]
+
+RegisterResponseData:
+  type: object
+  properties:
+    id: { type: string }
+    name: { type: string }
+    email: { type: string, format: email }
+    role:
+      type: string
+      enum: [USER, ADMIN]
+  required: [id, name, email, role]
+
+LoginCookieResponseData:
+  type: object
+  properties:
+    user:
+      $ref: ../openapi.yaml#/components/schemas/PublicUser
+  required: [user]
+
+MeResponseData:
+  type: object
+  properties:
+    user:
+      $ref: ../openapi.yaml#/components/schemas/PublicUser
+  required: [user]
+
+LoginTokenResponseData:
+  type: object
+  properties:
+    token:
+      type: string
+      description: JWT (Bearer)
+      example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    user:
+      $ref: ../openapi.yaml#/components/schemas/PublicUser
+  required: [token, user]
+
+ForgotPasswordRequest:
+  type: object
+  properties:
+    email:
+      type: string
+      format: email
+      example: 'joao@example.com'
+  required: [email]
+
+ResetPasswordRequest:
+  type: object
+  properties:
+    token:
+      type: string
+      description: Token recebido por e-mail
+      example: '6f9e...'
+    newPassword:
+      type: string
+      minLength: 8
+      maxLength: 72
+      example: 'NovaSenhaForte123'
+  required: [token, newPassword]

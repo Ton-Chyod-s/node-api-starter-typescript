@@ -1,0 +1,53 @@
+post:
+  tags: [Auth Mobile]
+  summary: Login (retorna JWT no body)
+  operationId: loginToken
+  description: >
+    Útil para apps/CLI e para testar no Swagger sem depender de cookies/CSRF.
+    Retorna o JWT no body e não seta cookie HttpOnly.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../openapi.yaml#/components/schemas/LoginRequest
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/LoginTokenResponseData
+          examples:
+            ok:
+              value:
+                statusCode: 200
+                message: 'Login successful'
+                data:
+                  token: 'token...'
+                  user:
+                    id: 'u1'
+                    name: 'João Silva'
+                    email: 'joao@example.com'
+    '400':
+      $ref: ../openapi.yaml#/components/responses/BadRequestValidation
+    '401':
+      description: Credenciais inválidas
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            invalidCredentials:
+              value:
+                statusCode: 401
+                message: 'Invalid credentials'
+    '429':
+      $ref: ../openapi.yaml#/components/responses/TooManyRequests
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

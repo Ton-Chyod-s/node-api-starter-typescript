@@ -1,0 +1,39 @@
+post:
+  tags: [Auth Web]
+  summary: Logout
+  operationId: logout
+  parameters:
+    - $ref: ../components/parameters.yaml#/CsrfHeader
+  description: >
+    Requer autenticação via cookie.
+    Limpa o cookie `token` (se existir).
+    Observação: quando CSRF_ENABLED=true, o middleware aplica CSRF neste endpoint por ele estar na lista de rotas /auth/logout.
+  security:
+    # Cookie: precisa do cookie token (e, quando CSRF_ENABLED=true, do header x-csrf-token)
+    - cookieAuth: []
+
+    # Bearer: para clients/CLI (sem CSRF)
+    - bearerAuth: []
+  responses:
+    '200':
+      description: OK
+      headers:
+        Set-Cookie:
+          schema:
+            type: string
+          description: Cookie expirado para limpar token (quando aplicável)
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            ok:
+              value:
+                statusCode: 200
+                message: 'Logout successful'
+    '401':
+      $ref: ../openapi.yaml#/components/responses/Unauthorized
+    '403':
+      $ref: ../openapi.yaml#/components/responses/ForbiddenCsrf
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

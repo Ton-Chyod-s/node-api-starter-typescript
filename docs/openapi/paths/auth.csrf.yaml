@@ -1,0 +1,34 @@
+get:
+  tags: [Auth Web]
+  summary: Inicializar cookie de CSRF
+  operationId: csrfInit
+  description: >
+    Quando CSRF_ENABLED=true, garante que exista o cookie de CSRF e retorna o token no body.
+    O middleware também gera e envia Set-Cookie (csrfToken ou CSRF_COOKIE_NAME) quando necessário.
+    Quando CSRF_ENABLED=false, retorna 204.
+  responses:
+    '200':
+      description: OK
+      headers:
+        Set-Cookie:
+          schema:
+            type: string
+          description: Cookie de CSRF (quando gerado)
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            ok:
+              value:
+                statusCode: 200
+                message: 'CSRF token generated'
+                data:
+                  csrfToken: '...'
+    '204':
+      description: No Content
+      headers:
+        Set-Cookie:
+          schema:
+            type: string
+          description: Cookie de CSRF (quando gerado)

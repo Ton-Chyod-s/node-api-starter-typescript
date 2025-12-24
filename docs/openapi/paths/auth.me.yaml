@@ -1,0 +1,34 @@
+get:
+  tags: [Auth Common]
+  summary: Usuário autenticado
+  operationId: me
+  security:
+    - cookieAuth: []
+    - bearerAuth: []
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/MeResponseData
+          examples:
+            ok:
+              value:
+                statusCode: 200
+                message: 'Authenticated'
+                data:
+                  user:
+                    id: 'u1'
+                    name: 'João Silva'
+                    email: 'joao@exemplo.com'
+                    role: USER
+    '401':
+      $ref: ../openapi.yaml#/components/responses/Unauthorized
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError
