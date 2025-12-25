@@ -20,9 +20,9 @@
     "format:fix": "prettier . --write",
     "format:prisma": "npx prisma format",
     "openapi:validate": "node scripts/validate-openapi.cjs",
-    "prepare": "husky",
     "docs": "docsify serve docs",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "check": "npm run lint && npm run format && npm run openapi:validate && npm test"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^12.1.0",
@@ -59,9 +59,7 @@
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "husky": "^9.1.7",
     "jest": "^29.7.0",
-    "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "prisma": "^7.2.0",
     "ts-jest": "^29.4.6",
@@ -71,11 +69,5 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,md,yml,yaml}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
   }
 }
