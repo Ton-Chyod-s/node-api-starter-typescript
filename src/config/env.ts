@@ -104,14 +104,12 @@ const schema = z.object({
 
   COOKIE_SECURE: z.string().optional().transform(parseBoolean),
 
-  CSRF_ENABLED: z.string().optional().default('false').transform(parseBoolean),
+  CSRF_ENABLED: z.string().optional().default('true').transform(parseBoolean),
 
   CSRF_COOKIE_NAME: z.string().optional().default('csrfToken'),
 
-  // Debug routes (development only)
   DEBUG_ROUTES_ENABLED: z.string().optional().default('false').transform(parseBoolean),
 
-  // Password reset
   FRONTEND_URL: z.string().optional().transform(normalizeOptionalString),
   PASSWORD_RESET_PATH: z.string().optional().default('/reset-password/{token}'),
   PASSWORD_RESET_TOKEN_TTL_MINUTES: z
@@ -126,12 +124,10 @@ const schema = z.object({
     .optional()
     .default(15),
 
-  // Seed (admin)
   SEED_ADMIN_EMAIL: z.string().optional().transform(normalizeOptionalString),
   SEED_ADMIN_PASSWORD: z.string().optional().transform(normalizeOptionalString),
   SEED_ADMIN_NAME: z.string().optional().transform(normalizeOptionalString),
 
-  // SMTP (mailer)
   SMTP_HOST: z.string().optional().transform(normalizeOptionalString),
   SMTP_PORT: z
     .preprocess(preprocessOptional, z.coerce.number().int().min(1).max(65535))
