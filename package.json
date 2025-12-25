@@ -16,7 +16,7 @@
     "coverage": "powershell -NoProfile -Command \"Start-Process .\\coverage\\lcov-report\\index.html\"",
     "lint": "eslint . --ext .ts --cache --cache-location .cache/eslint --max-warnings=0",
     "lint:fix": "eslint . --fix --cache --cache-location .cache/eslint",
-    "format": "prettier . --check",
+    "format:check": "prettier . --check",
     "format:fix": "prettier . --write",
     "format:prisma": "npx prisma format",
     "openapi:validate": "node scripts/validate-openapi.cjs",
