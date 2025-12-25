@@ -1,14 +1,8 @@
 export type AppErrorParams = {
   message: string;
   statusCode: number;
-  /**
-   * Stable machine-readable code.
-   * Example: AUTH_INVALID_CREDENTIALS, USER_ALREADY_EXISTS
-   */
   code: string;
-  /** Optional extra payload for debugging/clients. */
   data?: unknown;
-  /** Optional original cause (will not be serialized by default). */
   cause?: unknown;
 };
 
@@ -18,16 +12,12 @@ export class AppError extends Error {
   public readonly data?: unknown;
 
   constructor(params: AppErrorParams) {
-    super(params.message);
-    this.name = 'AppError';
+    super(params.message, params.cause !== undefined ? { cause: params.cause } : undefined);
 
+    this.name = 'AppError';
     this.statusCode = params.statusCode;
     this.code = params.code;
     this.data = params.data;
-
-    // Preserve cause when supported.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this as any).cause = params.cause;
   }
 
   static badRequest(message = 'Invalid request', code = 'BAD_REQUEST', data?: unknown) {
