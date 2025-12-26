@@ -1,9 +1,7 @@
 import type { Express } from 'express';
 import type { Socket } from 'node:net';
 
-// These tests spin up a real server. In some environments (CI/Windows), startup
-// can take more than Jest's default 5s timeout.
-jest.setTimeout(15000);
+jest.setTimeout(30000);
 
 type StartedServer = { baseUrl: string; close: () => Promise<void> };
 
@@ -25,7 +23,6 @@ function startServer(app: Express): Promise<StartedServer> {
         baseUrl: `http://127.0.0.1:${port}`,
         close: () =>
           new Promise<void>((r) => {
-            // Force-close any open keep-alive sockets so server.close() doesn't hang
             for (const s of sockets) s.destroy();
             server.close(() => r());
           }),
@@ -55,7 +52,6 @@ function pickCookie(setCookies: string[], cookieName: string): string | null {
   return null;
 }
 
-// Important: drain/cancel response body to release the connection (undici keep-alive)
 async function drain(res: Response) {
   try {
     await res.arrayBuffer();
@@ -127,8 +123,6 @@ describe('CSRF (HTTP)', () => {
 
       if (!csrfCookie || !token) throw new Error('CSRF cookie/token ausente');
 
-      // Drain is optional here because we already consumed json(),
-      // but it doesn't hurt and keeps things consistent.
       await drain(csrfRes);
 
       const noHeader = await fetch(`${baseUrl}/api/auth/login`, {

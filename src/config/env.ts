@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { z } from 'zod';
 import type { StringValue } from 'ms';
 
+type CorsOrigin = '*' | string | string[];
+
 function parseExpiresIn(value?: string): number | StringValue | undefined {
   if (!value) return undefined;
 
@@ -18,25 +20,31 @@ function parseExpiresIn(value?: string): number | StringValue | undefined {
   return v as StringValue;
 }
 
-function parseCorsOrigin(value?: string): string | string[] | undefined {
-  if (!value) return undefined;
-  const v = value.trim();
+function parseCorsOrigin(raw: unknown): CorsOrigin {
+  const value = String(raw ?? '').trim();
 
-  if (v === '*') return '*';
+  if (value === '*') return '*';
 
-  const parts = v
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  if (value.includes(',')) {
+    const list = value
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
 
-  for (const origin of parts) {
-    if (!/^https?:\/\/.+/i.test(origin)) {
-      throw new Error(`CORS_ORIGIN inválido: "${origin}". Use ex: "http://localhost:3000".`);
-    }
+    return list.length === 1 ? list[0] : list;
   }
 
-  return parts.length <= 1 ? parts[0] : parts;
+  return value;
 }
+
+const corsOriginSchema = z.preprocess(
+  (val) => parseCorsOrigin(val),
+  z.union([
+    z.literal('*'),
+    z.string().min(1),
+    z.array(z.string().min(1)).min(1),
+  ])
+);
 
 function parseTrustProxy(value?: string): boolean | number | undefined {
   if (value === undefined) return undefined;
@@ -92,7 +100,7 @@ const schema = z.object({
 
   JWT_AUDIENCE: z.string().min(1),
 
-  CORS_ORIGIN: z.string().min(1).transform(parseCorsOrigin),
+  CORS_ORIGIN: corsOriginSchema,
 
   SENTRY_DSN: z.string().optional(),
 
