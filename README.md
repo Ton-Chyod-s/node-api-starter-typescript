@@ -20,7 +20,7 @@ Este repositório foi pensado como **codebase base** para futuros projetos Web (
 1. Instale as dependências:
 
    ```bash
-   npm install
+   npm i
    ```
 
 2. Copie o arquivo de exemplo de variáveis de ambiente:
