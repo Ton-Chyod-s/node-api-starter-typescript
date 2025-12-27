@@ -4,32 +4,35 @@
     {
       "type": "pwa-node",
       "request": "launch",
-      "name": "Debug Express (TS) - sem reload",
+      "name": "Debug Express (TSX)",
+      "cwd": "${workspaceFolder}",
       "runtimeExecutable": "node",
       "runtimeArgs": [
-        "--nolazy",
-        "-r",
-        "ts-node/register/transpile-only",
+        "--inspect=9229",
+        "--enable-source-maps",
+        "--import",
+        "tsx",
         "-r",
         "tsconfig-paths/register"
       ],
       "args": ["${workspaceFolder}/src/main/server.ts"],
-      "cwd": "${workspaceFolder}",
-      "envFile": "${workspaceFolder}/.env",
       "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
       "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true
     },
     {
       "type": "pwa-node",
       "request": "attach",
-      "name": "Attach (ts-node-dev) 9229 - com reload",
+      "name": "Attach (TSX) 9229",
+      "address": "localhost",
       "port": 9229,
       "restart": true,
       "protocol": "inspector",
       "cwd": "${workspaceFolder}",
       "skipFiles": ["<node_internals>/**"],
-      "sourceMaps": true
+      "sourceMaps": true,
+      "autoAttachChildProcesses": true
     }
   ]
 }
