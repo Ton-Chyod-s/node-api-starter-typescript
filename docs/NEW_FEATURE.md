@@ -160,12 +160,18 @@ Atualize também:
 
 ## 7) Qualidade e CI local
 
-Antes de abrir PR:
+Antes de abrir PR, rode tudo de uma vez:
+
+```bash
+npm run check
+```
+
+Ou, se preferir separar:
 
 ```bash
 npm test
 npm run lint
-npm run format
+npm run format:check
 ```
 
 Se for uma feature com migração:

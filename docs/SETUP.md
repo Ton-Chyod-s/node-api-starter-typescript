@@ -2,7 +2,7 @@
 
 ## Requisitos
 
-- Node.js (recomendado LTS)
+- Node.js 20.x (obrigatório, conforme `engines` no `package.json`)
 - PostgreSQL (local ou via Docker)
 - npm
 
@@ -74,7 +74,7 @@ Essas variáveis controlam o comportamento do cookie de autenticação e do midd
 | ---------------- | ----------- | --------- | -------------------------------------------------------------------------------------------- |
 | COOKIE_SAMESITE  | não         | lax       | lax, strict ou none. Default: lax. Se none, exige HTTPS (COOKIE_SECURE=true).                |
 | COOKIE_SECURE    | não         | false     | true em produção com HTTPS. Quando true, o cookie só é enviado em conexões TLS.              |
-| CSRF_ENABLED     | não         | false     | true para proteger rotas que usam cookie de auth em contexto Web (SPA, SSR). Default: false. |
+| CSRF_ENABLED     | não         | true      | true para proteger rotas que usam cookie de auth em contexto Web (SPA, SSR). Default: true. |
 | CSRF_COOKIE_NAME | não         | csrfToken | Nome do cookie de CSRF. O header deve usar o mesmo valor (x-csrf-token ou x-xsrf-token).     |
 
 #### Web (SPA / navegador)
@@ -236,12 +236,18 @@ npm run docs
 
 ## Scripts
 
-- npm run dev: servidor com ts-node-dev
-- npm run build: build TypeScript para dist
-- npm start: roda dist/main/server.js
-- npm test: Jest
-- npm run test:coverage: gera relatório de cobertura em coverage/
-- npm run coverage: abre o relatório HTML (Windows)
-- npm run lint e npm run lint:fix: ESLint
-- npm run format e npm run format:fix: Prettier
-- npm run docs: abre a documentação (Docsify)
+- `npm run dev`: servidor em desenvolvimento (TypeScript com hot reload via ts-node-dev)
+- `npm run build`: build TypeScript para `dist/` (inclui ajuste de paths com tsc-alias)
+- `npm start`: roda `dist/main/server.js`
+- `npm test`: testes unitários (Jest)
+- `npm run test:integration`: habilita testes de integração via `RUN_INTEGRATION_TESTS=1`
+- `npm run test:integration:local-db`: integração apontando para um Postgres local (URL padrão no script)
+- `npm run test:coverage`: gera relatório de cobertura em `coverage/`
+- `npm run coverage`: abre o relatório HTML no Windows
+- `npm run lint` e `npm run lint:fix`: ESLint
+- `npm run format:check` e `npm run format:fix`: Prettier
+- `npm run format:prisma`: formata arquivos do Prisma
+- `npm run openapi:validate`: valida os YAMLs do OpenAPI em `docs/openapi/`
+- `npm run docs`: abre a documentação (Docsify)
+- `npm run db:seed`: executa o seed do Prisma (cria/atualiza admin)
+- `npm run check`: roda lint + prettier + validação OpenAPI + testes

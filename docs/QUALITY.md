@@ -1,5 +1,7 @@
 # Qualidade
 
+Este guia reúne os comandos e práticas de qualidade que o projeto já usa no dia a dia.
+
 ## ESLint
 
 Config: `eslint.config.mjs`
@@ -20,8 +22,24 @@ Config: `prettier.config.cjs`
 Comandos:
 
 ```bash
-npm run format
+npm run format:check
 npm run format:fix
+```
+
+## Prisma (format)
+
+Para formatar schemas/arquivos do Prisma:
+
+```bash
+npm run format:prisma
+```
+
+## OpenAPI (validação)
+
+O contrato OpenAPI fica em `docs/openapi/`. Para validar a consistência dos YAMLs:
+
+```bash
+npm run openapi:validate
 ```
 
 ## Testes (Jest)
@@ -43,19 +61,10 @@ No Windows, também existe o script:
 npm run coverage
 ```
 
-## Husky (pre-commit)
+## Check completo (CI local)
 
-O Husky é instalado via script `prepare`:
+Se você quer rodar tudo em sequência (lint + prettier + validação OpenAPI + testes):
 
 ```bash
-npm run prepare
+npm run check
 ```
-
-Hook atual: `.husky/pre-commit`
-
-O hook roda:
-
-- `npx lint-staged` (formata e aplica lint somente nos arquivos alterados)
-- `npm test`
-
-Config do `lint-staged` fica no `package.json`.

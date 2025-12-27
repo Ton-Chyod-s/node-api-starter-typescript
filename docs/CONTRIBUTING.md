@@ -2,7 +2,7 @@
 
 ## Pré-requisitos
 
-- Node.js (LTS)
+- Node.js 20.x (obrigatório, conforme `engines` no `package.json`)
 - PostgreSQL
 - npm
 
@@ -24,12 +24,18 @@ npm run dev
 
 ## Checks locais
 
-Antes de abrir PR:
+Antes de abrir PR, rode tudo de uma vez:
+
+```bash
+npm run check
+```
+
+Ou, se preferir separar:
 
 ```bash
 npm test
 npm run lint
-npm run format
+npm run format:check
 ```
 
 Para corrigir automaticamente:
@@ -43,6 +49,6 @@ npm run format:fix
 
 - [ ] Testes passando (`npm test`)
 - [ ] Lint sem erros (`npm run lint`)
-- [ ] Prettier ok (`npm run format`)
+- [ ] Prettier ok (`npm run format:check`)
 - [ ] Documentação atualizada (quando alterar API/fluxo)
 - [ ] Sem segredos no commit (`.env`, tokens, chaves)

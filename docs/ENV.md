@@ -14,7 +14,7 @@ sem precisar ler o SETUP inteiro.
 | DATABASE_URL | sim         | postgresql://user:pass@localhost:5432/db | Conexão com o Postgres (Prisma)                       |
 | KEY_JWT      | sim         | troque-esta-chave-por-um-segredo-forte   | Segredo usado para assinar tokens JWT                 |
 | JWT_ISSUER   | sim         | clean-arch-backend                       | Emissor esperado no token (iss)                       |
-| JWT_AUDIENCE | sim         | clean-arch-clients                       | Público esperado no token (aud)                       |
+| JWT_AUDIENCE | sim         | clean-arch-backend                       | Público esperado no token (aud)                       |
 | CORS_ORIGIN  | sim         | http://localhost:3000                    | Origem do front (pode ser lista separada por vírgula) |
 
 ---
@@ -55,7 +55,7 @@ JWT_EXPIRES_IN="2h"
 | ---------------- | ----------- | --------- | --------------------------------------------------------------- |
 | COOKIE_SAMESITE  | não         | lax       | lax, strict ou none. Se none, exige HTTPS (COOKIE_SECURE=true). |
 | COOKIE_SECURE    | não         | false     | true em produção com HTTPS.                                     |
-| CSRF_ENABLED     | não         | false     | true para habilitar CSRF nas rotas que usam cookie de auth.     |
+| CSRF_ENABLED     | não         | true      | true para habilitar CSRF nas rotas que usam cookie de auth (default: true). |
 | CSRF_COOKIE_NAME | não         | csrfToken | Nome do cookie de CSRF (default usado pelo middleware).         |
 
 Como o CSRF funciona aqui:
