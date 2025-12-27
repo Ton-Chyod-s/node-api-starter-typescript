@@ -12,5 +12,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Env (nunca envie segredos no build context)
+.env
+
 # Docker artifacts
 docker-compose*.yml

@@ -3,15 +3,15 @@ services:
     image: postgres:16-alpine
     container_name: clean-arch-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5432:5432'
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d postgres']
+      test: ['CMD-SHELL', 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
       interval: 5s
       timeout: 3s
       retries: 20
@@ -30,7 +30,7 @@ services:
       PORT: 3000
 
       # Dentro do compose, o host do Postgres é "db".
-      DATABASE_URL: postgresql://postgres:123@db:5432/postgres
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-postgres}
 
       # Obrigatórias (pode sobrescrever via .env do compose)
       KEY_JWT: ${KEY_JWT:-troque-esta-chave-por-um-segredo-forte}
@@ -92,8 +92,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: postgresql://postgres:123@db:5432/postgres
-      KEY_JWT: ${KEY_JWT:-troque-esta-chave-por-um-segredo-forte}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-postgres}
+      KEY_JWT: ${KEY_JWT:?KEY_JWT obrigatória no profile prod}
       JWT_ISSUER: ${JWT_ISSUER:-clean-arch-backend}
       JWT_AUDIENCE: ${JWT_AUDIENCE:-clean-arch-backend}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}

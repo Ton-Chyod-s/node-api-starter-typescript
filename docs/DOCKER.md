@@ -107,7 +107,7 @@ docker compose up -d db
 Depois, no seu `.env` local (do Node), use:
 
 ```env
-DATABASE_URL=postgresql://postgres:123@localhost:5432/postgres
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 ```
 
 ### Conectar no Postgres (DBeaver, pgAdmin, psql)
@@ -118,7 +118,9 @@ Credenciais padrão do compose (dev):
 - Porta: `5432`
 - Banco: `postgres`
 - Usuário: `postgres`
-- Senha: `123`
+- Senha: `postgres`
+
+Observação: a porta do Postgres está bindada em `127.0.0.1`, então só fica acessível localmente no seu computador.
 
 Se você mudou a porta para `5433:5432`, conecte usando `localhost:5433`.
 
