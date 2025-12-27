@@ -32,7 +32,6 @@ type Store = {
   tokenSeq: number;
 };
 
-// ADICIONADO: tipagem do body do /csrf
 type CsrfBody = {
   statusCode: number;
   message: string;

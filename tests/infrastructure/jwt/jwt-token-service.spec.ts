@@ -64,7 +64,6 @@ describe('JwtTokenService', () => {
   });
 
   it('deve respeitar o expiresIn e lançar erro quando o token estiver expirado', async () => {
-    // Evita flakiness de CI (sleep real) usando timers fake.
     jest.useFakeTimers();
     jest.setSystemTime(new Date('2025-01-01T00:00:00.000Z'));
 

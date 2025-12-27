@@ -25,14 +25,12 @@ const makeNext = () => jest.fn() as unknown as NextFunction;
 function setBaseEnv(nodeEnv: 'test' | 'development' | 'production' = 'test') {
   process.env.NODE_ENV = nodeEnv;
 
-  // Obrigatórias pelo schema do env
   process.env.DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://user:pass@localhost:5432/db';
   process.env.KEY_JWT = process.env.KEY_JWT ?? 'test-secret';
   process.env.JWT_ISSUER = process.env.JWT_ISSUER ?? 'test-issuer';
   process.env.JWT_AUDIENCE = process.env.JWT_AUDIENCE ?? 'test-audience';
   process.env.CORS_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:3000';
 
-  // Sentry não é relevante nos testes
   process.env.SENTRY_DSN = '';
 }
 

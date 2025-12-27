@@ -11,7 +11,6 @@ function startServer(app: Express): Promise<StartedServer> {
       const address = server.address();
       const port = typeof address === 'object' && address ? address.port : 0;
 
-      // Track sockets so we can destroy keep-alive connections on close
       const sockets = new Set<Socket>();
 
       server.on('connection', (socket: Socket) => {
