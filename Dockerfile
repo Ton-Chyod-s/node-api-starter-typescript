@@ -25,6 +25,8 @@ ENV NODE_ENV=development
 
 COPY . .
 
+USER node
+
 EXPOSE 3000
 
 CMD ["npm", "run", "dev"]
@@ -47,9 +49,11 @@ FROM base AS prod
 
 ENV NODE_ENV=production
 
-COPY --from=build /app/package.json ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
+COPY --from=build --chown=node:node /app/package.json ./
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/dist ./dist
+
+USER node
 
 EXPOSE 3000
 

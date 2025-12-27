@@ -2,6 +2,32 @@
 
 Alguns problemas comuns e como investigar.
 
+## Guia rápido de debug
+
+Quando algo “quebra” e você precisa achar a causa rápido, siga esta ordem:
+
+1. Health
+   - Verifique o status do serviço e do banco:
+     - `GET /api/health` (retorna status geral e info do DB quando possível)
+
+2. Logs
+   - Local (sem Docker): veja o console onde o `npm run dev` está rodando.
+   - Docker Compose:
+     - `docker compose ps`
+     - `docker compose logs -f api` (ajuste o nome do serviço se necessário)
+
+3. Sentry (se configurado)
+   - Confirme `SENTRY_DSN` no ambiente.
+   - Procure o erro em Issues e veja stack trace, breadcrumbs e contexto da request.
+
+4. Banco e migrations (Prisma)
+   - Confirme `DATABASE_URL` apontando para o banco correto.
+   - Verifique migrações:
+     - Dev: `npx prisma migrate dev`
+     - Prod: `npx prisma migrate deploy`
+     - Status: `npx prisma migrate status`
+   - Se necessário, regenere client: `npx prisma generate`
+
 ## Docker e Docker Compose
 
 Se você está usando Docker, o guia principal fica em `docs/DOCKER.md`.

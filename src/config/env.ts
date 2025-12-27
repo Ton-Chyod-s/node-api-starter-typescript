@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { z } from 'zod';
+import ms from 'ms';
 import type { StringValue } from 'ms';
 
 type CorsOrigin = '*' | string | string[];
@@ -18,6 +19,15 @@ function parseExpiresIn(value?: string): number | StringValue | undefined {
   }
 
   return v as StringValue;
+}
+
+export function expiresInToMs(expiresIn?: number | StringValue): number | undefined {
+  if (expiresIn === undefined) return undefined;
+
+  if (typeof expiresIn === 'number') return expiresIn * 1000;
+
+  const parsed = ms(expiresIn);
+  return typeof parsed === 'number' && Number.isFinite(parsed) ? parsed : undefined;
 }
 
 function parseCorsOrigin(raw: unknown): CorsOrigin {
