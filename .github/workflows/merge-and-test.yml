@@ -22,18 +22,18 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_USER: dipemax
+          POSTGRES_USER: cbase
           POSTGRES_PASSWORD: 123
-          POSTGRES_DB: dipemax
+          POSTGRES_DB: cbase
         options: >-
-          --health-cmd="pg_isready -U dipemax -d dipemax -h 127.0.0.1"
+          --health-cmd="pg_isready -U cbase -d cbase -h 127.0.0.1"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
 
     env:
       NODE_ENV: test
-      DATABASE_URL: postgresql://dipemax:123@localhost:5432/dipemax
+      DATABASE_URL: postgresql:/ cbase:123@localhost:5432 cbase
       KEY_JWT: test-secret
       JWT_ISSUER: test-issuer
       JWT_AUDIENCE: test-audience
@@ -57,7 +57,7 @@ jobs:
       - name: Wait for Postgres
         run: |
           for i in {1..30}; do
-            pg_isready -h 127.0.0.1 -p 5432 -U dipemax -d dipemax && exit 0
+            pg_isready -h 127.0.0.1 -p 5432 -U cbase -d cbase && exit 0
             sleep 2
           done
           echo "Postgres não ficou pronto a tempo" >&2
