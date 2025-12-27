@@ -70,12 +70,12 @@ Use TRUST_PROXY quando a app estiver atrás de NGINX, Cloudflare e afins, para q
 
 Essas variáveis controlam o comportamento do cookie de autenticação e do middleware de CSRF.
 
-| Variável         | Obrigatória | Exemplo   | Observação                                                                                   |
-| ---------------- | ----------- | --------- | -------------------------------------------------------------------------------------------- |
-| COOKIE_SAMESITE  | não         | lax       | lax, strict ou none. Default: lax. Se none, exige HTTPS (COOKIE_SECURE=true).                |
-| COOKIE_SECURE    | não         | false     | true em produção com HTTPS. Quando true, o cookie só é enviado em conexões TLS.              |
+| Variável         | Obrigatória | Exemplo   | Observação                                                                                  |
+| ---------------- | ----------- | --------- | ------------------------------------------------------------------------------------------- |
+| COOKIE_SAMESITE  | não         | lax       | lax, strict ou none. Default: lax. Se none, exige HTTPS (COOKIE_SECURE=true).               |
+| COOKIE_SECURE    | não         | false     | true em produção com HTTPS. Quando true, o cookie só é enviado em conexões TLS.             |
 | CSRF_ENABLED     | não         | true      | true para proteger rotas que usam cookie de auth em contexto Web (SPA, SSR). Default: true. |
-| CSRF_COOKIE_NAME | não         | csrfToken | Nome do cookie de CSRF. O header deve usar o mesmo valor (x-csrf-token ou x-xsrf-token).     |
+| CSRF_COOKIE_NAME | não         | csrfToken | Nome do cookie de CSRF. O header deve usar o mesmo valor (x-csrf-token ou x-xsrf-token).    |
 
 #### Web (SPA / navegador)
 

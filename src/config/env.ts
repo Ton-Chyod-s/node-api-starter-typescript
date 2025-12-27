@@ -39,11 +39,7 @@ function parseCorsOrigin(raw: unknown): CorsOrigin {
 
 const corsOriginSchema = z.preprocess(
   (val) => parseCorsOrigin(val),
-  z.union([
-    z.literal('*'),
-    z.string().min(1),
-    z.array(z.string().min(1)).min(1),
-  ])
+  z.union([z.literal('*'), z.string().min(1), z.array(z.string().min(1)).min(1)]),
 );
 
 function parseTrustProxy(value?: string): boolean | number | undefined {

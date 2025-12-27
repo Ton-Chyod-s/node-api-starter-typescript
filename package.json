@@ -22,7 +22,7 @@
     "openapi:validate": "node scripts/validate-openapi.cjs",
     "docs": "docsify serve docs",
     "db:seed": "prisma db seed",
-    "check": "npm run lint && npm run format && npm run openapi:validate && npm test"
+    "check": "npm run lint && npm run format:check && npm run openapi:validate && npm test"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^12.1.0",

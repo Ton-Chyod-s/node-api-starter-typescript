@@ -51,12 +51,12 @@ JWT_EXPIRES_IN="2h"
 
 ## Cookies e CSRF
 
-| Variável         | Obrigatória | Exemplo   | Observação                                                      |
-| ---------------- | ----------- | --------- | --------------------------------------------------------------- |
-| COOKIE_SAMESITE  | não         | lax       | lax, strict ou none. Se none, exige HTTPS (COOKIE_SECURE=true). |
-| COOKIE_SECURE    | não         | false     | true em produção com HTTPS.                                     |
+| Variável         | Obrigatória | Exemplo   | Observação                                                                  |
+| ---------------- | ----------- | --------- | --------------------------------------------------------------------------- |
+| COOKIE_SAMESITE  | não         | lax       | lax, strict ou none. Se none, exige HTTPS (COOKIE_SECURE=true).             |
+| COOKIE_SECURE    | não         | false     | true em produção com HTTPS.                                                 |
 | CSRF_ENABLED     | não         | true      | true para habilitar CSRF nas rotas que usam cookie de auth (default: true). |
-| CSRF_COOKIE_NAME | não         | csrfToken | Nome do cookie de CSRF (default usado pelo middleware).         |
+| CSRF_COOKIE_NAME | não         | csrfToken | Nome do cookie de CSRF (default usado pelo middleware).                     |
 
 Como o CSRF funciona aqui:
 

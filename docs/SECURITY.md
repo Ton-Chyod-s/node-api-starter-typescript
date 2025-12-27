@@ -121,7 +121,6 @@ Objetivo: reduzir brute force e abuso de endpoints de autenticação sem atrapal
 
 Sugestão: ajuste limites/janelas conforme o perfil do seu tráfego e a sua infraestrutura (e monitore com Sentry/GlitchTip, se usar).
 
-
 ## Tratamento de erros
 
 - errorMiddleware centraliza o tratamento.
