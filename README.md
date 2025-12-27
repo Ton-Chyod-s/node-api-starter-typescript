@@ -8,7 +8,12 @@ Este repositório foi pensado como **codebase base** para futuros projetos Web (
 - middlewares de segurança (CORS, CSRF, rate limit, Helmet)
 - estrutura de pastas em camadas
 - documentação com Docsify
-- pipeline de qualidade (ESLint, Prettier, Jest, Husky)
+- pipeline de qualidade (ESLint, Prettier, Jest e validação OpenAPI)
+
+## Requisitos
+
+- Node.js 20.x (obrigatório, conforme `engines` no `package.json`)
+- PostgreSQL (local ou via Docker)
 
 ## Começando rápido
 
@@ -30,10 +35,17 @@ Este repositório foi pensado como **codebase base** para futuros projetos Web (
 
    ```bash
    npx prisma migrate dev
+   npm run db:seed
    npm run dev
    ```
 
-5. Abra a documentação completa com Docsify:
+5. Rode os checks locais (lint + prettier + OpenAPI + testes), se quiser:
+
+   ```bash
+   npm run check
+   ```
+
+6. Abra a documentação completa com Docsify:
 
    ```bash
    npm run docs

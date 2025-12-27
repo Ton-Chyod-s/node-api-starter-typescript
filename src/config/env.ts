@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { z } from 'zod';
 import type { StringValue } from 'ms';
 
+type CorsOrigin = '*' | string | string[];
+
 function parseExpiresIn(value?: string): number | StringValue | undefined {
   if (!value) return undefined;
 
@@ -18,25 +20,27 @@ function parseExpiresIn(value?: string): number | StringValue | undefined {
   return v as StringValue;
 }
 
-function parseCorsOrigin(value?: string): string | string[] | undefined {
-  if (!value) return undefined;
-  const v = value.trim();
+function parseCorsOrigin(raw: unknown): CorsOrigin {
+  const value = String(raw ?? '').trim();
 
-  if (v === '*') return '*';
+  if (value === '*') return '*';
 
-  const parts = v
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  if (value.includes(',')) {
+    const list = value
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
 
-  for (const origin of parts) {
-    if (!/^https?:\/\/.+/i.test(origin)) {
-      throw new Error(`CORS_ORIGIN inválido: "${origin}". Use ex: "http://localhost:3000".`);
-    }
+    return list.length === 1 ? list[0] : list;
   }
 
-  return parts.length <= 1 ? parts[0] : parts;
+  return value;
 }
+
+const corsOriginSchema = z.preprocess(
+  (val) => parseCorsOrigin(val),
+  z.union([z.literal('*'), z.string().min(1), z.array(z.string().min(1)).min(1)]),
+);
 
 function parseTrustProxy(value?: string): boolean | number | undefined {
   if (value === undefined) return undefined;
@@ -92,7 +96,7 @@ const schema = z.object({
 
   JWT_AUDIENCE: z.string().min(1),
 
-  CORS_ORIGIN: z.string().min(1).transform(parseCorsOrigin),
+  CORS_ORIGIN: corsOriginSchema,
 
   SENTRY_DSN: z.string().optional(),
 
@@ -104,14 +108,12 @@ const schema = z.object({
 
   COOKIE_SECURE: z.string().optional().transform(parseBoolean),
 
-  CSRF_ENABLED: z.string().optional().default('false').transform(parseBoolean),
+  CSRF_ENABLED: z.string().optional().default('true').transform(parseBoolean),
 
   CSRF_COOKIE_NAME: z.string().optional().default('csrfToken'),
 
-  // Debug routes (development only)
   DEBUG_ROUTES_ENABLED: z.string().optional().default('false').transform(parseBoolean),
 
-  // Password reset
   FRONTEND_URL: z.string().optional().transform(normalizeOptionalString),
   PASSWORD_RESET_PATH: z.string().optional().default('/reset-password/{token}'),
   PASSWORD_RESET_TOKEN_TTL_MINUTES: z
@@ -126,12 +128,10 @@ const schema = z.object({
     .optional()
     .default(15),
 
-  // Seed (admin)
   SEED_ADMIN_EMAIL: z.string().optional().transform(normalizeOptionalString),
   SEED_ADMIN_PASSWORD: z.string().optional().transform(normalizeOptionalString),
   SEED_ADMIN_NAME: z.string().optional().transform(normalizeOptionalString),
 
-  // SMTP (mailer)
   SMTP_HOST: z.string().optional().transform(normalizeOptionalString),
   SMTP_PORT: z
     .preprocess(preprocessOptional, z.coerce.number().int().min(1).max(65535))

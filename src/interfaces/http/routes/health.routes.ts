@@ -44,11 +44,7 @@ type HealthData = {
 async function checkDatabase(timeoutMs = 300): Promise<DbHealth> {
   const started = Date.now();
 
-  // Import do Prisma é lazy de propósito.
-  // Motivo: o PrismaClient pode ser “caro” para inicializar (engine/adapters)
-  // e isso não deve impactar boot/import de rotas em ambientes de teste.
   try {
-    // Import relativo para funcionar também no build (tsc-alias não reescreve string de import dinâmica).
     const { prisma } = await import('../../../infrastructure/prisma/client');
 
     const result = await Promise.race<DbHealth>([

@@ -1,7 +1,6 @@
 export type ApiResponse<T = unknown> = {
   statusCode: number;
   message: string;
-  /** Optional machine-readable code (recommended for errors). */
   code?: string;
   data?: T;
   elapsedTime?: string;

@@ -51,8 +51,6 @@ export function createApp(): Application {
     if (requestHandler) app.use(requestHandler);
   }
 
-  // Rate limit global (suave) para a API inteira.
-  // Limites mais específicos (ex: /auth) ainda se aplicam nas rotas.
   app.use('/api', globalApiLimiter);
 
   app.use(csrfMiddleware);

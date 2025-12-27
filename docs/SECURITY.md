@@ -107,13 +107,19 @@ Mesmo em mobile, cuidado com:
 
 ## Rate limit
 
-- Implementado com express-rate-limit em `auth.routes.ts`.
-- Aplicado nas rotas de login/registro/token.
-- Janela e limite configurados no código (exemplo: 20 requisições em 15 minutos).
+O projeto aplica rate limit em dois níveis:
 
-Objetivo: reduzir brute force de senha.
+- **Global**: middleware `globalApiLimiter` aplicado em `/api` (veja `src/interfaces/http/middlewares/global-rate-limit.ts`).
+  - Janela padrão: 15 minutos.
+  - Limite padrão: 300 requisições por IP por janela.
+  - `/api/health` é ignorado pelo limiter (útil para healthchecks).
+  - Resposta usa o formato `createResponse` com status 429.
 
-Sugestão para produção: adicionar um rate limit leve global (para qualquer rota) e manter um mais forte em endpoints sensíveis (auth).
+- **Rotas sensíveis de auth**: limiters adicionais em `auth.routes.ts` (por exemplo login, register, token, forgot/reset).
+
+Objetivo: reduzir brute force e abuso de endpoints de autenticação sem atrapalhar healthchecks e tráfego normal.
+
+Sugestão: ajuste limites/janelas conforme o perfil do seu tráfego e a sua infraestrutura (e monitore com Sentry/GlitchTip, se usar).
 
 ## Tratamento de erros
 

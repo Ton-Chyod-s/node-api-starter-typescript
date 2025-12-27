@@ -32,6 +32,14 @@ type Store = {
   tokenSeq: number;
 };
 
+type CsrfBody = {
+  statusCode: number;
+  message: string;
+  data: {
+    csrfToken: string;
+  };
+};
+
 function getStore(): Store {
   const g = globalThis as unknown as { __authFlowStore?: Store };
   if (!g.__authFlowStore) {
@@ -283,7 +291,7 @@ describe('E2E /auth flows (HTTP)', () => {
       });
 
       const csrfRes = await fetch(`${baseUrl}/api/auth/csrf`);
-      const csrfBody = await csrfRes.json();
+      const csrfBody = (await csrfRes.json()) as CsrfBody; // ALTERADO
       expect(csrfRes.status).toBe(200);
       expect(csrfBody).toMatchObject({ statusCode: 200, message: 'CSRF token generated' });
 
@@ -387,7 +395,7 @@ describe('E2E /auth flows (HTTP)', () => {
       });
 
       const csrfRes = await fetch(`${baseUrl}/api/auth/csrf`);
-      const csrfBody = await csrfRes.json();
+      const csrfBody = (await csrfRes.json()) as CsrfBody; // ALTERADO
       const csrfCookie = pickCookie(
         getSetCookies(csrfRes as unknown as FetchLikeResponse),
         'csrfToken',

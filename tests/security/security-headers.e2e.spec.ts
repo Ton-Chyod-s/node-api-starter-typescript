@@ -1,7 +1,5 @@
 import type { Express } from 'express';
 
-// These tests spin up a real server. In some environments (CI/Windows), startup
-// can take more than Jest's default 5s timeout.
 jest.setTimeout(15000);
 
 function startServer(app: Express): Promise<{ baseUrl: string; close: () => Promise<void> }> {

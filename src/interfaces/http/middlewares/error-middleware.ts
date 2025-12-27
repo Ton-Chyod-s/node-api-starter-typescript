@@ -26,13 +26,6 @@ function isJwtError(err: unknown): boolean {
   );
 }
 
-/**
- * Detect AppError without relying on instanceof.
- *
- * Jest tests use jest.resetModules(), which can load the AppError class twice.
- * In that scenario, `instanceof AppError` may fail even if the object has the
- * expected shape.
- */
 function isAppErrorLike(
   err: unknown,
 ): err is { statusCode: number; message: string; code: string; data?: unknown } {
@@ -55,7 +48,6 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
     return next(err);
   }
 
-  // Invalid JSON body (body-parser)
   if (isBodyParserJsonError(err)) {
     const status = httpStatusCodes.BAD_REQUEST;
     const response = createResponse(
@@ -68,7 +60,6 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
     return res.status(status).json(response);
   }
 
-  // Zod validation
   if (err instanceof ZodError) {
     const status = httpStatusCodes.BAD_REQUEST;
     const response = createResponse(
@@ -81,14 +72,12 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
     return res.status(status).json(response);
   }
 
-  // JWT
   if (isJwtError(err)) {
     const status = httpStatusCodes.UNAUTHORIZED;
     const response = createResponse(status, 'Unauthorized', undefined, undefined, 'UNAUTHORIZED');
     return res.status(status).json(response);
   }
 
-  // Prisma
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
       const status = httpStatusCodes.CONFLICT;
@@ -105,15 +94,30 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
 
   const isProd = env.NODE_ENV === 'production';
 
-  // Preferred error type for application-level errors
-  if (err instanceof AppError || isAppErrorLike(err)) {
-    const appErr = err as AppError & { data?: unknown };
-    const status = appErr.statusCode;
-    const response = createResponse(status, appErr.message, appErr.data, undefined, appErr.code);
+  const isErrorWithAppShape = (e: unknown): e is Error & { statusCode: number; code: string } => {
+    if (!(e instanceof Error)) return false;
+    if (!e || typeof e !== 'object') return false;
+
+    const maybe = e as unknown as Record<string, unknown>;
+    const statusCode = maybe.statusCode;
+    const code = maybe.code;
+
+    return (
+      typeof statusCode === 'number' &&
+      Number.isInteger(statusCode) &&
+      typeof code === 'string' &&
+      code.trim().length > 0
+    );
+  };
+
+  if (err instanceof AppError || isAppErrorLike(err) || isErrorWithAppShape(err)) {
+    const appErr = err as AppError & { data?: unknown; code?: string; statusCode?: number };
+    const status = appErr.statusCode ?? httpStatusCodes.INTERNAL_SERVER_ERROR;
+    const code = appErr.code ?? 'UNEXPECTED_ERROR';
+    const response = createResponse(status, appErr.message, appErr.data, undefined, code);
     return res.status(status).json(response);
   }
 
-  // Backward compatible: allow plain Error with statusCode/data/code shape
   const legacy = err as Error & { statusCode?: number; data?: unknown; code?: unknown };
 
   const rawStatus =
