@@ -11,7 +11,7 @@
     "start": "node dist/main/server.js",
     "test": "jest",
     "test:integration": "cross-env RUN_INTEGRATION_TESTS=1 jest",
-    "test:integration:local-db": "cross-env RUN_INTEGRATION_TESTS=1 INTEGRATION_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres jest",
+    "test:integration:local-db": "cross-env RUN_INTEGRATION_TESTS=1 INTEGRATION_DATABASE_URL=postgresql://postgres:123@localhost:5432/postgres jest",
     "test:coverage": "npx jest --coverage",
     "coverage": "powershell -NoProfile -Command \"Start-Process .\\coverage\\lcov-report\\index.html\"",
     "lint": "eslint . --ext .ts --cache --cache-location .cache/eslint --max-warnings=0",
