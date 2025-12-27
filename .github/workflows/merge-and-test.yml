@@ -33,7 +33,7 @@ jobs:
 
     env:
       NODE_ENV: test
-      DATABASE_URL: postgresql:/ cbase:123@localhost:5432 cbase
+      DATABASE_URL: postgresql://cbase:123@localhost:5432/cbase
       KEY_JWT: test-secret
       JWT_ISSUER: test-issuer
       JWT_AUDIENCE: test-audience
