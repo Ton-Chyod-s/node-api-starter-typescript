@@ -6,9 +6,7 @@ const RUN =
   process.env.RUN_INTEGRATION_TESTS === 'true' ||
   process.env.RUN_INTEGRATION_TESTS === 'yes';
 
-const dbUrl =
-  process.env.INTEGRATION_DATABASE_URL ||
-  process.env.DATABASE_URL;
+const dbUrl = process.env.INTEGRATION_DATABASE_URL || process.env.DATABASE_URL;
 
 const HAS_DB_URL = typeof dbUrl === 'string' && dbUrl.trim().length > 0;
 

@@ -2,7 +2,14 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import { z } from 'zod';
-import { normalizeOptionalString, parseBoolean, parseCorsOrigin, parseExpiresIn, parseTrustProxy, preprocessOptional } from '@utils/string';
+import {
+  normalizeOptionalString,
+  parseBoolean,
+  parseCorsOrigin,
+  parseExpiresIn,
+  parseTrustProxy,
+  preprocessOptional,
+} from '@utils/string';
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const envFiles = [
