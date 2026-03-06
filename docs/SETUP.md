@@ -31,8 +31,8 @@ As variáveis abaixo são lidas em `src/config/env.ts` e validadas com Zod.
 | DATABASE_URL | sim         | postgresql://user:pass@localhost:5432/db         | URL do Postgres (usada pelo Prisma)            |
 | KEY_JWT      | sim         | troque-esta-chave-por-um-segredo-forte           | Segredo para assinar tokens JWT                |
 | JWT_ISSUER   | sim         | clean-arch-backend                               | iss esperado nos tokens                        |
-| JWT_AUDIENCE | sim         | clean-arch-clients                               | aud esperado nos tokens                        |
-| CORS_ORIGIN  | sim         | http://localhost:3000 ou https://app.exemplo.com | Origem do front. Pode ser lista separada por , |
+| JWT_AUDIENCE | sim         | clean-arch-backend                               | aud esperado nos tokens                        |
+| CORS_ORIGIN  | sim         | http://localhost:3001 ou https://app.exemplo.com | Origem do front. Pode ser lista separada por , |
 
 ### Expiração do JWT
 
@@ -83,7 +83,7 @@ Recomendação padrão em desenvolvimento:
 
 ```env
 NODE_ENV=development
-CORS_ORIGIN=http://localhost:3000
+CORS_ORIGIN=http://localhost:3001
 COOKIE_SAMESITE=lax
 COOKIE_SECURE=false
 CSRF_ENABLED=true
@@ -205,7 +205,7 @@ Para segredos e ajustes (ex: `KEY_JWT`), você pode criar um arquivo `.env` (usa
 KEY_JWT=troque-esta-chave-por-um-segredo-forte
 JWT_ISSUER=clean-arch-backend
 JWT_AUDIENCE=clean-arch-backend
-CORS_ORIGIN=http://localhost:3000
+CORS_ORIGIN=http://localhost:3001
 ```
 
 ### Rodar apenas banco (se quiser usar Node local)

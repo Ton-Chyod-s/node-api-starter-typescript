@@ -238,7 +238,23 @@ Corpo:
 
 Respostas:
 
-- 200: sucesso, seta cookie `token` httpOnly.
+- 200: seta cookie `token` httpOnly e retorna dados do usuário:
+
+  ```json
+  {
+    "statusCode": 200,
+    "message": "Login successful",
+    "data": {
+      "user": {
+        "id": "...",
+        "name": "...",
+        "email": "...",
+        "role": "USER"
+      }
+    }
+  }
+  ```
+
 - 401: credenciais inválidas.
 - 403: Invalid or missing CSRF token (when `CSRF_ENABLED=true` and the header was not sent correctly).
 
@@ -262,9 +278,15 @@ Respostas:
   ```json
   {
     "statusCode": 200,
-    "message": "Authenticated",
+    "message": "Login successful",
     "data": {
-      "token": "<jwt>"
+      "token": "<jwt>",
+      "user": {
+        "id": "...",
+        "name": "...",
+        "email": "...",
+        "role": "USER"
+      }
     }
   }
   ```

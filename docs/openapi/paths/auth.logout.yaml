@@ -5,9 +5,10 @@ post:
   parameters:
     - $ref: ../components/parameters.yaml#/CsrfHeader
   description: >
-    Requer autenticação via cookie.
+    Requer autenticação via cookie ou Bearer.
     Limpa o cookie `token` (se existir).
-    Observação: quando CSRF_ENABLED=true, o middleware aplica CSRF neste endpoint por ele estar na lista de rotas /auth/logout.
+    Observação: quando CSRF_ENABLED=true, o CSRF só é exigido se o cookie de autenticação `token`
+    estiver presente na requisição. Requests autenticados via Bearer não são afetados.
   security:
     # Cookie: precisa do cookie token (e, quando CSRF_ENABLED=true, do header x-csrf-token)
     - cookieAuth: []

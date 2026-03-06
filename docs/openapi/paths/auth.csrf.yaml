@@ -26,9 +26,4 @@ get:
                 data:
                   csrfToken: '...'
     '204':
-      description: No Content
-      headers:
-        Set-Cookie:
-          schema:
-            type: string
-          description: Cookie de CSRF (quando gerado)
+      description: No Content (CSRF_ENABLED=false)

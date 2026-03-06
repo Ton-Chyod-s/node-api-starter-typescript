@@ -15,7 +15,7 @@ sem precisar ler o SETUP inteiro.
 | KEY_JWT      | sim         | troque-esta-chave-por-um-segredo-forte   | Segredo usado para assinar tokens JWT                 |
 | JWT_ISSUER   | sim         | clean-arch-backend                       | Emissor esperado no token (iss)                       |
 | JWT_AUDIENCE | sim         | clean-arch-backend                       | Público esperado no token (aud)                       |
-| CORS_ORIGIN  | sim         | http://localhost:3000                    | Origem do front (pode ser lista separada por vírgula) |
+| CORS_ORIGIN  | sim         | http://localhost:3001                    | Origem do front (pode ser lista separada por vírgula) |
 
 ---
 
@@ -70,7 +70,7 @@ Exemplo rápido de configuração:
 
 ```env
 NODE_ENV=development
-CORS_ORIGIN=http://localhost:3000
+CORS_ORIGIN=http://localhost:3001
 COOKIE_SAMESITE=lax
 COOKIE_SECURE=false
 CSRF_ENABLED=true
