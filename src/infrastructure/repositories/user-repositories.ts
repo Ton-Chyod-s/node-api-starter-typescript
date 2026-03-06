@@ -6,8 +6,8 @@ import {
 } from '@domain/repositories/user-repository';
 import { User, type UserRole } from '@domain/entities/user';
 
-function normalizeRole(role: unknown): UserRole {
-  return role === 'ADMIN' || role === 'USER' ? (role as UserRole) : 'USER';
+function normalizeRole(role: string): UserRole {
+  return role === 'ADMIN' ? 'ADMIN' : 'USER';
 }
 
 export class PrismaUserRepository implements IUserRepository {
@@ -20,7 +20,7 @@ export class PrismaUserRepository implements IUserRepository {
       name: user.name,
       email: user.email,
       passwordHash: user.passwordHash,
-      role: normalizeRole((user as unknown as { role?: unknown }).role),
+      role: normalizeRole(user.role),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
@@ -35,7 +35,7 @@ export class PrismaUserRepository implements IUserRepository {
       name: user.name,
       email: user.email,
       passwordHash: user.passwordHash,
-      role: normalizeRole((user as unknown as { role?: unknown }).role),
+      role: normalizeRole(user.role),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
@@ -55,7 +55,7 @@ export class PrismaUserRepository implements IUserRepository {
       name: user.name,
       email: user.email,
       passwordHash: user.passwordHash,
-      role: normalizeRole((user as unknown as { role?: unknown }).role),
+      role: normalizeRole(user.role),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });

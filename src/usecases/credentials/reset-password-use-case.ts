@@ -1,13 +1,8 @@
-import crypto from 'crypto';
-
 import { IUserRepository } from '@domain/repositories/user-repository';
 import { IPasswordResetTokenRepository } from '@domain/repositories/password-reset-token-repository';
 import { hashPassword } from '@utils/password-generator';
 import { AppError } from '@utils/app-error';
-
-function sha256Hex(value: string): string {
-  return crypto.createHash('sha256').update(value).digest('hex');
-}
+import { sha256Hex } from '@utils/hash';
 
 type ResetInput = {
   token: string;

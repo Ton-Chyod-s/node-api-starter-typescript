@@ -4,10 +4,7 @@ import { IUserRepository } from '@domain/repositories/user-repository';
 import { IMailerService } from '@domain/services/mailer-service';
 import { IPasswordResetTokenRepository } from '@domain/repositories/password-reset-token-repository';
 import { env } from '@config/env';
-
-function sha256Hex(value: string): string {
-  return crypto.createHash('sha256').update(value).digest('hex');
-}
+import { sha256Hex } from '@utils/hash';
 
 function buildResetLink(rawToken: string): string {
   const frontend = env.FRONTEND_URL ?? 'http://localhost:3001';
