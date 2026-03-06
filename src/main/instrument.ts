@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import * as Sentry from '@sentry/node';
 import { env } from '@config/env';
 

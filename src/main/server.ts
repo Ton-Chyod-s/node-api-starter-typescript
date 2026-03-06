@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import './instrument';
 import { createApp } from './app';
 import { env } from '@config/env';

@@ -1,0 +1,51 @@
+# docker-compose.prod.yml — Ambiente de produção
+#
+# Uso:
+#   docker compose -f docker-compose.prod.yml up --build -d
+#
+# Pré-requisito:
+#   - Crie .env.production a partir de .env.production.example com os valores reais
+#   - A rede "shared-net" deve existir: docker network create shared-net
+#     (use se tiver NGINX ou outro proxy reverso na mesma rede Docker)
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    container_name: clean-arch-api-prod
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+    ports:
+      - '3000:3000'
+    command: >
+      sh -c "npx prisma migrate deploy && node dist/main/server.js"
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'node -e "fetch(''http://127.0.0.1:3000/api/health'').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - shared-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+networks:
+  shared-net:
+    external: true
+    name: shared-net

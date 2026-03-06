@@ -1,9 +1,35 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 import { z } from 'zod';
 import ms from 'ms';
 import type { StringValue } from 'ms';
 
 type CorsOrigin = '*' | string | string[];
+
+const nodeEnv = process.env.NODE_ENV || 'development';
+const envFiles = [
+  `.env.${nodeEnv}`,
+  nodeEnv === 'development' ? '.env.develop' : null,
+  '.env.local',
+  '.env',
+].filter(Boolean) as string[];
+
+let envFileLoaded = false;
+for (const envFile of envFiles) {
+  const envPath = path.resolve(process.cwd(), envFile);
+
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    console.log(`✅ Variáveis carregadas de: ${envFile}`);
+    envFileLoaded = true;
+    break;
+  }
+}
+
+if (!envFileLoaded) {
+  console.warn(`⚠️  Nenhum arquivo .env encontrado. Tentei: ${envFiles.join(', ')}`);
+}
 
 function parseExpiresIn(value?: string): number | StringValue | undefined {
   if (!value) return undefined;
@@ -79,10 +105,31 @@ function parseBoolean(value?: string): boolean | undefined {
   throw new Error(`Boolean inválido: "${value}". Use true/false (ou 1/0).`);
 }
 
+function parseBooleanOr(value: string | undefined, def: boolean): boolean {
+  const parsed = parseBoolean(value);
+  return parsed === undefined ? def : parsed;
+}
+
 function normalizeOptionalString(value?: string): string | undefined {
   if (value === undefined) return undefined;
   const v = value.trim();
   return v ? v : undefined;
+}
+
+function normalizePem(value?: string): string | undefined {
+  const v = normalizeOptionalString(value);
+  if (!v) return undefined;
+  return v.replace(/\\n/g, '\n').trim();
+}
+
+function parseStringList(value?: string): string[] {
+  const v = String(value ?? '').trim();
+  if (!v) return [];
+
+  return v
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean);
 }
 
 function preprocessOptional(value: unknown) {

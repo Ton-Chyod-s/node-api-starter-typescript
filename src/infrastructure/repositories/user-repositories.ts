@@ -1,5 +1,9 @@
 import { prisma } from '../prisma/client';
-import { IUserRepository, CreateUserData } from '@domain/repositories/user-repository';
+import {
+  IUserRepository,
+  CreateUserData,
+  UserListItemRepository,
+} from '@domain/repositories/user-repository';
 import { User, type UserRole } from '@domain/entities/user';
 
 function normalizeRole(role: unknown): UserRole {
@@ -62,5 +66,18 @@ export class PrismaUserRepository implements IUserRepository {
       where: { id: userId },
       data: { passwordHash },
     });
+  }
+
+  async findAll(): Promise<UserListItemRepository[]> {
+    const users = await prisma.user.findMany({
+      select: { id: true, name: true, email: true, role: true },
+    });
+
+    return users.map((user: (typeof users)[number]) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: normalizeRole(user.role),
+    }));
   }
 }

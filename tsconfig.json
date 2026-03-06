@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
@@ -18,11 +18,18 @@
       "@usecases/*": ["src/usecases/*"],
       "@domain/*": ["src/domain/*"],
       "@utils/*": ["src/utils/*"],
-      "@main/*": ["src/main/*"]
+      "@main/*": ["src/main/*"],
+      "@certs/*": ["src/certs/*"]
     },
 
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "prisma.config.ts", "prisma/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "scripts/**/*.ts",
+    "prisma.config.ts",
+    "prisma/**/*.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

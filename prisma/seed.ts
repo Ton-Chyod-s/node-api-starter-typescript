@@ -1,26 +1,20 @@
-import 'dotenv/config';
 import argon2 from 'argon2';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-
-function requiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing env var: ${name}`);
-  return value;
-}
+import { seedEnv } from '../src/config/seed-env';
 
 const adapter = new PrismaPg({
-  connectionString: requiredEnv('DATABASE_URL'),
+  connectionString: seedEnv.DATABASE_URL,
 });
 
 const prisma = new PrismaClient({ adapter });
 
 async function ensureAdminUser() {
-  const isProd = process.env.NODE_ENV === 'production';
+  const isProd = seedEnv.NODE_ENV === 'production';
 
-  const email = process.env.SEED_ADMIN_EMAIL ?? (isProd ? undefined : 'admin@local.test');
-  const password = process.env.SEED_ADMIN_PASSWORD ?? (isProd ? undefined : 'ChangeMe!123');
-  const name = process.env.SEED_ADMIN_NAME ?? 'Admin';
+  const email = seedEnv.SEED_ADMIN_EMAIL ?? (isProd ? undefined : 'admin@local.test');
+  const password = seedEnv.SEED_ADMIN_PASSWORD ?? (isProd ? undefined : 'ChangeMe!123');
+  const name = seedEnv.SEED_ADMIN_NAME ?? 'Admin';
 
   if (!email || !password) {
     if (isProd) {
@@ -53,8 +47,6 @@ async function ensureAdminUser() {
     where: { email },
     data: { name, role: 'ADMIN' },
   });
-
-  console.log(`[seed] Admin já existia (nome atualizado): ${email}`);
 }
 
 async function main() {

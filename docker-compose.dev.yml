@@ -1,0 +1,65 @@
+# docker-compose.dev.yml — Ambiente de desenvolvimento local
+#
+# Uso:
+#   docker compose -f docker-compose.dev.yml up --build
+#
+# Pré-requisito: crie .env.development a partir de .env.development.example
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: clean-arch-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: clean-arch-api-dev
+    env_file:
+      - .env.development
+    environment:
+      NODE_ENV: development
+      # Dentro do compose, o host do Postgres é "db"
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-postgres}
+      # Windows/WSL: ative polling se o hot-reload não funcionar
+      CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./:/app
+      - node_modules:/app/node_modules
+    command: >
+      sh -c "npx prisma migrate deploy && npm run db:seed && npm run dev"
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'node -e "fetch(''http://127.0.0.1:3000/api/health'').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  node_modules:
