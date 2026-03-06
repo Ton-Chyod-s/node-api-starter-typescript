@@ -6,6 +6,7 @@ export interface UserProps {
   email: string;
   passwordHash: string;
   role: UserRole;
+  tokenVersion?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -35,6 +36,7 @@ export class User {
       email,
       passwordHash: props.passwordHash,
       role: props.role,
+      tokenVersion: props.tokenVersion ?? 0,
       createdAt: props.createdAt ?? now,
       updatedAt: props.updatedAt ?? now,
     } satisfies Required<UserProps>;
@@ -60,6 +62,10 @@ export class User {
 
   get role() {
     return this.props.role;
+  }
+
+  get tokenVersion() {
+    return this.props.tokenVersion;
   }
 
   get createdAt() {

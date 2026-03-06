@@ -35,7 +35,7 @@ export function makeAuthMiddleware(tokenService: ITokenService) {
 
       try {
         const payload = tokenService.verify(token);
-        req.user = { id: payload.sub, role: payload.role };
+        req.user = { id: payload.sub, role: payload.role, tokenVersion: payload.tokenVersion };
         return next();
       } catch {
         return unauthorized();

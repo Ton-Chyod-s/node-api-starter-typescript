@@ -136,38 +136,22 @@ router.post('/auth/reset-password', passwordResetLimiter, async (req, res, next)
   return controller.handle(req, res, next);
 });
 
+let _meController:
+  | import('@interfaces/http/controllers/user/me-controller').MeController
+  | null = null;
+async function getMeController() {
+  if (_meController) return _meController;
+
+  const { makeMeController } =
+    await import('@interfaces/http/factories/controllers/user/me-controller.factory');
+
+  _meController = makeMeController();
+  return _meController;
+}
+
 router.get('/auth/me', authMiddleware, async (req, res, next) => {
-  if (!req.user) {
-    return res
-      .status(401)
-      .json(createResponse(401, 'Unauthorized', undefined, undefined, 'UNAUTHORIZED'));
-  }
-
-  // Busca dados completos do usuário (inclui role).
-  const { PrismaUserRepository } = await import('@infrastructure/repositories/user-repositories');
-  const userRepo = new PrismaUserRepository();
-
-  try {
-    const user = await userRepo.findById(req.user.id);
-    if (!user) {
-      return res
-        .status(401)
-        .json(createResponse(401, 'Unauthorized', undefined, undefined, 'UNAUTHORIZED'));
-    }
-
-    return res.status(200).json(
-      createResponse(200, 'Authenticated', {
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
-      }),
-    );
-  } catch (err) {
-    return next(err);
-  }
+  const controller = await getMeController();
+  return controller.handle(req, res, next);
 });
 
 router.get('/auth/csrf', (req, res) => {

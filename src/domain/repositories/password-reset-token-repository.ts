@@ -14,9 +14,10 @@ export type PasswordResetTokenRecord = {
 };
 
 export interface IPasswordResetTokenRepository {
-  deleteAllForUser(userId: string): Promise<void>;
-
-  create(input: CreatePasswordResetTokenInput): Promise<PasswordResetTokenRecord>;
+  replaceTokenForUser(
+    userId: string,
+    input: Omit<CreatePasswordResetTokenInput, 'userId'>,
+  ): Promise<PasswordResetTokenRecord>;
 
   findValidByTokenHash(tokenHash: string, now?: Date): Promise<PasswordResetTokenRecord | null>;
 

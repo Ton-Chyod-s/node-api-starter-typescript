@@ -3,6 +3,7 @@ import type { UserRole } from '@domain/entities/user';
 export type TokenPayload = {
   sub: string;
   role: UserRole;
+  tokenVersion: number;
 };
 
 export interface ITokenService {

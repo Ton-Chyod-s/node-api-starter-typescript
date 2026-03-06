@@ -6,18 +6,20 @@ import type {
 } from '@domain/repositories/password-reset-token-repository';
 
 export class PrismaPasswordResetTokenRepository implements IPasswordResetTokenRepository {
-  async deleteAllForUser(userId: string): Promise<void> {
-    await prisma.passwordResetToken.deleteMany({ where: { userId } });
-  }
-
-  async create(input: CreatePasswordResetTokenInput): Promise<PasswordResetTokenRecord> {
-    const token = await prisma.passwordResetToken.create({
-      data: {
-        userId: input.userId,
-        tokenHash: input.tokenHash,
-        expiresAt: input.expiresAt,
-      },
-    });
+  async replaceTokenForUser(
+    userId: string,
+    input: Omit<CreatePasswordResetTokenInput, 'userId'>,
+  ): Promise<PasswordResetTokenRecord> {
+    const [, token] = await prisma.$transaction([
+      prisma.passwordResetToken.deleteMany({ where: { userId } }),
+      prisma.passwordResetToken.create({
+        data: {
+          userId,
+          tokenHash: input.tokenHash,
+          expiresAt: input.expiresAt,
+        },
+      }),
+    ]);
 
     return {
       id: token.id,

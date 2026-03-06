@@ -40,6 +40,7 @@ export class ResetPasswordUseCase {
 
     const passwordHash = await hashPassword(newPassword);
     await this.userRepo.updatePasswordHash(user.id, passwordHash);
+    await this.userRepo.incrementTokenVersion(user.id);
     await this.resetTokenRepo.markUsed(tokenRecord.id);
   }
 }

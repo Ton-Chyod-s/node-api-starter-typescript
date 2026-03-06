@@ -42,8 +42,7 @@ export class ForgotPasswordUseCase {
     const ttl = ttlMinutes();
     const expiresAt = new Date(Date.now() + ttl * 60 * 1000);
 
-    await this.resetTokenRepo.deleteAllForUser(user.id);
-    await this.resetTokenRepo.create({ userId: user.id, tokenHash, expiresAt });
+    await this.resetTokenRepo.replaceTokenForUser(user.id, { tokenHash, expiresAt });
 
     const resetLink = buildResetLink(rawToken);
 

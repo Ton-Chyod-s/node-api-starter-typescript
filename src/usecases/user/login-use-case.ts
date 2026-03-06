@@ -22,7 +22,7 @@ export class LoginUseCase {
       throw AppError.unauthorized('Invalid credentials', 'AUTH_INVALID_CREDENTIALS');
     }
 
-    const token = this.tokenService.sign({ sub: user.id, role: user.role });
+    const token = this.tokenService.sign({ sub: user.id, role: user.role, tokenVersion: user.tokenVersion });
 
     return {
       token,

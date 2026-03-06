@@ -21,6 +21,7 @@ export class PrismaUserRepository implements IUserRepository {
       email: user.email,
       passwordHash: user.passwordHash,
       role: normalizeRole(user.role),
+      tokenVersion: user.tokenVersion,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
@@ -36,6 +37,7 @@ export class PrismaUserRepository implements IUserRepository {
       email: user.email,
       passwordHash: user.passwordHash,
       role: normalizeRole(user.role),
+      tokenVersion: user.tokenVersion,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
@@ -56,6 +58,7 @@ export class PrismaUserRepository implements IUserRepository {
       email: user.email,
       passwordHash: user.passwordHash,
       role: normalizeRole(user.role),
+      tokenVersion: user.tokenVersion,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
@@ -65,6 +68,13 @@ export class PrismaUserRepository implements IUserRepository {
     await prisma.user.update({
       where: { id: userId },
       data: { passwordHash },
+    });
+  }
+
+  async incrementTokenVersion(userId: string): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { tokenVersion: { increment: 1 } },
     });
   }
 

@@ -16,7 +16,7 @@ export class JwtTokenService implements ITokenService {
   constructor(private readonly config: JwtConfig) {}
 
   sign(payload: TokenPayload): string {
-    return jwt.sign({ role: payload.role }, this.config.secret, {
+    return jwt.sign({ role: payload.role, tokenVersion: payload.tokenVersion }, this.config.secret, {
       subject: payload.sub,
       expiresIn: this.config.expiresIn,
       algorithm: this.config.algorithm ?? DEFAULT_ALG,
@@ -51,6 +51,11 @@ export class JwtTokenService implements ITokenService {
       throw new jwt.JsonWebTokenError('Token com role inválida');
     }
 
-    return { sub, role: roleRaw as TokenPayload['role'] };
+    const tokenVersionRaw = (payload as unknown as { tokenVersion?: unknown }).tokenVersion;
+    if (typeof tokenVersionRaw !== 'number' || !Number.isInteger(tokenVersionRaw)) {
+      throw new jwt.JsonWebTokenError('Token com tokenVersion inválido');
+    }
+
+    return { sub, role: roleRaw as TokenPayload['role'], tokenVersion: tokenVersionRaw };
   }
 }
