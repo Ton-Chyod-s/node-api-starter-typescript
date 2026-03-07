@@ -26,21 +26,12 @@ export class ResetPasswordUseCase {
     }
 
     const tokenHash = sha256Hex(rawToken);
-    const tokenRecord = await this.resetTokenRepo.findValidByTokenHash(tokenHash);
-
-    if (!tokenRecord) {
-      throw AppError.badRequest('Invalid or expired token', 'PASSWORD_RESET_INVALID_TOKEN');
-    }
-
-    const user = await this.userRepo.findById(tokenRecord.userId);
-    if (!user) {
-      await this.resetTokenRepo.markUsed(tokenRecord.id);
-      throw AppError.badRequest('Invalid or expired token', 'PASSWORD_RESET_INVALID_TOKEN');
-    }
-
     const passwordHash = await hashPassword(newPassword);
-    await this.userRepo.updatePasswordHash(user.id, passwordHash);
-    await this.userRepo.incrementTokenVersion(user.id);
-    await this.resetTokenRepo.markUsed(tokenRecord.id);
+
+    const userId = await this.resetTokenRepo.consumeByTokenHash(tokenHash, passwordHash);
+
+    if (!userId) {
+      throw AppError.badRequest('Invalid or expired token', 'PASSWORD_RESET_INVALID_TOKEN');
+    }
   }
 }

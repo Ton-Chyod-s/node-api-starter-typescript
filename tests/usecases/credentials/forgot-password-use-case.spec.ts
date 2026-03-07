@@ -23,13 +23,15 @@ describe('ForgotPasswordUseCase', () => {
       findById: jest.fn(),
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
+      findAll: jest.fn(),
+      incrementTokenVersion: jest.fn(),
     };
 
     const resetTokenRepo: jest.Mocked<IPasswordResetTokenRepository> = {
-      deleteAllForUser: jest.fn(),
-      create: jest.fn(),
+      replaceTokenForUser: jest.fn(),
       findValidByTokenHash: jest.fn(),
       markUsed: jest.fn(),
+      consumeByTokenHash: jest.fn(),
     };
 
     const mailer: jest.Mocked<IMailerService> = {
@@ -39,8 +41,7 @@ describe('ForgotPasswordUseCase', () => {
     const useCase = new ForgotPasswordUseCase(userRepo, resetTokenRepo, mailer);
     await useCase.execute('no@exemplo.com');
 
-    expect(resetTokenRepo.deleteAllForUser).not.toHaveBeenCalled();
-    expect(resetTokenRepo.create).not.toHaveBeenCalled();
+    expect(resetTokenRepo.replaceTokenForUser).not.toHaveBeenCalled();
     expect(mailer.sendMail).not.toHaveBeenCalled();
   });
 
@@ -60,14 +61,15 @@ describe('ForgotPasswordUseCase', () => {
       findById: jest.fn(),
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
+      findAll: jest.fn(),
+      incrementTokenVersion: jest.fn(),
     };
 
     const resetTokenRepo: jest.Mocked<IPasswordResetTokenRepository> = {
-      deleteAllForUser: jest.fn().mockResolvedValue(undefined),
-      create: jest.fn().mockImplementation(async (input) => {
+      replaceTokenForUser: jest.fn().mockImplementation(async (userId, input) => {
         return {
           id: 't1',
-          userId: input.userId,
+          userId,
           tokenHash: input.tokenHash,
           expiresAt: input.expiresAt,
           createdAt: new Date(),
@@ -76,6 +78,7 @@ describe('ForgotPasswordUseCase', () => {
       }),
       findValidByTokenHash: jest.fn(),
       markUsed: jest.fn(),
+      consumeByTokenHash: jest.fn(),
     };
 
     const mailer: jest.Mocked<IMailerService> = {
@@ -96,9 +99,9 @@ describe('ForgotPasswordUseCase', () => {
     const useCase = new ForgotPasswordUseCase(userRepo, resetTokenRepo, mailer);
     await useCase.execute('USER@EXAMPLE.COM');
 
-    expect(resetTokenRepo.deleteAllForUser).toHaveBeenCalledWith('u1');
-    expect(resetTokenRepo.create).toHaveBeenCalledWith(
-      expect.objectContaining({ userId: 'u1', tokenHash: expectedHash }),
+    expect(resetTokenRepo.replaceTokenForUser).toHaveBeenCalledWith(
+      'u1',
+      expect.objectContaining({ tokenHash: expectedHash }),
     );
 
     expect(mailer.sendMail).toHaveBeenCalledWith(

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type RequestHandler } from 'express';
 import rateLimit from 'express-rate-limit';
 
 import { makeAuth } from '@interfaces/http/factories/controllers/user/make-auth-middleware';
@@ -10,6 +10,16 @@ import { ensureCsrfTokenCookie } from '@interfaces/http/middlewares/csrf-middlew
 
 const router = Router();
 const authMiddleware = makeAuth();
+
+
+const asyncRoute = (
+  handler: (req: Parameters<RequestHandler>[0], res: Parameters<RequestHandler>[1], next: Parameters<RequestHandler>[2]) => Promise<unknown>,
+): RequestHandler => {
+  return (req, res, next) => {
+    void handler(req, res, next).catch(next);
+  };
+};
+
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -106,35 +116,35 @@ async function getResetPasswordController() {
   return _resetPasswordController;
 }
 
-router.post('/auth/register', authLimiter, async (req, res, next) => {
+router.post('/auth/register', authLimiter, asyncRoute(async (req, res, next) => {
   const controller = await getRegisterController();
   return controller.handle(req, res, next);
-});
+}));
 
-router.post('/auth/login', authLimiter, async (req, res, next) => {
+router.post('/auth/login', authLimiter, asyncRoute(async (req, res, next) => {
   const controller = await getLoginController();
   return controller.handle(req, res, next);
-});
+}));
 
 // (app/CLI)
-router.post('/auth/token', authLimiter, async (req, res, next) => {
+router.post('/auth/token', authLimiter, asyncRoute(async (req, res, next) => {
   const controller = await getLoginTokenController();
   return controller.handle(req, res, next);
-});
+}));
 
 router.post('/auth/logout', authMiddleware, (req, res, next) =>
   logoutController.handle(req, res, next),
 );
 
-router.post('/auth/forgot-password', passwordResetLimiter, async (req, res, next) => {
+router.post('/auth/forgot-password', passwordResetLimiter, asyncRoute(async (req, res, next) => {
   const controller = await getForgotPasswordController();
   return controller.handle(req, res, next);
-});
+}));
 
-router.post('/auth/reset-password', passwordResetLimiter, async (req, res, next) => {
+router.post('/auth/reset-password', passwordResetLimiter, asyncRoute(async (req, res, next) => {
   const controller = await getResetPasswordController();
   return controller.handle(req, res, next);
-});
+}));
 
 let _meController:
   | import('@interfaces/http/controllers/user/me-controller').MeController
@@ -149,10 +159,10 @@ async function getMeController() {
   return _meController;
 }
 
-router.get('/auth/me', authMiddleware, async (req, res, next) => {
+router.get('/auth/me', authMiddleware, asyncRoute(async (req, res, next) => {
   const controller = await getMeController();
   return controller.handle(req, res, next);
-});
+}));
 
 router.get('/auth/csrf', (req, res) => {
   if (!env.CSRF_ENABLED) return res.sendStatus(204);

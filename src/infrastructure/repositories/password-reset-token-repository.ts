@@ -61,4 +61,49 @@ export class PrismaPasswordResetTokenRepository implements IPasswordResetTokenRe
       data: { usedAt },
     });
   }
+
+  async consumeByTokenHash(
+    tokenHash: string,
+    passwordHash: string,
+    now: Date = new Date(),
+  ): Promise<string | null> {
+    return prisma.$transaction(async (tx) => {
+      const token = await tx.passwordResetToken.findFirst({
+        where: {
+          tokenHash,
+          usedAt: null,
+          expiresAt: { gt: now },
+        },
+        select: { id: true, userId: true },
+      });
+
+      if (!token) return null;
+
+      const updateToken = await tx.passwordResetToken.updateMany({
+        where: {
+          id: token.id,
+          usedAt: null,
+          expiresAt: { gt: now },
+        },
+        data: { usedAt: now },
+      });
+
+      if (updateToken.count !== 1) return null;
+
+      const updateUser = await tx.user.updateMany({
+        where: { id: token.userId },
+        data: {
+          passwordHash,
+          tokenVersion: { increment: 1 },
+        },
+      });
+
+      if (updateUser.count !== 1) {
+        throw new Error('Password reset failed because the user no longer exists');
+      }
+
+      return token.userId;
+    });
+  }
+
 }

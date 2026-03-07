@@ -16,13 +16,15 @@ describe('ResetPasswordUseCase', () => {
       findById: jest.fn(),
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
+      findAll: jest.fn(),
+      incrementTokenVersion: jest.fn(),
     };
 
     const resetTokenRepo: jest.Mocked<IPasswordResetTokenRepository> = {
-      deleteAllForUser: jest.fn(),
-      create: jest.fn(),
-      findValidByTokenHash: jest.fn().mockResolvedValue(null),
+      replaceTokenForUser: jest.fn(),
+      findValidByTokenHash: jest.fn(),
       markUsed: jest.fn(),
+      consumeByTokenHash: jest.fn().mockResolvedValue(null),
     };
 
     const useCase = new ResetPasswordUseCase(userRepo, resetTokenRepo);
@@ -55,27 +57,25 @@ describe('ResetPasswordUseCase', () => {
       findById: jest.fn().mockResolvedValue(user),
       create: jest.fn(),
       updatePasswordHash: jest.fn().mockResolvedValue(undefined),
+      findAll: jest.fn(),
+      incrementTokenVersion: jest.fn(),
     };
 
     const resetTokenRepo: jest.Mocked<IPasswordResetTokenRepository> = {
-      deleteAllForUser: jest.fn(),
-      create: jest.fn(),
-      findValidByTokenHash: jest.fn().mockResolvedValue({
-        id: 't1',
-        userId: 'u1',
-        tokenHash,
-        expiresAt: new Date(Date.now() + 10_000),
-        createdAt: new Date(),
-        usedAt: null,
-      }),
-      markUsed: jest.fn().mockResolvedValue(undefined),
+      replaceTokenForUser: jest.fn(),
+      findValidByTokenHash: jest.fn(),
+      markUsed: jest.fn(),
+      consumeByTokenHash: jest.fn().mockResolvedValue('u1'),
     };
 
     const useCase = new ResetPasswordUseCase(userRepo, resetTokenRepo);
     await useCase.execute({ token: rawToken, newPassword: 'NovaSenhaForte123' });
 
-    expect(resetTokenRepo.findValidByTokenHash).toHaveBeenCalledWith(tokenHash);
-    expect(userRepo.updatePasswordHash).toHaveBeenCalledWith('u1', expect.any(String));
-    expect(resetTokenRepo.markUsed).toHaveBeenCalledWith('t1');
+    expect(resetTokenRepo.consumeByTokenHash).toHaveBeenCalledWith(
+      tokenHash,
+      expect.any(String),
+    );
+    expect(userRepo.updatePasswordHash).not.toHaveBeenCalled();
+    expect(resetTokenRepo.markUsed).not.toHaveBeenCalled();
   });
 });

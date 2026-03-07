@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import os from 'os';
 import { env } from '@config/env';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
@@ -24,17 +23,7 @@ type HealthData = {
   };
   runtime: {
     node: string;
-    pid: number;
     platform: NodeJS.Platform;
-    arch: string;
-  };
-  system: {
-    hostname: string;
-    memory: {
-      rssBytes: number;
-      heapUsedBytes: number;
-      heapTotalBytes: number;
-    };
   };
   checks: {
     database: DbHealth;
@@ -82,17 +71,7 @@ router.get('/health', async (_req, res) => {
     },
     runtime: {
       node: process.version,
-      pid: process.pid,
       platform: process.platform,
-      arch: process.arch,
-    },
-    system: {
-      hostname: os.hostname(),
-      memory: {
-        rssBytes: process.memoryUsage().rss,
-        heapUsedBytes: process.memoryUsage().heapUsed,
-        heapTotalBytes: process.memoryUsage().heapTotal,
-      },
     },
     checks: {
       database: db,

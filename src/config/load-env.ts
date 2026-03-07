@@ -7,7 +7,6 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 const envFiles = [
   `.env.${nodeEnv}`,
   nodeEnv === 'development' ? '.env.develop' : null,
-  '.env.production',
   '.env',
 ].filter(Boolean) as string[];
 
@@ -18,7 +17,9 @@ for (const envFile of envFiles) {
 
   if (fs.existsSync(envPath)) {
     dotenv.config({ path: envPath });
-    console.log(`Variáveis carregadas de: ${envFile}`);
+    if (nodeEnv === 'development') {
+      console.log(`Variáveis carregadas de: ${envFile}`);
+    }
     envFileLoaded = true;
     break;
   }
