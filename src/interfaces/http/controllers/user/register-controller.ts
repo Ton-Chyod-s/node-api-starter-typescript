@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { CreateUserUseCase } from '@usecases/user/create-use-case';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
+import { passwordSchema } from '@domain/dtos/shared/password-schema';
 
 const registerSchema = z.object({
   name: z
@@ -14,7 +15,7 @@ const registerSchema = z.object({
     .string()
     .email()
     .transform((v) => v.trim().toLowerCase()),
-  password: z.string().min(8).max(72),
+  password: passwordSchema,
 });
 
 export class RegisterController {

@@ -8,7 +8,10 @@ export type UserListItemRepository = {
   role: UserRole;
 };
 
-export type CreateUserData = Omit<RegisterRequestDTO, 'password'> & { passwordHash: string };
+export type CreateUserData = Omit<RegisterRequestDTO, 'password'> & {
+  passwordHash: string;
+  role?: UserRole;
+};
 
 export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
