@@ -74,7 +74,7 @@ export class NodemailerService implements IMailerService {
     }
 
     const toLower = to.toLowerCase();
-    if (!acceptedList.some((a) => a.toLowerCase().includes(toLower))) {
+    if (!acceptedList.some((a) => a.trim().toLowerCase() === toLower)) {
       throw new Error(`[mailer] SMTP não confirmou aceitação para o destinatário: ${to}`);
     }
   }

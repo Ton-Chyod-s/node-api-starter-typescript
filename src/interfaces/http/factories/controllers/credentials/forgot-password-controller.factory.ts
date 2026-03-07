@@ -10,7 +10,7 @@ import { env } from '@config/env';
 export function makeForgotPasswordController() {
   const userRepo = new PrismaUserRepository();
   const resetTokenRepo = new PrismaPasswordResetTokenRepository();
-  const hasSmtp = Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASSWORD);
+  const hasSmtp = Boolean(env.SMTP_HOST);
   const mailer = hasSmtp ? new NodemailerService() : new ConsoleMailerService();
 
   const useCase = new ForgotPasswordUseCase(userRepo, resetTokenRepo, mailer);

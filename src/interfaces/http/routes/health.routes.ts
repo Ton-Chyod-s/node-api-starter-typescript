@@ -36,15 +36,19 @@ async function checkDatabase(timeoutMs = 300): Promise<DbHealth> {
   try {
     const { prisma } = await import('../../../infrastructure/prisma/client');
 
-    const result = await Promise.race<DbHealth>([
-      prisma.$queryRaw`SELECT 1`.then(() => ({ status: 'up', latencyMs: Date.now() - started })),
-      new Promise<DbHealth>((resolve) =>
-        setTimeout(() => resolve({ status: 'timeout' }), timeoutMs),
-      ),
-    ]);
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRawUnsafe(`SET LOCAL statement_timeout = ${Math.max(1, Math.trunc(timeoutMs))}`);
+      await tx.$queryRaw`SELECT 1`;
+    });
 
-    return result;
-  } catch {
+    return { status: 'up', latencyMs: Date.now() - started };
+  } catch (error) {
+    const message = error instanceof Error ? error.message.toLowerCase() : '';
+
+    if (message.includes('statement timeout') || message.includes('timeout')) {
+      return { status: 'timeout' };
+    }
+
     return { status: 'down' };
   }
 }
