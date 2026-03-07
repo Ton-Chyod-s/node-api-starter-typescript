@@ -9,6 +9,8 @@ import cookieParser from 'cookie-parser';
 import * as jwt from 'jsonwebtoken';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
 
+jest.mock('@infrastructure/prisma/client', () => ({ prisma: {} }));
+
 jest.mock('@infrastructure/repositories/user-repositories', () => {
   return {
     PrismaUserRepository: jest.fn().mockImplementation(() => {
@@ -18,6 +20,7 @@ jest.mock('@infrastructure/repositories/user-repositories', () => {
           name: 'Klay',
           email: 'k@k.com',
           role: 'USER',
+          tokenVersion: 0,
         }),
       };
     }),
@@ -150,7 +153,7 @@ describe('routes /auth', () => {
     const issuer = process.env.JWT_ISSUER ?? 'test-issuer';
     const audience = process.env.JWT_AUDIENCE ?? 'test-audience';
 
-    const token = jwt.sign({ role: 'USER' }, secret, {
+    const token = jwt.sign({ role: 'USER', tokenVersion: 0 }, secret, {
       subject: 'user-123',
       expiresIn: '1h',
       algorithm: 'HS256',

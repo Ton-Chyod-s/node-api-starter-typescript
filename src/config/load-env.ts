@@ -16,7 +16,7 @@ for (const envFile of envFiles) {
   const envPath = path.resolve(process.cwd(), envFile);
 
   if (fs.existsSync(envPath)) {
-    dotenv.config({ path: envPath });
+    dotenv.config({ path: envPath, quiet: true });
     if (nodeEnv === 'development') {
       console.log(`Variáveis carregadas de: ${envFile}`);
     }

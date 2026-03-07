@@ -9,8 +9,16 @@ module.exports = {
   roots: ['<rootDir>/tests'],
   moduleFileExtensions: ['ts', 'js', 'json'],
 
-  modulePaths: [compilerOptions.baseUrl],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths || {}, {
-    prefix: '<rootDir>/',
-  }),
+  setupFiles: ['<rootDir>/tests/setup/test-env.js'],
+
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', { diagnostics: false }],
+  },
+
+  moduleNameMapper: {
+    '^@prisma/client$': '<rootDir>/tests/setup/prisma-client-mock.ts',
+    ...pathsToModuleNameMapper(compilerOptions.paths || {}, {
+      prefix: '<rootDir>/',
+    }),
+  },
 };

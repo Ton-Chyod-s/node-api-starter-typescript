@@ -99,6 +99,25 @@ jest.mock('@infrastructure/repositories/user-repositories', () => {
         mutable.props.passwordHash = passwordHash;
       }
     }
+
+    async findAll() {
+      const store = getStore();
+      return Array.from(store.usersById.values()).map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+      }));
+    }
+
+    async incrementTokenVersion(userId: string) {
+      const store = getStore();
+      const user = store.usersById.get(userId);
+      if (user) {
+        const mutable = user as unknown as { props: { tokenVersion: number } };
+        mutable.props.tokenVersion = (mutable.props.tokenVersion ?? 0) + 1;
+      }
+    }
   }
 
   return { PrismaUserRepository };
@@ -106,26 +125,22 @@ jest.mock('@infrastructure/repositories/user-repositories', () => {
 
 jest.mock('@infrastructure/repositories/password-reset-token-repository', () => {
   class PrismaPasswordResetTokenRepository {
-    async deleteAllForUser(userId: string) {
+    async replaceTokenForUser(
+      userId: string,
+      input: { tokenHash: string; expiresAt: Date },
+    ): Promise<ResetTokenRecord> {
       const store = getStore();
 
       for (const [id, token] of store.resetTokens.entries()) {
         if (token.userId === userId) store.resetTokens.delete(id);
       }
-    }
 
-    async create(input: {
-      userId: string;
-      tokenHash: string;
-      expiresAt: Date;
-    }): Promise<ResetTokenRecord> {
-      const store = getStore();
       store.tokenSeq += 1;
       const id = `rt-${store.tokenSeq}`;
 
       const record: ResetTokenRecord = {
         id,
-        userId: input.userId,
+        userId,
         tokenHash: input.tokenHash,
         expiresAt: input.expiresAt,
         createdAt: new Date(),
@@ -155,6 +170,41 @@ jest.mock('@infrastructure/repositories/password-reset-token-repository', () => 
       const store = getStore();
       const token = store.resetTokens.get(id);
       if (token) token.usedAt = usedAt;
+    }
+
+    async consumeByTokenHash(
+      tokenHash: string,
+      passwordHash: string,
+      now: Date = new Date(),
+    ): Promise<string | null> {
+      const store = getStore();
+      const { User } = jest.requireActual(
+        '@domain/entities/user',
+      ) as typeof import('@domain/entities/user');
+
+      for (const token of store.resetTokens.values()) {
+        if (token.tokenHash === tokenHash && !token.usedAt && token.expiresAt > now) {
+          token.usedAt = now;
+
+          const existingUser = store.usersById.get(token.userId);
+          if (existingUser) {
+            const updatedUser = new User({
+              id: existingUser.id,
+              name: existingUser.name,
+              email: existingUser.email,
+              passwordHash,
+              role: existingUser.role,
+              tokenVersion: (existingUser.tokenVersion ?? 0) + 1,
+            });
+            store.usersById.set(token.userId, updatedUser);
+            store.usersByEmail.set(existingUser.email, updatedUser);
+          }
+
+          return token.userId;
+        }
+      }
+
+      return null;
     }
   }
 

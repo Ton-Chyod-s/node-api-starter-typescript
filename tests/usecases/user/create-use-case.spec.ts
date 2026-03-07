@@ -16,6 +16,8 @@ function makeRepoMock(): RepoMock {
     findById: jest.fn(),
     create: jest.fn(),
     updatePasswordHash: jest.fn(),
+    findAll: jest.fn(),
+    incrementTokenVersion: jest.fn(),
   };
 }
 

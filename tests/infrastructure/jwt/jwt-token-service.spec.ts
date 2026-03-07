@@ -20,6 +20,7 @@ describe('JwtTokenService', () => {
     const payload: TokenPayload = {
       sub: '123',
       role: 'USER',
+      tokenVersion: 0,
     };
 
     const token = service.sign(payload);
@@ -78,6 +79,7 @@ describe('JwtTokenService', () => {
     const payload: TokenPayload = {
       sub: '123',
       role: 'USER',
+      tokenVersion: 0,
     };
 
     const token = service.sign(payload);

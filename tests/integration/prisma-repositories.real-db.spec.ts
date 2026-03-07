@@ -113,8 +113,7 @@ maybeDescribe('integration: Prisma repositories com Postgres real', () => {
     });
 
     const expiresAt = new Date(Date.now() + 60_000);
-    const record = await tokenRepo.create({
-      userId: user.id,
+    const record = await tokenRepo.replaceTokenForUser(user.id, {
       tokenHash: 'abc',
       expiresAt,
     });
@@ -126,8 +125,7 @@ maybeDescribe('integration: Prisma repositories com Postgres real', () => {
     const afterUsed = await tokenRepo.findValidByTokenHash('abc');
     expect(afterUsed).toBeNull();
 
-    const record2 = await tokenRepo.create({
-      userId: user.id,
+    const record2 = await tokenRepo.replaceTokenForUser(user.id, {
       tokenHash: 'def',
       expiresAt,
     });

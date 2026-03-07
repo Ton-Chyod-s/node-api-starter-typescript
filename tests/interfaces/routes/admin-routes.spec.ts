@@ -16,6 +16,25 @@ jest.mock('express-rate-limit', () => {
   return () => (_req: Request, _res: Response, next: NextFunction) => next();
 });
 
+jest.mock('@infrastructure/prisma/client', () => ({ prisma: {} }));
+
+// Objeto mutável para controlar o retorno do findById entre testes
+const mockUserData = {
+  id: 'user-1',
+  name: 'Test User',
+  email: 'user@test.com',
+  role: 'USER' as const,
+  tokenVersion: 0,
+};
+
+jest.mock('@infrastructure/repositories/user-repositories', () => {
+  return {
+    PrismaUserRepository: jest.fn().mockImplementation(() => ({
+      findById: jest.fn().mockImplementation(() => Promise.resolve({ ...mockUserData })),
+    })),
+  };
+});
+
 async function startServer(app: Express): Promise<{ baseUrl: string; close: () => Promise<void> }> {
   return new Promise((resolve) => {
     const server = app.listen(0, () => {
@@ -75,7 +94,7 @@ describe('routes /admin', () => {
     const issuer = process.env.JWT_ISSUER ?? 'test-issuer';
     const audience = process.env.JWT_AUDIENCE ?? 'test-audience';
 
-    const token = jwt.sign({ role: 'USER' }, secret, {
+    const token = jwt.sign({ role: 'USER', tokenVersion: 0 }, secret, {
       subject: 'user-1',
       expiresIn: '1h',
       algorithm: 'HS256',
@@ -111,12 +130,21 @@ describe('routes /admin', () => {
     const issuer = process.env.JWT_ISSUER ?? 'test-issuer';
     const audience = process.env.JWT_AUDIENCE ?? 'test-audience';
 
-    const token = jwt.sign({ role: 'ADMIN' }, secret, {
+    const token = jwt.sign({ role: 'ADMIN', tokenVersion: 0 }, secret, {
       subject: 'admin-1',
       expiresIn: '1h',
       algorithm: 'HS256',
       issuer,
       audience,
+    });
+
+    // Configurar findById para retornar um usuário ADMIN neste teste
+    Object.assign(mockUserData, {
+      id: 'admin-1',
+      name: 'Admin User',
+      email: 'admin@test.com',
+      role: 'ADMIN',
+      tokenVersion: 0,
     });
 
     const app = express();

@@ -18,6 +18,8 @@ function makeRepoMock(): RepoMock {
     findById: jest.fn(),
     create: jest.fn(),
     updatePasswordHash: jest.fn(),
+    findAll: jest.fn(),
+    incrementTokenVersion: jest.fn(),
   };
 }
 
@@ -103,7 +105,7 @@ describe('LoginUseCase', () => {
     });
 
     expect(verifyPassword).toHaveBeenCalledWith('correct', 'hash');
-    expect(tokenService.sign).toHaveBeenCalledWith({ sub: 'u1', role: 'USER' });
+    expect(tokenService.sign).toHaveBeenCalledWith({ sub: 'u1', role: 'USER', tokenVersion: 0 });
 
     expect(result).toEqual({
       token: 'token-123',
