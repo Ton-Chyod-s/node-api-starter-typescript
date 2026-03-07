@@ -15,8 +15,6 @@ export interface IUserRepository {
   findById(id: string): Promise<User | null>;
   create(data: CreateUserData): Promise<User>;
   updatePasswordHash(userId: string, passwordHash: string): Promise<void>;
-
   findAll(): Promise<UserListItemRepository[]>;
-  updatePasswordHash(userId: string, passwordHash: string): Promise<void>;
   incrementTokenVersion(userId: string): Promise<void>;
 }

@@ -1,29 +1,31 @@
-import { config } from 'dotenv';
-import { resolve } from 'path';
-import { existsSync } from 'fs';
+import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 
-const envFile = nodeEnv === 'production' ? '.env.production' : '.env.development';
+const envFiles = [
+  `.env.${nodeEnv}`,
+  nodeEnv === 'development' ? '.env.develop' : null,
+  '.env.production',
+  '.env',
+].filter(Boolean) as string[];
 
-const envPath = resolve(process.cwd(), envFile);
+let envFileLoaded = false;
 
-if (!existsSync(envPath)) {
-  const fallbackPath = resolve(process.cwd(), '.env');
+for (const envFile of envFiles) {
+  const envPath = path.resolve(process.cwd(), envFile);
 
-  if (existsSync(fallbackPath)) {
-    config({ path: fallbackPath });
-    console.log(`Variáveis de ambiente carregadas de .env (fallback)`);
-  } else {
-    if (!process.env.DATABASE_URL) {
-      console.warn(`Arquivo ${envFile} não encontrado e DATABASE_URL não definida.`);
-      console.warn(`Em desenvolvimento: crie ${envFile} baseado em .env.example`);
-      console.warn(`Em produção/Docker: defina variáveis de ambiente no container`);
-    }
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    console.log(`Variáveis carregadas de: ${envFile}`);
+    envFileLoaded = true;
+    break;
   }
-} else {
-  config({ path: envPath });
-  console.log(`Variáveis de ambiente carregadas de ${envFile}`);
+}
+
+if (!envFileLoaded) {
+  console.warn(`Nenhum arquivo .env encontrado. Tentei: ${envFiles.join(', ')}`);
 }
 
 export {};

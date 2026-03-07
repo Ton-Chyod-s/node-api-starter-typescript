@@ -1,5 +1,6 @@
 import type { CookieOptions } from 'express';
-import { env, expiresInToMs } from '@config/env';
+import { env } from '@config/env';
+import { expiresInToMs } from '@utils/string';
 
 export const AUTH_COOKIE_NAME = 'token';
 

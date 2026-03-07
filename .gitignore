@@ -1,6 +1,9 @@
 
 node_modules/
 .env
+.env.production
+.env.development
+.env.local
 **/generated/
 dist/
 .DS_Store
