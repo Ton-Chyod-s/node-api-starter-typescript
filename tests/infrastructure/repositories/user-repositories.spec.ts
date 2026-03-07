@@ -53,16 +53,18 @@ describe('PrismaUserRepository', () => {
       name: 'Novo',
       email: 'n@n.com',
       passwordHash: 'hash2',
+      role: 'USER',
     });
 
     const result = await repo.create({
       name: 'Novo',
       email: 'n@n.com',
       passwordHash: 'hash2',
+      role: 'USER',
     });
 
     expect(prisma.user.create).toHaveBeenCalledWith({
-      data: { name: 'Novo', email: 'n@n.com', passwordHash: 'hash2' },
+      data: { name: 'Novo', email: 'n@n.com', passwordHash: 'hash2', role: 'USER' },
     });
 
     expect(result).toBeInstanceOf(User);
@@ -71,6 +73,7 @@ describe('PrismaUserRepository', () => {
       name: 'Novo',
       email: 'n@n.com',
       passwordHash: 'hash2',
+      role: 'USER',
     });
   });
 
