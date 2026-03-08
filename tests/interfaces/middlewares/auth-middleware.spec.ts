@@ -286,4 +286,67 @@ describe('auth-middleware', () => {
     expect(res.status).toHaveBeenCalledWith(httpStatusCodes.UNAUTHORIZED);
     expect(next).not.toHaveBeenCalled();
   });
+  it('deve seguir com fallback para o banco quando cache.get falhar', async () => {
+    const tokenService = makeTokenServiceMock();
+    const userRepo = makeUserRepoMock();
+    const cacheService = makeCacheServiceMock();
+
+    tokenService.verify.mockReturnValue({ sub: '1', role: 'USER', tokenVersion: 0 });
+    cacheService.get.mockRejectedValue(new Error('redis down'));
+    userRepo.findById.mockResolvedValue(makeUserStub({ id: '1', tokenVersion: 0 }));
+
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      cacheService,
+    );
+
+    const req = {
+      cookies: { [AUTH_COOKIE_NAME]: 'cookie-token' },
+      headers: {},
+    } as unknown as Request;
+
+    const res = makeResponseMock();
+    const next = jest.fn() as unknown as NextFunction;
+
+    await middleware(req, res, next);
+
+    expect(userRepo.findById).toHaveBeenCalledWith('1');
+    expect(req.user).toEqual({ id: '1', role: 'USER', tokenVersion: 0 });
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.status).not.toHaveBeenCalled();
+  });
+
+  it('deve autenticar mesmo quando cache.set falhar após fallback do banco', async () => {
+    const tokenService = makeTokenServiceMock();
+    const userRepo = makeUserRepoMock();
+    const cacheService = makeCacheServiceMock();
+
+    tokenService.verify.mockReturnValue({ sub: '1', role: 'USER', tokenVersion: 0 });
+    cacheService.get.mockResolvedValue(null);
+    cacheService.set.mockRejectedValue(new Error('redis down'));
+    userRepo.findById.mockResolvedValue(makeUserStub({ id: '1', tokenVersion: 0 }));
+
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      cacheService,
+    );
+
+    const req = {
+      cookies: { [AUTH_COOKIE_NAME]: 'cookie-token' },
+      headers: {},
+    } as unknown as Request;
+
+    const res = makeResponseMock();
+    const next = jest.fn() as unknown as NextFunction;
+
+    await middleware(req, res, next);
+
+    expect(userRepo.findById).toHaveBeenCalledWith('1');
+    expect(req.user).toEqual({ id: '1', role: 'USER', tokenVersion: 0 });
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.status).not.toHaveBeenCalled();
+  });
+
 });

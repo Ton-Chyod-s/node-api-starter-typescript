@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { IUserRepository } from '@domain/repositories/user-repository';
 import { ICacheService } from '@domain/services/cache-service';
+import { logger } from '@infrastructure/logging/logger';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { AUTH_COOKIE_NAME, authCookieOptions } from '@interfaces/http/cookies/auth-cookie';
@@ -18,7 +19,15 @@ export class LogoutController {
 
       if (userId) {
         await this.userRepository.incrementTokenVersion(userId);
-        await this.cacheService.del(userCacheKey(userId));
+
+        try {
+          await this.cacheService.del(userCacheKey(userId));
+        } catch (err) {
+          logger.warn('Falha ao invalidar sessão no cache durante logout.', {
+            userId,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
       }
 
       res.clearCookie(AUTH_COOKIE_NAME, authCookieOptions());

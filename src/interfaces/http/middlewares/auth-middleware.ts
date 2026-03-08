@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ITokenService } from '@domain/services/token-service';
 import { IUserRepository } from '@domain/repositories/user-repository';
 import { ICacheService } from '@domain/services/cache-service';
+import { logger } from '@infrastructure/logging/logger';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
@@ -53,22 +54,45 @@ export function makeAuthMiddleware(
         return unauthorized();
       }
 
-      // Tenta buscar do cache primeiro
-      let cached = await cacheService.get<CachedUser>(userCacheKey(payload.sub));
+      const cacheKey = userCacheKey(payload.sub);
+
+      let cached: CachedUser | null = null;
+
+      try {
+        cached = await cacheService.get<CachedUser>(cacheKey);
+      } catch (err) {
+        logger.warn('Falha ao ler sessão do cache. Seguindo com fallback para banco.', {
+          userId: payload.sub,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
 
       if (!cached) {
         const user = await userRepository.findById(payload.sub);
         if (!user) return unauthorized();
 
         cached = { id: user.id, role: user.role, tokenVersion: user.tokenVersion };
-        await cacheService.set(userCacheKey(user.id), cached, USER_CACHE_TTL);
+
+        try {
+          await cacheService.set(cacheKey, cached, USER_CACHE_TTL);
+        } catch (err) {
+          logger.warn('Falha ao salvar sessão no cache. Requisição seguirá normalmente.', {
+            userId: user.id,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
       }
 
       if (cached.tokenVersion !== payload.tokenVersion) {
         return unauthorized();
       }
 
-      req.user = { id: cached.id, role: cached.role as 'USER' | 'ADMIN', tokenVersion: cached.tokenVersion };
+      req.user = {
+        id: cached.id,
+        role: cached.role as 'USER' | 'ADMIN',
+        tokenVersion: cached.tokenVersion,
+      };
+
       return next();
     } catch (err) {
       return next(err);

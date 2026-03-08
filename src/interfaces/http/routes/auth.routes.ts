@@ -1,11 +1,10 @@
 import { Router, type RequestHandler } from 'express';
-import rateLimit from 'express-rate-limit';
-
 import { makeAuth } from '@interfaces/http/factories/controllers/user/make-auth-middleware';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { env } from '@config/env';
 import { ensureCsrfTokenCookie } from '@interfaces/http/middlewares/csrf-middleware';
+import { makeRateLimiter } from '@interfaces/http/middlewares/rate-limit';
 
 const router = Router();
 const authMiddleware = makeAuth();
@@ -20,18 +19,9 @@ const asyncRoute = (
 };
 
 
-const authLimiter = rateLimit({
+const authLimiter = makeRateLimiter({
   windowMs: 15 * 60 * 1000,
   limit: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res, _next) => {
-    const status = httpStatusCodes.TOO_MANY_REQUESTS ?? 429;
-
-    const response = createResponse(status, 'Too many requests, please try again later');
-
-    return res.status(status).json(response);
-  },
 });
 
 let _logoutController:
@@ -85,16 +75,9 @@ async function getLoginTokenController() {
   return _loginTokenController;
 }
 
-const passwordResetLimiter = rateLimit({
+const passwordResetLimiter = makeRateLimiter({
   windowMs: 15 * 60 * 1000,
   limit: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res, _next) => {
-    const status = httpStatusCodes.TOO_MANY_REQUESTS ?? 429;
-    const response = createResponse(status, 'Too many requests, please try again later');
-    return res.status(status).json(response);
-  },
 });
 
 let _forgotPasswordController:
