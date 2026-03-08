@@ -14,23 +14,36 @@ type CachedUser = {
   tokenVersion: number;
 };
 
+type MakeAuthMiddlewareOptions = {
+  allowAnonymous?: boolean;
+};
+
 const USER_CACHE_TTL = 60;
 
-export function makeAuthMiddleware(
+function buildUnauthorizedResponse(res: Response) {
+  const response = createResponse(
+    httpStatusCodes.UNAUTHORIZED,
+    'Unauthorized',
+    undefined,
+    undefined,
+    'UNAUTHORIZED',
+  );
+  return res.status(httpStatusCodes.UNAUTHORIZED).json(response);
+}
+
+function makeAuthMiddlewareInternal(
   tokenService: ITokenService,
   userRepository: IUserRepository,
   cacheService: ICacheService,
+  { allowAnonymous = false }: MakeAuthMiddlewareOptions = {},
 ) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const unauthorized = () => {
-      const response = createResponse(
-        httpStatusCodes.UNAUTHORIZED,
-        'Unauthorized',
-        undefined,
-        undefined,
-        'UNAUTHORIZED',
-      );
-      return res.status(httpStatusCodes.UNAUTHORIZED).json(response);
+      if (allowAnonymous) {
+        return next();
+      }
+
+      return buildUnauthorizedResponse(res);
     };
 
     try {
@@ -95,7 +108,32 @@ export function makeAuthMiddleware(
 
       return next();
     } catch (err) {
+      if (allowAnonymous) {
+        logger.warn('Falha ao resolver autenticação opcional. A requisição seguirá como anônima.', {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        return next();
+      }
+
       return next(err);
     }
   };
+}
+
+export function makeAuthMiddleware(
+  tokenService: ITokenService,
+  userRepository: IUserRepository,
+  cacheService: ICacheService,
+) {
+  return makeAuthMiddlewareInternal(tokenService, userRepository, cacheService);
+}
+
+export function makeOptionalAuthMiddleware(
+  tokenService: ITokenService,
+  userRepository: IUserRepository,
+  cacheService: ICacheService,
+) {
+  return makeAuthMiddlewareInternal(tokenService, userRepository, cacheService, {
+    allowAnonymous: true,
+  });
 }

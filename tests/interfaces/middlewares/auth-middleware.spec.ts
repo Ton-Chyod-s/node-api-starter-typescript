@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { makeAuthMiddleware } from '@interfaces/http/middlewares/auth-middleware';
+import {
+  makeAuthMiddleware,
+  makeOptionalAuthMiddleware,
+} from '@interfaces/http/middlewares/auth-middleware';
 import { ITokenService } from '@domain/services/token-service';
 import { IUserRepository } from '@domain/repositories/user-repository';
 import { ICacheService } from '@domain/services/cache-service';
@@ -345,6 +348,87 @@ describe('auth-middleware', () => {
 
     expect(userRepo.findById).toHaveBeenCalledWith('1');
     expect(req.user).toEqual({ id: '1', role: 'USER', tokenVersion: 0 });
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.status).not.toHaveBeenCalled();
+  });
+
+
+  it('deve permitir logout anônimo quando não houver token no optional auth', async () => {
+    const tokenService = makeTokenServiceMock();
+    const userRepo = makeUserRepoMock();
+
+    const middleware = makeOptionalAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
+
+    const req = {
+      cookies: {},
+      headers: {},
+    } as unknown as Request;
+
+    const res = makeResponseMock();
+    const next = jest.fn() as unknown as NextFunction;
+
+    await middleware(req, res, next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(userRepo.findById).not.toHaveBeenCalled();
+  });
+
+  it('deve seguir como anônimo quando token opcional for inválido', async () => {
+    const tokenService = makeTokenServiceMock();
+    const userRepo = makeUserRepoMock();
+
+    tokenService.verify.mockImplementation(() => {
+      throw new Error('invalid');
+    });
+
+    const middleware = makeOptionalAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
+
+    const req = {
+      cookies: { [AUTH_COOKIE_NAME]: 'bad-token' },
+      headers: {},
+    } as unknown as Request;
+
+    const res = makeResponseMock();
+    const next = jest.fn() as unknown as NextFunction;
+
+    await middleware(req, res, next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(userRepo.findById).not.toHaveBeenCalled();
+  });
+
+  it('deve seguir como anônimo quando houver erro inesperado no optional auth', async () => {
+    const tokenService = makeTokenServiceMock();
+    const userRepo = makeUserRepoMock();
+
+    const middleware = makeOptionalAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
+
+    const req = {
+      get cookies() {
+        throw new Error('boom');
+      },
+      headers: {},
+    } as unknown as Request;
+
+    const res = makeResponseMock();
+    const next = jest.fn() as unknown as NextFunction;
+
+    await middleware(req, res, next);
+
     expect(next).toHaveBeenCalledTimes(1);
     expect(res.status).not.toHaveBeenCalled();
   });

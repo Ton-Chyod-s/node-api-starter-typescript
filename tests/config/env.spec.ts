@@ -29,6 +29,7 @@ async function loadEnv(envVars: Record<string, string | undefined>) {
     'SMTP_USER',
     'SMTP_PASSWORD',
     'EMAIL_FROM',
+    'REDIS_URL',
   ] as const;
 
   for (const k of keys) delete process.env[k];
@@ -43,7 +44,7 @@ async function loadEnv(envVars: Record<string, string | undefined>) {
   process.env.JWT_ISSUER ??= 'test-issuer';
   process.env.JWT_AUDIENCE ??= 'test-audience';
   process.env.CORS_ORIGIN ??= 'http://localhost:3000';
-  process.env.NODE_ENV = 'test';
+  process.env.NODE_ENV = envVars.NODE_ENV ?? 'test';
 
   const mod = (await import('@config/env')) as typeof import('@config/env');
   return mod.env;
@@ -80,4 +81,20 @@ describe('env parsing', () => {
   it('deve lançar erro para TRUST_PROXY inválido', async () => {
     await expect(loadEnv({ TRUST_PROXY: 'abc' })).rejects.toThrow('TRUST_PROXY inválido');
   });
+
+  it('deve exigir REDIS_URL em production', async () => {
+    await expect(loadEnv({ NODE_ENV: 'production', REDIS_URL: '' })).rejects.toThrow(/REDIS_URL/i);
+  });
+
+  it('deve aceitar production quando REDIS_URL estiver definida', async () => {
+    const env = await loadEnv({
+      NODE_ENV: 'production',
+      REDIS_URL: 'redis://localhost:6379',
+    });
+
+    expect(env.NODE_ENV).toBe('production');
+    expect(env.REDIS_URL).toBe('redis://localhost:6379');
+  });
+
+
 });

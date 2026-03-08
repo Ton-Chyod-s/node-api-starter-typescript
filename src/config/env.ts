@@ -83,4 +83,14 @@ const schema = z.object({
   APP_NAME: z.string().optional().default('app'),
 });
 
-export const env = schema.parse(process.env);
+const parsedEnv = schema.superRefine((data, ctx) => {
+  if (data.NODE_ENV === 'production' && !data.REDIS_URL) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['REDIS_URL'],
+      message: 'REDIS_URL is required in production',
+    });
+  }
+});
+
+export const env = parsedEnv.parse(process.env);
