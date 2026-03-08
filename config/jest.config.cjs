@@ -11,7 +11,6 @@ const baseConfig = {
   rootDir: path.resolve(__dirname, '..'),
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testTimeout: 30000,
   setupFiles: ['<rootDir>/tests/setup/test-env.js'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { diagnostics: false }],
@@ -19,6 +18,7 @@ const baseConfig = {
 };
 
 module.exports = {
+  testTimeout: 60000,
   projects: [
     {
       ...baseConfig,
@@ -34,7 +34,6 @@ module.exports = {
     {
       ...baseConfig,
       displayName: 'integration',
-      testTimeout: 60000,
       testMatch: ['<rootDir>/tests/integration/**/*.spec.ts'],
       moduleNameMapper: {
         ...tsPaths,

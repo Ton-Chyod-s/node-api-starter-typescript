@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { makeAuthMiddleware } from '@interfaces/http/middlewares/auth-middleware';
 import { ITokenService } from '@domain/services/token-service';
 import { IUserRepository } from '@domain/repositories/user-repository';
+import { ICacheService } from '@domain/services/cache-service';
 import { User } from '@domain/entities/user';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
@@ -17,6 +18,7 @@ const makeResponseMock = () => {
 
 type TokenMock = jest.Mocked<ITokenService>;
 type RepoMock = jest.Mocked<Pick<IUserRepository, 'findById'>>;
+type CacheMock = jest.Mocked<ICacheService>;
 
 function makeTokenServiceMock(): TokenMock {
   return {
@@ -27,6 +29,14 @@ function makeTokenServiceMock(): TokenMock {
 
 function makeUserRepoMock(): RepoMock {
   return { findById: jest.fn() };
+}
+
+function makeCacheServiceMock(): CacheMock {
+  return {
+    get: jest.fn().mockResolvedValue(null),
+    set: jest.fn().mockResolvedValue(undefined),
+    del: jest.fn().mockResolvedValue(undefined),
+  };
 }
 
 function makeUserStub(overrides: Partial<{ id: string; tokenVersion: number }> = {}): User {
@@ -51,7 +61,7 @@ describe('auth-middleware', () => {
     tokenService.verify.mockReturnValue({ sub: '1', role: 'USER', tokenVersion: 0 });
     userRepo.findById.mockResolvedValue(makeUserStub({ id: '1', tokenVersion: 0 }));
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository);
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'cookie-token' },
@@ -76,7 +86,7 @@ describe('auth-middleware', () => {
     tokenService.verify.mockReturnValue({ sub: '2', role: 'USER', tokenVersion: 3 });
     userRepo.findById.mockResolvedValue(makeUserStub({ id: '2', tokenVersion: 3 }));
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository);
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
 
     const req = {
       cookies: {},
@@ -101,7 +111,7 @@ describe('auth-middleware', () => {
     
     userRepo.findById.mockResolvedValue(makeUserStub({ id: '1', tokenVersion: 1 }));
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository);
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'stale-token' },
@@ -126,7 +136,7 @@ describe('auth-middleware', () => {
     tokenService.verify.mockReturnValue({ sub: 'ghost', role: 'USER', tokenVersion: 0 });
     userRepo.findById.mockResolvedValue(null);
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository);
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'valid-sig-but-deleted-user' },
@@ -145,7 +155,7 @@ describe('auth-middleware', () => {
   it('deve retornar 401 quando não houver token', async () => {
     const tokenService = makeTokenServiceMock();
     const userRepo = makeUserRepoMock();
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository);
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
 
     const req = {
       cookies: {},
@@ -164,7 +174,7 @@ describe('auth-middleware', () => {
   it('deve retornar 401 quando authorization não for Bearer', async () => {
     const tokenService = makeTokenServiceMock();
     const userRepo = makeUserRepoMock();
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository);
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
 
     const req = {
       cookies: {},
@@ -187,7 +197,7 @@ describe('auth-middleware', () => {
       throw new Error('invalid');
     });
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository);
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'bad-token' },
@@ -207,7 +217,7 @@ describe('auth-middleware', () => {
   it('deve chamar next(err) quando ocorrer erro inesperado ao ler req', async () => {
     const tokenService = makeTokenServiceMock();
     const userRepo = makeUserRepoMock();
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository);
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
 
     const req = {
       get cookies() {
