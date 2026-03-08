@@ -13,7 +13,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # Env (nunca envie segredos no build context)
-.env
+config/.env
+config/.env.production
+config/.env.development
+config/.env.local
+config/.env.test
 
-# Docker artifacts
-docker-compose*.yml
+# Docker artifacts (não precisam ir pro build context)
+config/docker-compose*.yml

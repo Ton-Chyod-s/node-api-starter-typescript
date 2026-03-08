@@ -1,12 +1,14 @@
 /** @type {import('jest').Config} */
+const path = require('path');
 const { pathsToModuleNameMapper } = require('ts-jest');
-const { compilerOptions } = require('./tsconfig.json');
+const { compilerOptions } = require('../tsconfig.json');
 
 const tsPaths = pathsToModuleNameMapper(compilerOptions.paths || {}, {
   prefix: '<rootDir>/',
 });
 
 const baseConfig = {
+  rootDir: path.resolve(__dirname, '..'),
   preset: 'ts-jest',
   testEnvironment: 'node',
   testTimeout: 30000,

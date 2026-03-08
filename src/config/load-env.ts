@@ -13,12 +13,12 @@ const envFiles = [
 let envFileLoaded = false;
 
 for (const envFile of envFiles) {
-  const envPath = path.resolve(process.cwd(), envFile);
+  const envPath = path.resolve(process.cwd(), 'config', envFile);
 
   if (fs.existsSync(envPath)) {
     dotenv.config({ path: envPath, quiet: true });
     if (nodeEnv === 'development') {
-      console.log(`Variáveis carregadas de: ${envFile}`);
+      console.log(`Variáveis carregadas de: config/${envFile}`);
     }
     envFileLoaded = true;
     break;
@@ -26,7 +26,7 @@ for (const envFile of envFiles) {
 }
 
 if (!envFileLoaded) {
-  console.warn(`Nenhum arquivo .env encontrado. Tentei: ${envFiles.join(', ')}`);
+  console.warn(`Nenhum arquivo .env encontrado. Tentei: ${envFiles.map((f) => `config/${f}`).join(', ')}`);
 }
 
 export {};
