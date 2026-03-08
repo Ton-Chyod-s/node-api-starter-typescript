@@ -64,7 +64,6 @@ export class PrismaPasswordResetTokenRepository implements IPasswordResetTokenRe
 
   async consumeByTokenHash(
     tokenHash: string,
-    passwordHash: string,
     now: Date = new Date(),
   ): Promise<string | null> {
     return prisma.$transaction(async (tx) => {
@@ -89,18 +88,6 @@ export class PrismaPasswordResetTokenRepository implements IPasswordResetTokenRe
       });
 
       if (updateToken.count !== 1) return null;
-
-      const updateUser = await tx.user.updateMany({
-        where: { id: token.userId },
-        data: {
-          passwordHash,
-          tokenVersion: { increment: 1 },
-        },
-      });
-
-      if (updateUser.count !== 1) {
-        throw new Error('Password reset failed because the user no longer exists');
-      }
 
       return token.userId;
     });

@@ -10,7 +10,7 @@ const loginSchema = z.object({
     .string()
     .email()
     .transform((v) => v.trim().toLowerCase()),
-  password: z.string().min(8).max(72),
+  password: z.string().min(8).max(128),
 });
 
 export class LoginController {

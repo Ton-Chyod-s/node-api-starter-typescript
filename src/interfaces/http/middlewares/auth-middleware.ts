@@ -5,6 +5,7 @@ import { ICacheService } from '@domain/services/cache-service';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
+import { env } from '@config/env';
 
 type CachedUser = {
   id: string;
@@ -13,7 +14,7 @@ type CachedUser = {
 };
 
 const USER_CACHE_TTL = 60;
-const userCacheKey = (id: string) => `user:${id}`;
+const userCacheKey = (id: string) => `${env.APP_NAME}:user:${id}`;
 
 export function makeAuthMiddleware(
   tokenService: ITokenService,

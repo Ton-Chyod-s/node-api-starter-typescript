@@ -22,5 +22,5 @@ export interface IPasswordResetTokenRepository {
   findValidByTokenHash(tokenHash: string, now?: Date): Promise<PasswordResetTokenRecord | null>;
 
   markUsed(id: string, usedAt?: Date): Promise<void>;
-  consumeByTokenHash(tokenHash: string, passwordHash: string, now?: Date): Promise<string | null>;
+  consumeByTokenHash(tokenHash: string, now?: Date): Promise<string | null>;
 }
