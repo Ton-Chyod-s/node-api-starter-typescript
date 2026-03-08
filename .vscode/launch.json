@@ -10,29 +10,16 @@
       "runtimeArgs": [
         "--inspect=9229",
         "--enable-source-maps",
+        "--watch",
         "--import",
-        "tsx",
-        "-r",
-        "tsconfig-paths/register"
+        "tsx"
       ],
-      "args": ["${workspaceFolder}/src/main/server.ts"],
+      "args": ["src/main/server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "skipFiles": ["<node_internals>/**"],
-      "sourceMaps": true
-    },
-    {
-      "type": "pwa-node",
-      "request": "attach",
-      "name": "Attach (TSX) 9229",
-      "address": "localhost",
-      "port": 9229,
-      "restart": true,
-      "protocol": "inspector",
-      "cwd": "${workspaceFolder}",
-      "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true,
-      "autoAttachChildProcesses": true
+      "restart": true
     }
   ]
 }

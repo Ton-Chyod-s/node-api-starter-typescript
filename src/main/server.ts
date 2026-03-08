@@ -31,6 +31,7 @@ async function shutdown(signal: string) {
   }, 10_000);
   forceExitTimeout.unref();
 
+  server.closeAllConnections();
   server.close(async (err) => {
     try {
       if (err) {
