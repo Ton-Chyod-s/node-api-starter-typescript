@@ -24,6 +24,20 @@ services:
       retries: 20
     restart: unless-stopped
 
+  redis:
+    image: redis:7-alpine
+    container_name: clean-arch-redis
+    ports:
+      - '127.0.0.1:6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   api:
     build:
       context: .
@@ -36,10 +50,14 @@ services:
       NODE_ENV: development
       # Dentro do compose, o host do Postgres é "db"
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-postgres}
+      # Dentro do compose, o host do Redis é "redis"
+      REDIS_URL: redis://redis:6379
       # Windows/WSL: ative polling se o hot-reload não funcionar
       CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-false}
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     ports:
       - '3000:3000'
@@ -62,4 +80,5 @@ services:
 
 volumes:
   db-data:
+  redis-data:
   node_modules:

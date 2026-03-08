@@ -21,6 +21,11 @@ const schema = z.object({
 
   DATABASE_URL: z.string().min(1),
 
+  // ------------------------------------------------------------------------------
+  // REDIS
+  // ------------------------------------------------------------------------------
+  REDIS_URL: z.string().optional().transform(normalizeOptionalString),
+
   KEY_JWT: z.string().min(1),
 
   JWT_EXPIRES_IN: z.string().optional().transform(parseExpiresIn),
@@ -74,6 +79,8 @@ const schema = z.object({
   SMTP_PASSWORD: z.string().optional().transform(normalizeOptionalString),
   SMTP_SECURE: z.string().optional().transform(parseBoolean),
   EMAIL_FROM: z.string().optional().transform(normalizeOptionalString),
+
+  APP_NAME: z.string().optional().default('app'),
 });
 
 export const env = schema.parse(process.env);
