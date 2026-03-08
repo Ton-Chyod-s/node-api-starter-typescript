@@ -1,7 +1,6 @@
 import type { Express } from 'express';
 import type { Socket } from 'node:net';
 
-jest.setTimeout(30000);
 
 type StartedServer = { baseUrl: string; close: () => Promise<void> };
 

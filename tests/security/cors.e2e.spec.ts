@@ -1,6 +1,5 @@
 import type { Express } from 'express';
 
-jest.setTimeout(45000);
 
 type StartedServer = { baseUrl: string; close: () => Promise<void> };
 

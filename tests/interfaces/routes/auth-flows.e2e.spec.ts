@@ -1,7 +1,6 @@
 import type { Express } from 'express';
 import type { User as UserEntity } from '@domain/entities/user';
 
-jest.setTimeout(30000);
 
 jest.mock('express-rate-limit', () => {
   return () => (_req: unknown, _res: unknown, next: (err?: unknown) => void) => next();
@@ -92,11 +91,19 @@ jest.mock('@infrastructure/repositories/user-repositories', () => {
 
     async updatePasswordHash(userId: string, passwordHash: string) {
       const store = getStore();
-      const user = store.usersById.get(userId);
+      const existing = store.usersById.get(userId);
 
-      if (user) {
-        const mutable = user as unknown as { props: { passwordHash: string } };
-        mutable.props.passwordHash = passwordHash;
+      if (existing) {
+        const updated = new User({
+          id: existing.id,
+          name: existing.name,
+          email: existing.email,
+          passwordHash,
+          role: existing.role,
+          tokenVersion: existing.tokenVersion,
+        });
+        store.usersById.set(userId, updated);
+        store.usersByEmail.set(existing.email, updated);
       }
     }
 
@@ -112,10 +119,19 @@ jest.mock('@infrastructure/repositories/user-repositories', () => {
 
     async incrementTokenVersion(userId: string) {
       const store = getStore();
-      const user = store.usersById.get(userId);
-      if (user) {
-        const mutable = user as unknown as { props: { tokenVersion: number } };
-        mutable.props.tokenVersion = (mutable.props.tokenVersion ?? 0) + 1;
+      const existing = store.usersById.get(userId);
+
+      if (existing) {
+        const updated = new User({
+          id: existing.id,
+          name: existing.name,
+          email: existing.email,
+          passwordHash: existing.passwordHash,
+          role: existing.role,
+          tokenVersion: (existing.tokenVersion ?? 0) + 1,
+        });
+        store.usersById.set(userId, updated);
+        store.usersByEmail.set(existing.email, updated);
       }
     }
   }
@@ -174,32 +190,13 @@ jest.mock('@infrastructure/repositories/password-reset-token-repository', () => 
 
     async consumeByTokenHash(
       tokenHash: string,
-      passwordHash: string,
       now: Date = new Date(),
     ): Promise<string | null> {
       const store = getStore();
-      const { User } = jest.requireActual(
-        '@domain/entities/user',
-      ) as typeof import('@domain/entities/user');
 
       for (const token of store.resetTokens.values()) {
         if (token.tokenHash === tokenHash && !token.usedAt && token.expiresAt > now) {
           token.usedAt = now;
-
-          const existingUser = store.usersById.get(token.userId);
-          if (existingUser) {
-            const updatedUser = new User({
-              id: existingUser.id,
-              name: existingUser.name,
-              email: existingUser.email,
-              passwordHash,
-              role: existingUser.role,
-              tokenVersion: (existingUser.tokenVersion ?? 0) + 1,
-            });
-            store.usersById.set(token.userId, updatedUser);
-            store.usersByEmail.set(existingUser.email, updatedUser);
-          }
-
           return token.userId;
         }
       }

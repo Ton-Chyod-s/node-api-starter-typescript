@@ -71,11 +71,12 @@ describe('ResetPasswordUseCase', () => {
     const useCase = new ResetPasswordUseCase(userRepo, resetTokenRepo);
     await useCase.execute({ token: rawToken, newPassword: 'NovaSenhaForte123' });
 
-    expect(resetTokenRepo.consumeByTokenHash).toHaveBeenCalledWith(
-      tokenHash,
-      expect.any(String),
-    );
-    expect(userRepo.updatePasswordHash).not.toHaveBeenCalled();
+    expect(resetTokenRepo.consumeByTokenHash).toHaveBeenCalledWith(tokenHash);
+
+    expect(userRepo.updatePasswordHash).toHaveBeenCalledWith('u1', expect.any(String));
+
+    expect(userRepo.incrementTokenVersion).toHaveBeenCalledWith('u1');
+
     expect(resetTokenRepo.markUsed).not.toHaveBeenCalled();
   });
 });

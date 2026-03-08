@@ -233,4 +233,57 @@ describe('auth-middleware', () => {
 
     expect(next).toHaveBeenCalledWith(expect.any(Error));
   });
+
+  it('deve aceitar token quando usuário vier do cache com tokenVersion correta (sem hit no banco)', async () => {
+    const tokenService = makeTokenServiceMock();
+    const userRepo = makeUserRepoMock();
+    const cacheService = makeCacheServiceMock();
+
+    tokenService.verify.mockReturnValue({ sub: '1', role: 'USER', tokenVersion: 2 });
+
+    cacheService.get.mockResolvedValue({ id: '1', role: 'USER', tokenVersion: 2 });
+
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, cacheService);
+
+    const req = {
+      cookies: { [AUTH_COOKIE_NAME]: 'cached-token' },
+      headers: {},
+    } as unknown as Request;
+
+    const res = makeResponseMock();
+    const next = jest.fn() as unknown as NextFunction;
+
+    await middleware(req, res, next);
+
+    expect(userRepo.findById).not.toHaveBeenCalled();
+    expect(req.user).toEqual({ id: '1', role: 'USER', tokenVersion: 2 });
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.status).not.toHaveBeenCalled();
+  });
+
+  it('deve rejeitar token quando cache retornar tokenVersion desatualizada (stale cache pós-logout)', async () => {
+    const tokenService = makeTokenServiceMock();
+    const userRepo = makeUserRepoMock();
+    const cacheService = makeCacheServiceMock();
+
+    tokenService.verify.mockReturnValue({ sub: '1', role: 'USER', tokenVersion: 1 });
+
+    cacheService.get.mockResolvedValue({ id: '1', role: 'USER', tokenVersion: 2 });
+
+    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, cacheService);
+
+    const req = {
+      cookies: { [AUTH_COOKIE_NAME]: 'stale-cached-token' },
+      headers: {},
+    } as unknown as Request;
+
+    const res = makeResponseMock();
+    const next = jest.fn() as unknown as NextFunction;
+
+    await middleware(req, res, next);
+
+    expect(userRepo.findById).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(httpStatusCodes.UNAUTHORIZED);
+    expect(next).not.toHaveBeenCalled();
+  });
 });

@@ -8,20 +8,26 @@ import express, {
 import cookieParser from 'cookie-parser';
 import * as jwt from 'jsonwebtoken';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
+import { User } from '@domain/entities/user';
 
 jest.mock('@infrastructure/prisma/client', () => ({ prisma: {} }));
 
 jest.mock('@infrastructure/repositories/user-repositories', () => {
+  const { User } = jest.requireActual('@domain/entities/user') as typeof import('@domain/entities/user');
+
   return {
     PrismaUserRepository: jest.fn().mockImplementation(() => {
       return {
-        findById: jest.fn().mockResolvedValue({
-          id: 'user-123',
-          name: 'Klay',
-          email: 'k@k.com',
-          role: 'USER',
-          tokenVersion: 0,
-        }),
+        findById: jest.fn().mockResolvedValue(
+          new User({
+            id: 'user-123',
+            name: 'Klay',
+            email: 'k@k.com',
+            passwordHash: 'hash',
+            role: 'USER',
+            tokenVersion: 0,
+          }),
+        ),
       };
     }),
   };

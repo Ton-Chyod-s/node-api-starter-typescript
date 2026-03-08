@@ -9,8 +9,6 @@ import cookieParser from 'cookie-parser';
 import * as jwt from 'jsonwebtoken';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
 
-// Esses testes sobem um servidor real e, com ts-jest, a primeira compilação pode passar de 5s.
-jest.setTimeout(20000);
 
 jest.mock('express-rate-limit', () => {
   return () => (_req: Request, _res: Response, next: NextFunction) => next();
@@ -18,7 +16,6 @@ jest.mock('express-rate-limit', () => {
 
 jest.mock('@infrastructure/prisma/client', () => ({ prisma: {} }));
 
-// Objeto mutável para controlar o retorno do findById entre testes
 const mockUserData = {
   id: 'user-1',
   name: 'Test User',
@@ -138,7 +135,6 @@ describe('routes /admin', () => {
       audience,
     });
 
-    // Configurar findById para retornar um usuário ADMIN neste teste
     Object.assign(mockUserData, {
       id: 'admin-1',
       name: 'Admin User',

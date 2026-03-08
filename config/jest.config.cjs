@@ -13,7 +13,7 @@ const baseConfig = {
   testEnvironment: 'node',
   setupFiles: ['<rootDir>/tests/setup/test-env.js'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { diagnostics: false }],
+    '^.+\\.tsx?$': ['ts-jest', { diagnostics: { warnOnly: true } }],
   },
 };
 

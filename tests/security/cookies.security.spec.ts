@@ -1,6 +1,5 @@
 import type { Express } from 'express';
 
-jest.setTimeout(30000);
 
 type HeadersWithGetSetCookie = Headers & { getSetCookie?: () => string[] };
 
