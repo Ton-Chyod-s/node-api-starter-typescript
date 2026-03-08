@@ -6,7 +6,6 @@ import { Prisma } from '@prisma/client';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { env } from '@config/env';
-import { AppError } from '@utils/app-error';
 
 const RESET = '\x1b[0m';
 const RED = '\x1b[31m';
@@ -92,31 +91,13 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
     }
   }
 
-  const isProd = env.NODE_ENV === 'production';
-
-  const isErrorWithAppShape = (e: unknown): e is Error & { statusCode: number; code: string } => {
-    if (!(e instanceof Error)) return false;
-    if (!e || typeof e !== 'object') return false;
-
-    const maybe = e as unknown as Record<string, unknown>;
-    const statusCode = maybe.statusCode;
-    const code = maybe.code;
-
-    return (
-      typeof statusCode === 'number' &&
-      Number.isInteger(statusCode) &&
-      typeof code === 'string' &&
-      code.trim().length > 0
-    );
-  };
-
-  if (err instanceof AppError || isAppErrorLike(err) || isErrorWithAppShape(err)) {
-    const appErr = err as AppError & { data?: unknown; code?: string; statusCode?: number };
-    const status = appErr.statusCode ?? httpStatusCodes.INTERNAL_SERVER_ERROR;
-    const code = appErr.code ?? 'UNEXPECTED_ERROR';
-    const response = createResponse(status, appErr.message, appErr.data, undefined, code);
-    return res.status(status).json(response);
+  if (isAppErrorLike(err)) {
+    const appErr = err as { statusCode: number; message: string; code: string; data?: unknown };
+    const response = createResponse(appErr.statusCode, appErr.message, appErr.data, undefined, appErr.code);
+    return res.status(appErr.statusCode).json(response);
   }
+
+  const isProd = env.NODE_ENV === 'production';
 
   const legacy = err as Error & { statusCode?: number; data?: unknown; code?: unknown };
 

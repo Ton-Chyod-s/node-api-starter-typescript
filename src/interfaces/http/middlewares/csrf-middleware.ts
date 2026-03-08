@@ -7,12 +7,9 @@ import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
 
 function safeEqual(a: string, b: string): boolean {
   try {
-    const aBuf = Buffer.from(a, 'utf8');
-    const bBuf = Buffer.from(b, 'utf8');
-
-    if (aBuf.length !== bBuf.length) return false;
-
-    return crypto.timingSafeEqual(aBuf, bBuf);
+    const aHash = crypto.createHash('sha256').update(a, 'utf8').digest();
+    const bHash = crypto.createHash('sha256').update(b, 'utf8').digest();
+    return crypto.timingSafeEqual(aHash, bHash);
   } catch {
     return false;
   }

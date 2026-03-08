@@ -2,7 +2,6 @@ import { Router, type RequestHandler } from 'express';
 import rateLimit from 'express-rate-limit';
 
 import { makeAuth } from '@interfaces/http/factories/controllers/user/make-auth-middleware';
-import { LogoutController } from '@interfaces/http/controllers/user/logout-controller';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { env } from '@config/env';
@@ -35,7 +34,17 @@ const authLimiter = rateLimit({
   },
 });
 
-const logoutController = new LogoutController();
+let _logoutController:
+  | import('@interfaces/http/controllers/user/logout-controller').LogoutController
+  | null = null;
+async function getLogoutController() {
+  if (_logoutController) return _logoutController;
+  const { makeLogoutController } = await import(
+    '@interfaces/http/factories/controllers/user/logout-controller.factory'
+  );
+  _logoutController = makeLogoutController();
+  return _logoutController;
+}
 
 let _registerController:
   | import('@interfaces/http/controllers/user/register-controller').RegisterController
@@ -129,9 +138,10 @@ router.post('/auth/token', authLimiter, asyncRoute(async (req, res, next) => {
   return controller.handle(req, res, next);
 }));
 
-router.post('/auth/logout', authMiddleware, (req, res, next) =>
-  logoutController.handle(req, res, next),
-);
+router.post('/auth/logout', authMiddleware, asyncRoute(async (req, res, next) => {
+  const controller = await getLogoutController();
+  return controller.handle(req, res, next);
+}));
 
 router.post('/auth/forgot-password', passwordResetLimiter, asyncRoute(async (req, res, next) => {
   const controller = await getForgotPasswordController();
@@ -176,6 +186,7 @@ router.get('/auth/csrf', (req, res) => {
 export default router;
 
 export function resetControllersForTesting(): void {
+  _logoutController = null;
   _registerController = null;
   _loginController = null;
   _loginTokenController = null;

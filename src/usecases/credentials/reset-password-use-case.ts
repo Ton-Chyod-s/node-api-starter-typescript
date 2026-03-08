@@ -1,9 +1,11 @@
 import { IUserRepository } from '@domain/repositories/user-repository';
 import { IPasswordResetTokenRepository } from '@domain/repositories/password-reset-token-repository';
+import { ICacheService } from '@domain/services/cache-service';
 import { hashPassword } from '@utils/password-generator';
 import { AppError } from '@utils/app-error';
 import { sha256Hex } from '@utils/hash';
 import { passwordSchema } from '@domain/dtos/shared/password-schema';
+import { userCacheKey } from '@utils/cache-keys';
 
 type ResetInput = {
   token: string;
@@ -14,6 +16,7 @@ export class ResetPasswordUseCase {
   constructor(
     private readonly userRepo: IUserRepository,
     private readonly resetTokenRepo: IPasswordResetTokenRepository,
+    private readonly cacheService: ICacheService,
   ) {}
 
   async execute({ token, newPassword }: ResetInput): Promise<void> {
@@ -38,5 +41,7 @@ export class ResetPasswordUseCase {
 
     await this.userRepo.updatePasswordHash(userId, passwordHash);
     await this.userRepo.incrementTokenVersion(userId);
+
+    await this.cacheService.del(userCacheKey(userId));
   }
 }

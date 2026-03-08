@@ -5,7 +5,7 @@ import { hashPassword } from '@utils/password-generator';
 import { AppError } from '@utils/app-error';
 
 export class CreateUserUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private readonly userRepository: IUserRepository) {}
 
   async execute(input: RegisterRequestDTO): Promise<User> {
     const normalizedEmail = input.email.trim().toLowerCase();

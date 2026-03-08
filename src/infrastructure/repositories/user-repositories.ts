@@ -7,7 +7,8 @@ import {
 import { User, type UserRole } from '@domain/entities/user';
 
 function normalizeRole(role: string): UserRole {
-  return role === 'ADMIN' ? 'ADMIN' : 'USER';
+  if (role === 'ADMIN' || role === 'USER') return role;
+  throw new Error(`Unknown role: "${role}". Expected ADMIN or USER.`);
 }
 
 export class PrismaUserRepository implements IUserRepository {
