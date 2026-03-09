@@ -15,12 +15,12 @@ export function createResponse<T>(
 ): ApiResponse<T> {
   const response: ApiResponse<T> = { statusCode, message };
 
-  if (code !== undefined) {
-    response.code = code;
-  }
-
   if (data !== undefined) {
     response.data = data;
+  }
+
+  if (code !== undefined) {
+    response.code = code;
   }
 
   if (elapsedTime !== undefined) {

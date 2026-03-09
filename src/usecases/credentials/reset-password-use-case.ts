@@ -32,12 +32,6 @@ export class ResetPasswordUseCase {
     }
 
     const tokenHash = sha256Hex(rawToken);
-    const validToken = await this.resetTokenRepo.findValidByTokenHash(tokenHash);
-
-    if (!validToken) {
-      throw AppError.badRequest('Invalid or expired token', 'PASSWORD_RESET_INVALID_TOKEN');
-    }
-
     const passwordHash = await hashPassword(parsed.data);
     const userId = await this.resetTokenRepo.consumeByTokenHash(tokenHash);
 

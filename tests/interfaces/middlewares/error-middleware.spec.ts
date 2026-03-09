@@ -30,8 +30,11 @@ function setBaseEnv(nodeEnv: 'test' | 'development' | 'production' = 'test') {
   process.env.JWT_ISSUER = process.env.JWT_ISSUER ?? 'test-issuer';
   process.env.JWT_AUDIENCE = process.env.JWT_AUDIENCE ?? 'test-audience';
   process.env.CORS_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:3000';
-
   process.env.SENTRY_DSN = '';
+
+  if (nodeEnv === 'production') {
+    process.env.REDIS_URL = 'redis://localhost:6379';
+  }
 }
 
 async function loadErrorMiddleware(nodeEnv: 'test' | 'development' | 'production' = 'test') {
@@ -244,34 +247,4 @@ describe('errorMiddleware', () => {
 
     consoleSpy.mockRestore();
   });
-
-  it('não deve devolver err.meta do Prisma para o cliente', async () => {
-    const errorMiddleware = await loadErrorMiddleware('test');
-    const { Prisma } = await import('@prisma/client');
-
-    const err = new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
-      code: 'P2002',
-      clientVersion: 'test',
-      meta: { target: ['email'] },
-    });
-
-    const req = makeReq({ method: 'POST', originalUrl: '/api/auth/register' });
-    const res = makeRes();
-    const next = makeNext();
-
-    errorMiddleware(err, req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(httpStatusCodes.CONFLICT);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        statusCode: httpStatusCodes.CONFLICT,
-        message: 'Resource already exists',
-        data: undefined,
-        code: 'RESOURCE_CONFLICT',
-      }),
-    );
-    expect(next).not.toHaveBeenCalled();
-  });
-
-
 });

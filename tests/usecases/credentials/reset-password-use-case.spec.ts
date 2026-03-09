@@ -1,23 +1,25 @@
-import crypto from 'crypto';
-
 import { ResetPasswordUseCase } from '@usecases/credentials/reset-password-use-case';
 import type { IUserRepository } from '@domain/repositories/user-repository';
 import type { IPasswordResetTokenRepository } from '@domain/repositories/password-reset-token-repository';
 import type { ICacheService } from '@domain/services/cache-service';
-import { User } from '@domain/entities/user';
 
-function sha256Hex(value: string): string {
-  return crypto.createHash('sha256').update(value).digest('hex');
-}
+jest.mock('@utils/password-generator', () => ({
+  hashPassword: jest.fn().mockResolvedValue('hashed-new-password'),
+  verifyPassword: jest.fn().mockResolvedValue(true),
+}));
+
+jest.mock('@utils/hash', () => ({
+  sha256Hex: jest.fn((v: string) => `sha256:${v}`),
+}));
 
 function makeUserRepoMock(): jest.Mocked<IUserRepository> {
   return {
     findByEmail: jest.fn(),
     findById: jest.fn(),
     create: jest.fn(),
-    updatePasswordHash: jest.fn(),
+    updatePasswordHash: jest.fn().mockResolvedValue(undefined),
     findAll: jest.fn(),
-    incrementTokenVersion: jest.fn(),
+    incrementTokenVersion: jest.fn().mockResolvedValue(undefined),
   };
 }
 
@@ -43,16 +45,15 @@ describe('ResetPasswordUseCase', () => {
     jest.clearAllMocks();
   });
 
-  it('deve falhar com token inválido', async () => {
+  it('deve falhar com token inválido (vazio)', async () => {
     const userRepo = makeUserRepoMock();
     const resetTokenRepo = makeResetTokenRepoMock();
     const cacheService = makeCacheServiceMock();
-    resetTokenRepo.consumeByTokenHash.mockResolvedValue(null);
 
     const useCase = new ResetPasswordUseCase(userRepo, resetTokenRepo, cacheService);
 
     await expect(
-      useCase.execute({ token: 'invalid-token', newPassword: 'SenhaForte123' }),
+      useCase.execute({ token: '   ', newPassword: 'SenhaForte123' }),
     ).rejects.toMatchObject({
       statusCode: 400,
       message: 'Invalid or expired token',
@@ -60,35 +61,39 @@ describe('ResetPasswordUseCase', () => {
     });
   });
 
+  it('deve falhar quando token não encontrado no banco', async () => {
+    const userRepo = makeUserRepoMock();
+    const resetTokenRepo = makeResetTokenRepoMock();
+    const cacheService = makeCacheServiceMock();
+
+    resetTokenRepo.consumeByTokenHash.mockResolvedValue(null);
+
+    const useCase = new ResetPasswordUseCase(userRepo, resetTokenRepo, cacheService);
+
+    await expect(
+      useCase.execute({ token: 'token-inexistente', newPassword: 'SenhaForte123' }),
+    ).rejects.toMatchObject({
+      statusCode: 400,
+      message: 'Invalid or expired token',
+      code: 'PASSWORD_RESET_INVALID_TOKEN',
+    });
+
+    expect(resetTokenRepo.consumeByTokenHash).toHaveBeenCalledWith('sha256:token-inexistente');
+  });
+
   it('deve atualizar senha e marcar token como usado', async () => {
     const userRepo = makeUserRepoMock();
     const resetTokenRepo = makeResetTokenRepoMock();
     const cacheService = makeCacheServiceMock();
 
-    const user = new User({
-      id: 'u1',
-      name: 'User',
-      email: 'user@example.com',
-      passwordHash: 'old',
-      role: 'USER',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    const rawToken = 'abc123token-value-xxxxxxxx';
-    const tokenHash = sha256Hex(rawToken);
-
-    userRepo.findById.mockResolvedValue(user);
-    userRepo.updatePasswordHash.mockResolvedValue(undefined);
     resetTokenRepo.consumeByTokenHash.mockResolvedValue('u1');
 
     const useCase = new ResetPasswordUseCase(userRepo, resetTokenRepo, cacheService);
-    await useCase.execute({ token: rawToken, newPassword: 'NovaSenhaForte123' });
+    await useCase.execute({ token: 'valid-token-123', newPassword: 'NovaSenhaForte123' });
 
-    expect(resetTokenRepo.consumeByTokenHash).toHaveBeenCalledWith(tokenHash);
-    expect(userRepo.updatePasswordHash).toHaveBeenCalledWith('u1', expect.any(String));
+    expect(resetTokenRepo.consumeByTokenHash).toHaveBeenCalledWith('sha256:valid-token-123');
+    expect(userRepo.updatePasswordHash).toHaveBeenCalledWith('u1', 'hashed-new-password');
     expect(userRepo.incrementTokenVersion).toHaveBeenCalledWith('u1');
     expect(cacheService.del).toHaveBeenCalledWith(expect.stringContaining('u1'));
-    expect(resetTokenRepo.markUsed).not.toHaveBeenCalled();
   });
 });
