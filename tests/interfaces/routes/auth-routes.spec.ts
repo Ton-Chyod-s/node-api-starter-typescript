@@ -198,4 +198,31 @@ describe('routes /auth', () => {
       await close();
     }
   });
+
+  it('POST /auth/logout deve retornar 200 mesmo sem token', async () => {
+    const routes = await loadRoutesWithEnv('secret-logout');
+
+    const app = express();
+    app.use(cookieParser());
+    app.use('/api', routes);
+
+    const { baseUrl, close } = await startServer(app);
+
+    try {
+      const res = await fetch(`${baseUrl}/api/auth/logout`, {
+        method: 'POST',
+      });
+      const body = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(body).toMatchObject({
+        statusCode: 200,
+        message: 'Logout successful',
+      });
+    } finally {
+      await close();
+    }
+  });
+
+
 });

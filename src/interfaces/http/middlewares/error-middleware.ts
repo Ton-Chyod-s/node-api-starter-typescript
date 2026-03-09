@@ -83,7 +83,7 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
       const response = createResponse(
         status,
         'Resource already exists',
-        err.meta ? { meta: err.meta } : undefined,
+        undefined,
         undefined,
         'RESOURCE_CONFLICT',
       );

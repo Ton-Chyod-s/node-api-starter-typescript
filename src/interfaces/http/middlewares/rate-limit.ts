@@ -18,6 +18,10 @@ let memoryFallbackWarned = false;
 
 function getRateLimitStore(): RedisStore | undefined {
   if (!env.REDIS_URL) {
+    if (env.NODE_ENV === 'production') {
+      throw new Error('REDIS_URL é obrigatória em produção para o rate limit.');
+    }
+
     if (!memoryFallbackWarned && env.NODE_ENV !== 'test') {
       logger.warn('REDIS_URL não configurada. Rate limit seguirá com store em memória.');
       memoryFallbackWarned = true;

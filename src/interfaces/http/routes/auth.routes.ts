@@ -1,5 +1,5 @@
 import { Router, type RequestHandler } from 'express';
-import { makeAuth } from '@interfaces/http/factories/controllers/user/make-auth-middleware';
+import { makeAuth, makeOptionalAuth } from '@interfaces/http/factories/controllers/user/make-auth-middleware';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { env } from '@config/env';
@@ -8,6 +8,7 @@ import { makeRateLimiter } from '@interfaces/http/middlewares/rate-limit';
 
 const router = Router();
 const authMiddleware = makeAuth();
+const optionalAuthMiddleware = makeOptionalAuth();
 
 
 const asyncRoute = (
@@ -121,7 +122,7 @@ router.post('/auth/token', authLimiter, asyncRoute(async (req, res, next) => {
   return controller.handle(req, res, next);
 }));
 
-router.post('/auth/logout', authMiddleware, asyncRoute(async (req, res, next) => {
+router.post('/auth/logout', optionalAuthMiddleware, asyncRoute(async (req, res, next) => {
   const controller = await getLogoutController();
   return controller.handle(req, res, next);
 }));
