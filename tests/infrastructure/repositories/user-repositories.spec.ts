@@ -33,6 +33,7 @@ describe('PrismaUserRepository', () => {
       name: 'Klay',
       email: 'k@k.com',
       passwordHash: 'hash',
+      role: 'USER',
     });
 
     const result = await repo.findByEmail('k@k.com');

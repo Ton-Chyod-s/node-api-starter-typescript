@@ -9,6 +9,32 @@ function sha256Hex(value: string): string {
   return crypto.createHash('sha256').update(value).digest('hex');
 }
 
+function makeUserRepoMock(): jest.Mocked<IUserRepository> {
+  return {
+    findByEmail: jest.fn(),
+    findById: jest.fn(),
+    create: jest.fn(),
+    updatePasswordHash: jest.fn(),
+    findAll: jest.fn(),
+    incrementTokenVersion: jest.fn(),
+  };
+}
+
+function makeResetTokenRepoMock(): jest.Mocked<IPasswordResetTokenRepository> {
+  return {
+    replaceTokenForUser: jest.fn(),
+    findValidByTokenHash: jest.fn(),
+    markUsed: jest.fn(),
+    consumeByTokenHash: jest.fn(),
+  };
+}
+
+function makeMailerMock(): jest.Mocked<IMailerService> {
+  return {
+    sendMail: jest.fn(),
+  };
+}
+
 describe('ForgotPasswordUseCase', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
@@ -18,25 +44,11 @@ describe('ForgotPasswordUseCase', () => {
   });
 
   it('não deve enviar e-mail quando usuário não existir', async () => {
-    const userRepo: jest.Mocked<IUserRepository> = {
-      findByEmail: jest.fn().mockResolvedValue(null),
-      findById: jest.fn(),
-      create: jest.fn(),
-      updatePasswordHash: jest.fn(),
-      findAll: jest.fn(),
-      incrementTokenVersion: jest.fn(),
-    };
+    const userRepo = makeUserRepoMock();
+    const resetTokenRepo = makeResetTokenRepoMock();
+    const mailer = makeMailerMock();
 
-    const resetTokenRepo: jest.Mocked<IPasswordResetTokenRepository> = {
-      replaceTokenForUser: jest.fn(),
-      findValidByTokenHash: jest.fn(),
-      markUsed: jest.fn(),
-      consumeByTokenHash: jest.fn(),
-    };
-
-    const mailer: jest.Mocked<IMailerService> = {
-      sendMail: jest.fn(),
-    };
+    userRepo.findByEmail.mockResolvedValue(null);
 
     const useCase = new ForgotPasswordUseCase(userRepo, resetTokenRepo, mailer);
     await useCase.execute('no@exemplo.com');
@@ -46,6 +58,10 @@ describe('ForgotPasswordUseCase', () => {
   });
 
   it('deve criar token e enviar e-mail quando usuário existir', async () => {
+    const userRepo = makeUserRepoMock();
+    const resetTokenRepo = makeResetTokenRepoMock();
+    const mailer = makeMailerMock();
+
     const user = new User({
       id: 'u1',
       name: 'User',
@@ -56,41 +72,22 @@ describe('ForgotPasswordUseCase', () => {
       updatedAt: new Date(),
     });
 
-    const userRepo: jest.Mocked<IUserRepository> = {
-      findByEmail: jest.fn().mockResolvedValue(user),
-      findById: jest.fn(),
-      create: jest.fn(),
-      updatePasswordHash: jest.fn(),
-      findAll: jest.fn(),
-      incrementTokenVersion: jest.fn(),
-    };
-
-    const resetTokenRepo: jest.Mocked<IPasswordResetTokenRepository> = {
-      replaceTokenForUser: jest.fn().mockImplementation(async (userId, input) => {
-        return {
-          id: 't1',
-          userId,
-          tokenHash: input.tokenHash,
-          expiresAt: input.expiresAt,
-          createdAt: new Date(),
-          usedAt: null,
-        };
-      }),
-      findValidByTokenHash: jest.fn(),
-      markUsed: jest.fn(),
-      consumeByTokenHash: jest.fn(),
-    };
-
-    const mailer: jest.Mocked<IMailerService> = {
-      sendMail: jest.fn().mockResolvedValue(undefined),
-    };
+    userRepo.findByEmail.mockResolvedValue(user);
+    resetTokenRepo.replaceTokenForUser.mockImplementation(async (userId, input) => ({
+      id: 't1',
+      userId,
+      tokenHash: input.tokenHash,
+      expiresAt: input.expiresAt,
+      createdAt: new Date(),
+      usedAt: null,
+    }));
+    mailer.sendMail.mockResolvedValue(undefined);
 
     const fixed = Buffer.alloc(32, 7);
     const randomBytesSpy = jest.spyOn(crypto, 'randomBytes') as unknown as jest.SpyInstance<
       Buffer,
       [number]
     >;
-
     randomBytesSpy.mockReturnValue(fixed);
 
     const rawToken = fixed.toString('hex');
@@ -113,3 +110,4 @@ describe('ForgotPasswordUseCase', () => {
     );
   });
 });
+

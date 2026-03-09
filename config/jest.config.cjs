@@ -13,12 +13,12 @@ const baseConfig = {
   testEnvironment: 'node',
   setupFiles: ['<rootDir>/tests/setup/test-env.js'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { diagnostics: { warnOnly: true } }],
+    '^.+\\.tsx?$': ['ts-jest', { diagnostics: true }],
   },
 };
 
 module.exports = {
-  testTimeout: 60000,
+  testTimeout: 30000,
   projects: [
     {
       ...baseConfig,

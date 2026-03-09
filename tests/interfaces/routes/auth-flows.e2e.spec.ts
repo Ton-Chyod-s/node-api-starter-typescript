@@ -1,6 +1,8 @@
-import type { Express } from 'express';
 import type { User as UserEntity } from '@domain/entities/user';
+import { loadApp, startServer, getSetCookies, pickCookie, type FetchLikeResponse } from '../../setup/test-helpers';
+import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
 
+jest.setTimeout(30000);
 
 jest.mock('express-rate-limit', () => {
   return () => (_req: unknown, _res: unknown, next: (err?: unknown) => void) => next();
@@ -39,19 +41,18 @@ type CsrfBody = {
   };
 };
 
+// Store encapsulado em módulo local — sem poluir globalThis
+const store: Store = {
+  usersById: new Map(),
+  usersByEmail: new Map(),
+  resetTokens: new Map(),
+  sentMails: [],
+  userSeq: 0,
+  tokenSeq: 0,
+};
+
 function getStore(): Store {
-  const g = globalThis as unknown as { __authFlowStore?: Store };
-  if (!g.__authFlowStore) {
-    g.__authFlowStore = {
-      usersById: new Map(),
-      usersByEmail: new Map(),
-      resetTokens: new Map(),
-      sentMails: [],
-      userSeq: 0,
-      tokenSeq: 0,
-    };
-  }
-  return g.__authFlowStore;
+  return store;
 }
 
 jest.mock('@infrastructure/repositories/user-repositories', () => {
@@ -219,44 +220,6 @@ jest.mock('@infrastructure/services/node-mailer-service', () => {
   return { NodemailerService };
 });
 
-async function startServer(app: Express): Promise<{ baseUrl: string; close: () => Promise<void> }> {
-  return new Promise((resolve) => {
-    const server = app.listen(0, () => {
-      const address = server.address();
-      const port = typeof address === 'object' && address ? address.port : 0;
-
-      resolve({
-        baseUrl: `http://127.0.0.1:${port}`,
-        close: () => new Promise((r) => server.close(() => r())),
-      });
-    });
-  });
-}
-
-type FetchLikeResponse = {
-  headers: {
-    get: (name: string) => string | null;
-    getSetCookie?: () => string[];
-  };
-};
-
-function getSetCookies(res: FetchLikeResponse): string[] {
-  const headers = res.headers;
-
-  if (typeof headers.getSetCookie === 'function') return headers.getSetCookie();
-
-  const single = headers.get('set-cookie');
-  return single ? [single] : [];
-}
-
-function pickCookie(setCookies: string[], cookieName: string): string | null {
-  for (const sc of setCookies) {
-    const first = sc.split(';')[0];
-    if (first.startsWith(`${cookieName}=`)) return first;
-  }
-  return null;
-}
-
 function extractTokenFromResetLink(html: string): string {
   const linkMatch = html.match(/href=["']([^"']+)["']/i);
   if (!linkMatch?.[1]) throw new Error('Reset link não encontrado no e-mail mockado');
@@ -268,36 +231,6 @@ function extractTokenFromResetLink(html: string): string {
   return token;
 }
 
-async function loadApp(): Promise<Express> {
-  jest.resetModules();
-
-  process.env.NODE_ENV = 'test';
-  process.env.DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://user:pass@localhost:5432/db';
-  process.env.KEY_JWT = 'test-secret';
-  process.env.JWT_ISSUER = 'test-issuer';
-  process.env.JWT_AUDIENCE = 'test-audience';
-  process.env.JWT_EXPIRES_IN = '1h';
-  process.env.CORS_ORIGIN = 'http://localhost:3000';
-  process.env.SENTRY_DSN = '';
-  process.env.TRUST_PROXY = '0';
-
-  process.env.CSRF_ENABLED = 'true';
-  process.env.CSRF_COOKIE_NAME = 'csrfToken';
-  process.env.COOKIE_SECURE = 'false';
-  process.env.COOKIE_SAMESITE = 'lax';
-
-  process.env.SMTP_HOST = 'smtp.local';
-  process.env.SMTP_USER = 'user';
-  process.env.SMTP_PASSWORD = 'pass';
-  process.env.SMTP_PORT = '465';
-
-  process.env.FRONTEND_URL = 'http://frontend.local';
-  process.env.PASSWORD_RESET_PATH = '/reset-password/{token}';
-  process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES = '15';
-
-  const { createApp } = (await import('@main/app')) as typeof import('@main/app');
-  return createApp() as unknown as Express;
-}
 
 describe('E2E /auth flows (HTTP)', () => {
   beforeEach(() => {
@@ -374,7 +307,7 @@ describe('E2E /auth flows (HTTP)', () => {
       });
 
       const loginCookies = getSetCookies(loginRes as unknown as FetchLikeResponse);
-      const authCookie = pickCookie(loginCookies, 'token');
+      const authCookie = pickCookie(loginCookies, AUTH_COOKIE_NAME);
       expect(authCookie).toBeTruthy();
 
       const meRes = await fetch(`${baseUrl}/api/auth/me`, {

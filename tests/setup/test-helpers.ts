@@ -1,12 +1,40 @@
 import type { Express } from 'express';
 import type { Socket } from 'node:net';
 
-type FetchLikeResponse = {
+export type FetchLikeResponse = {
   headers: {
     get: (name: string) => string | null;
     getSetCookie?: () => string[];
   };
 };
+
+export async function loadApp(): Promise<Express> {
+  jest.resetModules();
+
+  process.env.NODE_ENV = 'test';
+  process.env.DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://user:pass@localhost:5432/db';
+  process.env.KEY_JWT = 'test-secret';
+  process.env.JWT_ISSUER = 'test-issuer';
+  process.env.JWT_AUDIENCE = 'test-audience';
+  process.env.JWT_EXPIRES_IN = '1h';
+  process.env.CORS_ORIGIN = 'http://localhost:3000';
+  process.env.SENTRY_DSN = '';
+  process.env.TRUST_PROXY = '0';
+  process.env.CSRF_ENABLED = 'true';
+  process.env.CSRF_COOKIE_NAME = 'csrfToken';
+  process.env.COOKIE_SECURE = 'false';
+  process.env.COOKIE_SAMESITE = 'lax';
+  process.env.SMTP_HOST = 'smtp.local';
+  process.env.SMTP_USER = 'user';
+  process.env.SMTP_PASSWORD = 'pass';
+  process.env.SMTP_PORT = '465';
+  process.env.FRONTEND_URL = 'http://frontend.local';
+  process.env.PASSWORD_RESET_PATH = '/reset-password/{token}';
+  process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES = '15';
+
+  const { createApp } = (await import('@main/app')) as typeof import('@main/app');
+  return createApp() as unknown as Express;
+}
 
 export function startServer(app: Express): Promise<{ baseUrl: string; close: () => Promise<void> }> {
   return new Promise((resolve) => {
