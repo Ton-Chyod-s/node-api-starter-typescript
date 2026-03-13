@@ -7,6 +7,7 @@ import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
 import { userCacheKey } from '@utils/cache-keys';
+import { env } from '@config/env';
 
 type CachedUser = {
   id: string;
@@ -17,8 +18,6 @@ type CachedUser = {
 type MakeAuthMiddlewareOptions = {
   allowAnonymous?: boolean;
 };
-
-const USER_CACHE_TTL = 60;
 
 function buildUnauthorizedResponse(res: Response) {
   const response = createResponse(
@@ -87,7 +86,7 @@ function makeAuthMiddlewareInternal(
         cached = { id: user.id, role: user.role, tokenVersion: user.tokenVersion };
 
         try {
-          await cacheService.set(cacheKey, cached, USER_CACHE_TTL);
+          await cacheService.set(cacheKey, cached, env.USER_CACHE_TTL_SECONDS);
         } catch (err) {
           logger.warn('Falha ao salvar sessão no cache. Requisição seguirá normalmente.', {
             userId: user.id,

@@ -18,7 +18,7 @@ if (env.NODE_ENV === 'development') {
 router.use(authRoutes);
 router.use(adminRoutes);
 
-if (env.NODE_ENV === 'development' && env.DEBUG_ROUTES_ENABLED) {
+if (env.DEBUG_ROUTES_ENABLED) {
   router.use(debugRoutes);
 }
 

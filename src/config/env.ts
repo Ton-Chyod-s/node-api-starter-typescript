@@ -81,6 +81,11 @@ const schema = z.object({
   EMAIL_FROM: z.string().optional().transform(normalizeOptionalString),
 
   APP_NAME: z.string().optional().default('app'),
+
+  USER_CACHE_TTL_SECONDS: z
+    .preprocess(preprocessOptional, z.coerce.number().int().min(10).max(3600))
+    .optional()
+    .default(60),
 });
 
 const parsedEnv = schema.superRefine((data, ctx) => {

@@ -17,7 +17,14 @@ function buildResetLink(rawToken: string): string {
     : `${template.replace(/\/$/, '')}/${rawToken}`;
 
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  return `${base}${normalizedPath}`;
+  const link = `${base}${normalizedPath}`;
+
+  const url = new URL(link);
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error(`Reset link gerou um esquema inválido: ${url.protocol}`);
+  }
+
+  return link;
 }
 
 function ttlMinutes(): number {

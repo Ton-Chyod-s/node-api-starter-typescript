@@ -170,6 +170,8 @@ router.get('/auth/csrf', (req, res) => {
 export default router;
 
 export function resetControllersForTesting(): void {
+  if (env.NODE_ENV === 'production') return;
+
   _logoutController = null;
   _registerController = null;
   _loginController = null;
