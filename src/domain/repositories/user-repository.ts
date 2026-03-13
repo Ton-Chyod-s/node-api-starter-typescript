@@ -9,13 +9,15 @@ export type UserListItemRepository = {
 };
 
 export type CreateUserData = Omit<RegisterRequestDTO, 'password'> & {
-  passwordHash: string;
+  passwordHash?: string | null;
+  googleId?: string | null;
   role?: UserRole;
 };
 
 export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
   findById(id: string): Promise<User | null>;
+  findByGoogleId(googleId: string): Promise<User | null>;
   create(data: CreateUserData): Promise<User>;
   updatePasswordHash(userId: string, passwordHash: string): Promise<void>;
   findAll(): Promise<UserListItemRepository[]>;

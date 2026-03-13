@@ -21,6 +21,7 @@ export class PrismaUserRepository implements IUserRepository {
       name: user.name,
       email: user.email,
       passwordHash: user.passwordHash,
+      googleId: user.googleId,
       role: normalizeRole(user.role),
       tokenVersion: user.tokenVersion,
       createdAt: user.createdAt,
@@ -37,6 +38,24 @@ export class PrismaUserRepository implements IUserRepository {
       name: user.name,
       email: user.email,
       passwordHash: user.passwordHash,
+      googleId: user.googleId,
+      role: normalizeRole(user.role),
+      tokenVersion: user.tokenVersion,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+  }
+
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    const user = await prisma.user.findUnique({ where: { googleId } });
+    if (!user) return null;
+
+    return new User({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      passwordHash: user.passwordHash,
+      googleId: user.googleId,
       role: normalizeRole(user.role),
       tokenVersion: user.tokenVersion,
       createdAt: user.createdAt,
@@ -49,7 +68,8 @@ export class PrismaUserRepository implements IUserRepository {
       data: {
         name: data.name,
         email: data.email,
-        passwordHash: data.passwordHash,
+        passwordHash: data.passwordHash ?? null,
+        googleId: data.googleId ?? null,
         role: data.role ?? 'USER',
       },
     });
@@ -59,6 +79,7 @@ export class PrismaUserRepository implements IUserRepository {
       name: user.name,
       email: user.email,
       passwordHash: user.passwordHash,
+      googleId: user.googleId,
       role: normalizeRole(user.role),
       tokenVersion: user.tokenVersion,
       createdAt: user.createdAt,

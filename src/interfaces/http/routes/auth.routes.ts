@@ -137,6 +137,38 @@ router.post('/auth/reset-password', passwordResetLimiter, asyncRoute(async (req,
   return controller.handle(req, res, next);
 }));
 
+let _googleAuthController:
+  | import('@interfaces/http/controllers/user/google-auth-controller').GoogleAuthController
+  | null = null;
+async function getGoogleAuthController() {
+  if (_googleAuthController) return _googleAuthController;
+  const { makeGoogleAuthController } =
+    await import('@interfaces/http/factories/controllers/user/google-auth-controller.factory');
+  _googleAuthController = makeGoogleAuthController();
+  return _googleAuthController;
+}
+
+let _googleCallbackController:
+  | import('@interfaces/http/controllers/user/google-callback-controller').GoogleCallbackController
+  | null = null;
+async function getGoogleCallbackController() {
+  if (_googleCallbackController) return _googleCallbackController;
+  const { makeGoogleCallbackController } =
+    await import('@interfaces/http/factories/controllers/user/google-callback-controller.factory');
+  _googleCallbackController = makeGoogleCallbackController();
+  return _googleCallbackController;
+}
+
+router.get('/auth/google', asyncRoute(async (req, res, next) => {
+  const controller = await getGoogleAuthController();
+  return controller.handle(req, res, next);
+}));
+
+router.get('/auth/google/callback', asyncRoute(async (req, res, next) => {
+  const controller = await getGoogleCallbackController();
+  return controller.handle(req, res, next);
+}));
+
 let _meController:
   | import('@interfaces/http/controllers/user/me-controller').MeController
   | null = null;
@@ -179,4 +211,6 @@ export function resetControllersForTesting(): void {
   _forgotPasswordController = null;
   _resetPasswordController = null;
   _meController = null;
+  _googleAuthController = null;
+  _googleCallbackController = null;
 }

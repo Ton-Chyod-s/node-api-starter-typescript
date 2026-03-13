@@ -1,0 +1,18 @@
+get:
+  tags: [Auth Web]
+  summary: Iniciar login com Google
+  operationId: googleAuth
+  description: >
+    Redireciona o usuário para a tela de consentimento do Google OAuth2.
+    Após autorizar, o Google redireciona para `/auth/google/callback`.
+    Use este endpoint iniciando a navegação diretamente (não via fetch/axios).
+  responses:
+    '302':
+      description: Redirect para o Google OAuth consent screen
+      headers:
+        Location:
+          schema:
+            type: string
+          description: URL de autorização do Google
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

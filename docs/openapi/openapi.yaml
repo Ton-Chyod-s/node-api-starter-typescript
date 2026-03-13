@@ -115,6 +115,12 @@ paths:
   /auth/reset-password:
     $ref: ./paths/auth.reset-password.yaml
 
+  /auth/google:
+    $ref: ./paths/auth.google.yaml
+
+  /auth/google/callback:
+    $ref: ./paths/auth.google-callback.yaml
+
   /debug-sentry:
     $ref: ./paths/debug-sentry.yaml
 

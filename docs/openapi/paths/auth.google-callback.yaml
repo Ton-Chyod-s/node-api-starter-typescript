@@ -1,0 +1,93 @@
+get:
+  tags: [Auth Web]
+  summary: Callback do Google OAuth2
+  operationId: googleCallback
+  description: >
+    Endpoint chamado automaticamente pelo Google após o usuário autorizar o acesso.
+    Troca o `code` por um token do Google, valida o ID token, cria ou recupera o usuário
+    e seta o cookie HttpOnly com o JWT da aplicação.
+    Se `FRONTEND_URL` estiver configurado, redireciona para o frontend após o login.
+    **Não chame este endpoint diretamente — ele é exclusivo para o redirect do Google.**
+  parameters:
+    - name: code
+      in: query
+      required: true
+      description: Código de autorização retornado pelo Google
+      schema:
+        type: string
+    - name: state
+      in: query
+      required: false
+      description: Parâmetro de estado (passthrough do Google)
+      schema:
+        type: string
+  responses:
+    '200':
+      description: Login realizado com sucesso (quando FRONTEND_URL não está configurado)
+      headers:
+        Set-Cookie:
+          schema:
+            type: string
+          description: Cookie HttpOnly com o JWT (token)
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/LoginCookieResponseData
+    '302':
+      description: Redirect para FRONTEND_URL após login bem-sucedido
+      headers:
+        Location:
+          schema:
+            type: string
+        Set-Cookie:
+          schema:
+            type: string
+          description: Cookie HttpOnly com o JWT (token)
+    '400':
+      description: Código de autorização ausente ou inválido
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            missingCode:
+              value:
+                statusCode: 400
+                message: Missing authorization code
+                code: AUTH_MISSING_CODE
+    '401':
+      description: Token do Google inválido
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            noIdToken:
+              value:
+                statusCode: 401
+                message: Google did not return an ID token
+                code: AUTH_GOOGLE_NO_ID_TOKEN
+            invalidPayload:
+              value:
+                statusCode: 401
+                message: Invalid Google token payload
+                code: AUTH_GOOGLE_INVALID_PAYLOAD
+    '409':
+      description: E-mail já cadastrado com senha — use o login padrão
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            emailConflict:
+              value:
+                statusCode: 409
+                message: An account with this email already exists. Please log in with your password.
+                code: AUTH_EMAIL_ALREADY_EXISTS
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

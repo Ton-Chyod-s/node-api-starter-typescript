@@ -11,12 +11,13 @@ type MakeRateLimiterOptions = {
   windowMs: number;
   limit: number;
   skip?: Options['skip'];
+  prefix?: string;
 };
 
-let redisStore: RedisStore | undefined;
 let memoryFallbackWarned = false;
+let prefixCounter = 0;
 
-function getRateLimitStore(): RedisStore | undefined {
+function getRateLimitStore(prefix: string): RedisStore | undefined {
   if (!env.REDIS_URL) {
     if (env.NODE_ENV === 'production') {
       throw new Error('REDIS_URL é obrigatória em produção para o rate limit.');
@@ -30,31 +31,30 @@ function getRateLimitStore(): RedisStore | undefined {
     return undefined;
   }
 
-  if (redisStore) return redisStore;
-
   const client = getRedisClient();
 
-  redisStore = new RedisStore({
+  return new RedisStore({
     sendCommand: (command: string, ...args: string[]) =>
       client.call(command, ...args) as Promise<number>,
-    prefix: 'rl:',
+    prefix,
   });
-
-  return redisStore;
 }
 
 export function makeRateLimiter({
   windowMs,
   limit,
   skip,
+  prefix,
 }: MakeRateLimiterOptions) {
+  const storePrefix = prefix ?? `rl:${++prefixCounter}:`;
+
   return rateLimit({
     windowMs,
     limit,
     standardHeaders: true,
     legacyHeaders: false,
     skip,
-    store: getRateLimitStore(),
+    store: getRateLimitStore(storePrefix),
     passOnStoreError: true,
     handler: (_req, res) => {
       const status = httpStatusCodes.TOO_MANY_REQUESTS ?? 429;

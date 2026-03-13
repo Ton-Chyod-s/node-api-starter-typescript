@@ -70,6 +70,13 @@ const schema = z.object({
   SEED_ADMIN_PASSWORD: z.string().optional().transform(normalizeOptionalString),
   SEED_ADMIN_NAME: z.string().optional().transform(normalizeOptionalString),
 
+  // ------------------------------------------------------------------------------
+  // GOOGLE OAUTH
+  // ------------------------------------------------------------------------------
+  GOOGLE_CLIENT_ID: z.string().min(1).optional().transform(normalizeOptionalString),
+  GOOGLE_CLIENT_SECRET: z.string().min(1).optional().transform(normalizeOptionalString),
+  GOOGLE_REDIRECT_URI: z.string().url().optional().transform(normalizeOptionalString),
+
   SMTP_HOST: z.string().optional().transform(normalizeOptionalString),
   SMTP_PORT: z
     .preprocess(preprocessOptional, z.coerce.number().int().min(1).max(65535))

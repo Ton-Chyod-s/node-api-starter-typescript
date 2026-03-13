@@ -4,7 +4,8 @@ export interface UserProps {
   id: string;
   name: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string | null;
+  googleId?: string | null;
   role: UserRole;
   tokenVersion?: number;
   createdAt?: Date;
@@ -25,16 +26,17 @@ export class User {
 
     if (!id) throw new Error('id is required');
     if (!name) throw new Error('name is required');
-    if (!email) throw new Error('email is required');
+    if (!email) throw new Error('email is invalid');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('email is invalid');
-    if (!props.passwordHash) throw new Error('passwordHash is required');
+    if (!props.passwordHash && !props.googleId) throw new Error('passwordHash or googleId is required');
     if (props.role !== 'USER' && props.role !== 'ADMIN') throw new Error('role is invalid');
 
     const normalized = {
       id,
       name,
       email,
-      passwordHash: props.passwordHash,
+      passwordHash: props.passwordHash ?? null,
+      googleId: props.googleId ?? null,
       role: props.role,
       tokenVersion: props.tokenVersion ?? 0,
       createdAt: props.createdAt ?? now,
@@ -58,6 +60,10 @@ export class User {
 
   get passwordHash() {
     return this.props.passwordHash;
+  }
+
+  get googleId() {
+    return this.props.googleId;
   }
 
   get role() {
