@@ -254,7 +254,7 @@ describe('E2E /auth flows (HTTP)', () => {
         body: JSON.stringify({
           name: '  John Doe  ',
           email: 'John.DOE@Example.com',
-          password: '12345678',
+          password: 'Senha@12345',
         }),
       });
 
@@ -288,7 +288,7 @@ describe('E2E /auth flows (HTTP)', () => {
         },
         body: JSON.stringify({
           email: 'john.doe@example.com',
-          password: '12345678',
+          password: 'Senha@12345',
         }),
       });
 
@@ -345,7 +345,7 @@ describe('E2E /auth flows (HTTP)', () => {
         body: JSON.stringify({
           name: 'Klay',
           email: 'klay@example.com',
-          password: 'OldPass123',
+          password: 'OldPass@123',
         }),
       });
 
@@ -401,7 +401,7 @@ describe('E2E /auth flows (HTTP)', () => {
           Cookie: csrfCookie!,
           'x-csrf-token': csrfBody.data.csrfToken,
         },
-        body: JSON.stringify({ email: 'klay@example.com', password: 'NewPass123' }),
+        body: JSON.stringify({ email: 'klay@example.com', password: 'NewPass@123' }),
       });
 
       expect(newLoginRes.status).toBe(200);

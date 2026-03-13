@@ -53,7 +53,7 @@ describe('ResetPasswordUseCase', () => {
     const useCase = new ResetPasswordUseCase(userRepo, resetTokenRepo, cacheService);
 
     await expect(
-      useCase.execute({ token: '   ', newPassword: 'SenhaForte123' }),
+      useCase.execute({ token: '   ', newPassword: 'SenhaForte123!' }),
     ).rejects.toMatchObject({
       statusCode: 400,
       message: 'Invalid or expired token',
@@ -71,7 +71,7 @@ describe('ResetPasswordUseCase', () => {
     const useCase = new ResetPasswordUseCase(userRepo, resetTokenRepo, cacheService);
 
     await expect(
-      useCase.execute({ token: 'token-inexistente', newPassword: 'SenhaForte123' }),
+      useCase.execute({ token: 'token-inexistente', newPassword: 'SenhaForte123!' }),
     ).rejects.toMatchObject({
       statusCode: 400,
       message: 'Invalid or expired token',
@@ -89,7 +89,7 @@ describe('ResetPasswordUseCase', () => {
     resetTokenRepo.consumeByTokenHash.mockResolvedValue('u1');
 
     const useCase = new ResetPasswordUseCase(userRepo, resetTokenRepo, cacheService);
-    await useCase.execute({ token: 'valid-token-123', newPassword: 'NovaSenhaForte123' });
+    await useCase.execute({ token: 'valid-token-123', newPassword: 'NovaSenhaForte123!' });
 
     expect(resetTokenRepo.consumeByTokenHash).toHaveBeenCalledWith('sha256:valid-token-123');
     expect(userRepo.updatePasswordHash).toHaveBeenCalledWith('u1', 'hashed-new-password');

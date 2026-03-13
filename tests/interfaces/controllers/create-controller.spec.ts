@@ -34,7 +34,7 @@ describe('RegisterController', () => {
       body: {
         name: '  John Doe  ',
         email: 'John.DOE@Example.com',
-        password: '12345678',
+        password: 'Senha@123!',
       },
     } as Request;
 
@@ -56,7 +56,7 @@ describe('RegisterController', () => {
     expect(useCase.execute).toHaveBeenCalledWith({
       name: 'John Doe',
       email: 'john.doe@example.com',
-      password: '12345678',
+      password: 'Senha@123!',
     });
 
     expect(res.status).toHaveBeenCalledWith(httpStatusCodes.CREATED);
@@ -120,7 +120,7 @@ describe('RegisterController', () => {
       body: {
         name: 'John Doe',
         email: 'john.doe@example.com',
-        password: '12345678',
+        password: 'Senha@123!',
       },
     } as Request;
 
