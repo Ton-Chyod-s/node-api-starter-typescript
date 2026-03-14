@@ -2,6 +2,7 @@ import { prisma } from '../prisma/client';
 import {
   IUserRepository,
   CreateUserData,
+  UpsertGoogleUserData,
   UserListItemRepository,
 } from '@domain/repositories/user-repository';
 import { User, type UserRole } from '@domain/entities/user';
@@ -85,6 +86,37 @@ export class PrismaUserRepository implements IUserRepository {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
+  }
+
+  async upsertByGoogleId(
+    data: UpsertGoogleUserData,
+  ): Promise<{ user: User; created: boolean }> {
+    const existing = await prisma.user.findUnique({ where: { googleId: data.googleId } });
+
+    const record = await prisma.user.upsert({
+      where: { googleId: data.googleId },
+      update: {},
+      create: {
+        name: data.name,
+        email: data.email.trim().toLowerCase(),
+        googleId: data.googleId,
+        role: 'USER',
+      },
+    });
+
+    const user = new User({
+      id: record.id,
+      name: record.name,
+      email: record.email,
+      passwordHash: record.passwordHash,
+      googleId: record.googleId,
+      role: normalizeRole(record.role),
+      tokenVersion: record.tokenVersion,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    });
+
+    return { user, created: existing === null };
   }
 
   async updatePasswordHash(userId: string, passwordHash: string): Promise<void> {

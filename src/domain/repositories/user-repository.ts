@@ -14,11 +14,18 @@ export type CreateUserData = Omit<RegisterRequestDTO, 'password'> & {
   role?: UserRole;
 };
 
+export type UpsertGoogleUserData = {
+  googleId: string;
+  email: string;
+  name: string;
+};
+
 export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
   findById(id: string): Promise<User | null>;
   findByGoogleId(googleId: string): Promise<User | null>;
   create(data: CreateUserData): Promise<User>;
+  upsertByGoogleId(data: UpsertGoogleUserData): Promise<{ user: User; created: boolean }>;
   updatePasswordHash(userId: string, passwordHash: string): Promise<void>;
   findAll(): Promise<UserListItemRepository[]>;
   incrementTokenVersion(userId: string): Promise<void>;

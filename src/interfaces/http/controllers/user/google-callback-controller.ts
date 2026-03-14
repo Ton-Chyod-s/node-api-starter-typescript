@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { GoogleLoginUseCase } from '@usecases/user/google-login-use-case';
 import { AUTH_COOKIE_NAME, authCookieOptions } from '@interfaces/http/cookies/auth-cookie';
+import { OAUTH_STATE_COOKIE } from '@interfaces/http/controllers/user/google-auth-controller';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { AppError } from '@utils/app-error';
@@ -20,6 +21,20 @@ export class GoogleCallbackController {
 
   async handle(req: Request, res: Response, next: NextFunction) {
     try {
+      const stateParam = req.query['state'];
+      const stateCookie = req.cookies?.[OAUTH_STATE_COOKIE] as string | undefined;
+
+      res.clearCookie(OAUTH_STATE_COOKIE, { path: '/' });
+
+      if (
+        !stateParam ||
+        typeof stateParam !== 'string' ||
+        !stateCookie ||
+        stateParam !== stateCookie
+      ) {
+        throw AppError.forbidden('Invalid OAuth state', 'AUTH_OAUTH_STATE_MISMATCH');
+      }
+
       const code = req.query['code'];
 
       if (!code || typeof code !== 'string') {

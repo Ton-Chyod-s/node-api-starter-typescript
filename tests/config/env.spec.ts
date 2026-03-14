@@ -30,6 +30,11 @@ async function loadEnv(envVars: Record<string, string | undefined>) {
     'SMTP_PASSWORD',
     'EMAIL_FROM',
     'REDIS_URL',
+    'USER_CACHE_TTL_SECONDS',
+    'APP_NAME',
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET',
+    'GOOGLE_REDIRECT_URI',
   ] as const;
 
   for (const k of keys) delete process.env[k];

@@ -122,7 +122,7 @@ router.post('/auth/token', authLimiter, asyncRoute(async (req, res, next) => {
   return controller.handle(req, res, next);
 }));
 
-router.post('/auth/logout', optionalAuthMiddleware, asyncRoute(async (req, res, next) => {
+router.post('/auth/logout', authLimiter, optionalAuthMiddleware, asyncRoute(async (req, res, next) => {
   const controller = await getLogoutController();
   return controller.handle(req, res, next);
 }));
@@ -159,12 +159,12 @@ async function getGoogleCallbackController() {
   return _googleCallbackController;
 }
 
-router.get('/auth/google', asyncRoute(async (req, res, next) => {
+router.get('/auth/google', authLimiter, asyncRoute(async (req, res, next) => {
   const controller = await getGoogleAuthController();
   return controller.handle(req, res, next);
 }));
 
-router.get('/auth/google/callback', asyncRoute(async (req, res, next) => {
+router.get('/auth/google/callback', authLimiter, asyncRoute(async (req, res, next) => {
   const controller = await getGoogleCallbackController();
   return controller.handle(req, res, next);
 }));
