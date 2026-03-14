@@ -26,7 +26,7 @@ Este repositório foi pensado como **codebase base** para futuros projetos Web (
 2. Copie o arquivo de exemplo de variáveis de ambiente:
 
    ```bash
-   cp .env.example .env
+   cp config/.env.development.example config/.env.development
    ```
 
 3. Ajuste as variáveis de ambiente conforme descrito em `docs/SETUP.md`.

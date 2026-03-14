@@ -169,6 +169,29 @@ Configure essas variáveis para enviar e-mails de recuperação via SMTP. Se est
 | SMTP_PASSWORD | não         | senha-ou-app-password | Senha.                                  |
 | EMAIL_FROM    | não         | no-reply@dominio.com  | Remetente. Se vazio, usa SMTP_USER.     |
 
+## Redis e Cache
+
+| Variável               | Obrigatória | Exemplo                | Observação                                                              |
+| ---------------------- | ----------- | ---------------------- | ----------------------------------------------------------------------- |
+| REDIS_URL              | não*        | redis://localhost:6379 | Se ausente, usa NullCacheService (sem cache). *Obrigatório em prod.     |
+| USER_CACHE_TTL_SECONDS | não         | 60                     | TTL do cache de usuário em segundos (min: 10, max: 3600, default: 60).  |
+
+Em produção, `REDIS_URL` é **obrigatória** — a aplicação recusa iniciar sem ela quando `NODE_ENV=production`.
+
+Para mais detalhes sobre a integração com Redis (NullCacheService, RedisService, configuração local com Docker), veja `docs/REDIS.md`.
+
+## Google OAuth (opcional)
+
+| Variável             | Obrigatória | Exemplo                                        | Observação                               |
+| -------------------- | ----------- | ---------------------------------------------- | ---------------------------------------- |
+| GOOGLE_CLIENT_ID     | não         | xxx.apps.googleusercontent.com                 | Client ID do projeto no Google Cloud.    |
+| GOOGLE_CLIENT_SECRET | não         | GOCSPX-xxx                                     | Client Secret do projeto.                |
+| GOOGLE_REDIRECT_URI  | não         | http://localhost:3000/api/auth/google/callback  | URI registrado no Google Cloud Console.  |
+
+Se as três variáveis não estiverem definidas, as rotas de OAuth do Google ficam desabilitadas.
+
+Para criar credenciais: https://console.cloud.google.com/apis/credentials
+
 ## Rodando o projeto em desenvolvimento
 
 ```bash

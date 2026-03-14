@@ -168,3 +168,27 @@ Em produção, `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` são exigidas para rod
 
 Use TRUST_PROXY quando a app estiver atrás de NGINX, Cloudflare ou outro proxy reverso,
 para o Express interpretar corretamente X-Forwarded-For e X-Forwarded-Proto.
+
+---
+
+## Redis e Cache
+
+| Variável               | Obrigatória | Exemplo                  | Observação                                                           |
+| ---------------------- | ----------- | ------------------------ | -------------------------------------------------------------------- |
+| REDIS_URL              | não*        | redis://localhost:6379   | Se ausente, usa NullCacheService (sem cache). *Obrigatório em prod.  |
+| USER_CACHE_TTL_SECONDS | não         | 60                       | TTL do cache de usuário em segundos (min: 10, max: 3600, default: 60). |
+
+Em produção, `REDIS_URL` é **obrigatória** — a app recusa iniciar sem ela quando `NODE_ENV=production`.
+
+---
+
+## Google OAuth (opcional)
+
+| Variável              | Obrigatória | Exemplo                                   | Observação                               |
+| --------------------- | ----------- | ----------------------------------------- | ---------------------------------------- |
+| GOOGLE_CLIENT_ID      | não         | xxx.apps.googleusercontent.com            | Client ID do projeto no Google Cloud.    |
+| GOOGLE_CLIENT_SECRET  | não         | GOCSPX-xxx                                | Client Secret do projeto.                |
+| GOOGLE_REDIRECT_URI   | não         | http://localhost:3000/api/auth/google/callback | URI registrado no Google Cloud Console. |
+
+Se as três variáveis não estiverem definidas, as rotas de OAuth do Google ficam desabilitadas.
+Crie credenciais em: https://console.cloud.google.com/apis/credentials
