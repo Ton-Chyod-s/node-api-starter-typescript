@@ -1,0 +1,98 @@
+get:
+  tags: [Auth Web]
+  summary: Callback do Facebook OAuth2
+  operationId: facebookCallback
+  description: >
+    Endpoint chamado automaticamente pelo Facebook após o usuário autorizar o acesso.
+    Troca o `code` por um access token do Facebook, busca o perfil na Graph API,
+    cria ou recupera o usuário e seta o cookie HttpOnly com o JWT da aplicação.
+    Se `FRONTEND_URL` estiver configurado, redireciona para o frontend após o login.
+    **Não chame este endpoint diretamente — ele é exclusivo para o redirect do Facebook.**
+  parameters:
+    - name: code
+      in: query
+      required: true
+      description: Código de autorização retornado pelo Facebook
+      schema:
+        type: string
+    - name: state
+      in: query
+      required: false
+      description: Parâmetro de estado (passthrough do Facebook)
+      schema:
+        type: string
+  responses:
+    '200':
+      description: Login realizado com sucesso (quando FRONTEND_URL não está configurado)
+      headers:
+        Set-Cookie:
+          schema:
+            type: string
+          description: Cookie HttpOnly com o JWT (token)
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/LoginCookieResponseData
+    '302':
+      description: Redirect para FRONTEND_URL após login bem-sucedido
+      headers:
+        Location:
+          schema:
+            type: string
+        Set-Cookie:
+          schema:
+            type: string
+          description: Cookie HttpOnly com o JWT (token)
+    '400':
+      description: Código de autorização ausente ou inválido
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            missingCode:
+              value:
+                statusCode: 400
+                message: Missing authorization code
+                code: AUTH_MISSING_CODE
+    '401':
+      description: Token ou perfil do Facebook inválido
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            tokenError:
+              value:
+                statusCode: 401
+                message: Failed to exchange Facebook code
+                code: AUTH_FACEBOOK_TOKEN_ERROR
+            profileError:
+              value:
+                statusCode: 401
+                message: Failed to fetch Facebook profile
+                code: AUTH_FACEBOOK_PROFILE_ERROR
+            invalidPayload:
+              value:
+                statusCode: 401
+                message: Invalid Facebook profile data
+                code: AUTH_FACEBOOK_INVALID_PAYLOAD
+    '403':
+      description: Estado OAuth inválido ou ausente (possível CSRF)
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            stateMismatch:
+              value:
+                statusCode: 403
+                message: Invalid OAuth state
+                code: AUTH_OAUTH_STATE_MISMATCH
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

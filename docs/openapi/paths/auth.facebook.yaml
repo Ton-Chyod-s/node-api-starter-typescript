@@ -1,0 +1,18 @@
+get:
+  tags: [Auth Web]
+  summary: Iniciar login com Facebook
+  operationId: facebookAuth
+  description: >
+    Redireciona o usuário para a tela de consentimento do Facebook OAuth2.
+    Após autorizar, o Facebook redireciona para `/auth/facebook/callback`.
+    Use este endpoint iniciando a navegação diretamente (não via fetch/axios).
+  responses:
+    '302':
+      description: Redirect para o Facebook OAuth consent screen
+      headers:
+        Location:
+          schema:
+            type: string
+          description: URL de autorização do Facebook
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

@@ -121,6 +121,12 @@ paths:
   /auth/google/callback:
     $ref: ./paths/auth.google-callback.yaml
 
+  /auth/facebook:
+    $ref: ./paths/auth.facebook.yaml
+
+  /auth/facebook/callback:
+    $ref: ./paths/auth.facebook-callback.yaml
+
   /debug-sentry:
     $ref: ./paths/debug-sentry.yaml
 
