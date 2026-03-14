@@ -5,7 +5,7 @@ import { ICacheService } from '@domain/services/cache-service';
 import { logger } from '@infrastructure/logging/logger';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
-import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
+import { AUTH_COOKIE_NAME, authCookieOptions } from '@interfaces/http/cookies/auth-cookie';
 import { userCacheKey } from '@utils/cache-keys';
 import { env } from '@config/env';
 
@@ -104,6 +104,10 @@ function makeAuthMiddlewareInternal(
         role: cached.role as 'USER' | 'ADMIN',
         tokenVersion: cached.tokenVersion,
       };
+
+      if (cookieToken) {
+        res.cookie(AUTH_COOKIE_NAME, cookieToken, authCookieOptions());
+      }
 
       return next();
     } catch (err) {
