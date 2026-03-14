@@ -9,6 +9,7 @@ model User {
   email        String  @unique @db.Citext
   passwordHash String?
   googleId     String? @unique
+  facebookId   String? @unique
   role         Role    @default(USER)
   tokenVersion Int     @default(0)
 

@@ -188,6 +188,28 @@ async function getGoogleCallbackController() {
   return _googleCallbackController;
 }
 
+let _facebookAuthController:
+  | import('@interfaces/http/controllers/user/facebook-auth-controller').FacebookAuthController
+  | null = null;
+async function getFacebookAuthController() {
+  if (_facebookAuthController) return _facebookAuthController;
+  const { makeFacebookAuthController } =
+    await import('@interfaces/http/factories/controllers/user/facebook-auth-controller.factory');
+  _facebookAuthController = makeFacebookAuthController();
+  return _facebookAuthController;
+}
+
+let _facebookCallbackController:
+  | import('@interfaces/http/controllers/user/facebook-callback-controller').FacebookCallbackController
+  | null = null;
+async function getFacebookCallbackController() {
+  if (_facebookCallbackController) return _facebookCallbackController;
+  const { makeFacebookCallbackController } =
+    await import('@interfaces/http/factories/controllers/user/facebook-callback-controller.factory');
+  _facebookCallbackController = makeFacebookCallbackController();
+  return _facebookCallbackController;
+}
+
 router.get(
   '/auth/google',
   authLimiter,
@@ -202,6 +224,24 @@ router.get(
   authLimiter,
   asyncRoute(async (req, res, next) => {
     const controller = await getGoogleCallbackController();
+    return controller.handle(req, res, next);
+  }),
+);
+
+router.get(
+  '/auth/facebook',
+  authLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getFacebookAuthController();
+    return controller.handle(req, res, next);
+  }),
+);
+
+router.get(
+  '/auth/facebook/callback',
+  authLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getFacebookCallbackController();
     return controller.handle(req, res, next);
   }),
 );
@@ -253,4 +293,6 @@ export function resetControllersForTesting(): void {
   _meController = null;
   _googleAuthController = null;
   _googleCallbackController = null;
+  _facebookAuthController = null;
+  _facebookCallbackController = null;
 }
