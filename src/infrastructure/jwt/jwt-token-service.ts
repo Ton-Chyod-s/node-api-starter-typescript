@@ -16,13 +16,17 @@ export class JwtTokenService implements ITokenService {
   constructor(private readonly config: JwtConfig) {}
 
   sign(payload: TokenPayload): string {
-    return jwt.sign({ role: payload.role, tokenVersion: payload.tokenVersion }, this.config.secret, {
-      subject: payload.sub,
-      expiresIn: this.config.expiresIn,
-      algorithm: this.config.algorithm ?? DEFAULT_ALG,
-      issuer: this.config.issuer,
-      audience: this.config.audience,
-    });
+    return jwt.sign(
+      { role: payload.role, tokenVersion: payload.tokenVersion },
+      this.config.secret,
+      {
+        subject: payload.sub,
+        expiresIn: this.config.expiresIn,
+        algorithm: this.config.algorithm ?? DEFAULT_ALG,
+        issuer: this.config.issuer,
+        audience: this.config.audience,
+      },
+    );
   }
 
   verify(token: string): TokenPayload {

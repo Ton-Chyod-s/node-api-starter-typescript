@@ -1,6 +1,5 @@
 import type { Express } from 'express';
 
-
 type StartedServer = { baseUrl: string; close: () => Promise<void> };
 
 function startServer(app: Express): Promise<StartedServer> {

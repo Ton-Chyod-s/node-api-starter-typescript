@@ -1,7 +1,6 @@
 import type { Express } from 'express';
 import type { Socket } from 'node:net';
 
-
 type StartedServer = { baseUrl: string; close: () => Promise<void> };
 
 function startServer(app: Express): Promise<StartedServer> {

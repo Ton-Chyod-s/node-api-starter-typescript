@@ -61,10 +61,7 @@ describe('LogoutController', () => {
   it('deve incrementar tokenVersion e invalidar cache quando usuário autenticado', async () => {
     const userRepo = makeUserRepoMock();
     const cacheService = makeCacheServiceMock();
-    const controller = new LogoutController(
-      userRepo as unknown as IUserRepository,
-      cacheService,
-    );
+    const controller = new LogoutController(userRepo as unknown as IUserRepository, cacheService);
 
     const req = { user: { id: 'u1', role: 'USER', tokenVersion: 0 } } as unknown as Request;
     const res = makeResponseMock();

@@ -1,5 +1,8 @@
 import { Router, type RequestHandler } from 'express';
-import { makeAuth, makeOptionalAuth } from '@interfaces/http/factories/controllers/user/make-auth-middleware';
+import {
+  makeAuth,
+  makeOptionalAuth,
+} from '@interfaces/http/factories/controllers/user/make-auth-middleware';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { env } from '@config/env';
@@ -10,15 +13,17 @@ const router = Router();
 const authMiddleware = makeAuth();
 const optionalAuthMiddleware = makeOptionalAuth();
 
-
 const asyncRoute = (
-  handler: (req: Parameters<RequestHandler>[0], res: Parameters<RequestHandler>[1], next: Parameters<RequestHandler>[2]) => Promise<unknown>,
+  handler: (
+    req: Parameters<RequestHandler>[0],
+    res: Parameters<RequestHandler>[1],
+    next: Parameters<RequestHandler>[2],
+  ) => Promise<unknown>,
 ): RequestHandler => {
   return (req, res, next) => {
     void handler(req, res, next).catch(next);
   };
 };
-
 
 const authLimiter = makeRateLimiter({
   windowMs: 15 * 60 * 1000,
@@ -30,9 +35,8 @@ let _logoutController:
   | null = null;
 async function getLogoutController() {
   if (_logoutController) return _logoutController;
-  const { makeLogoutController } = await import(
-    '@interfaces/http/factories/controllers/user/logout-controller.factory'
-  );
+  const { makeLogoutController } =
+    await import('@interfaces/http/factories/controllers/user/logout-controller.factory');
   _logoutController = makeLogoutController();
   return _logoutController;
 }
@@ -107,35 +111,60 @@ async function getResetPasswordController() {
   return _resetPasswordController;
 }
 
-router.post('/auth/register', authLimiter, asyncRoute(async (req, res, next) => {
-  const controller = await getRegisterController();
-  return controller.handle(req, res, next);
-}));
+router.post(
+  '/auth/register',
+  authLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getRegisterController();
+    return controller.handle(req, res, next);
+  }),
+);
 
-router.post('/auth/login', authLimiter, asyncRoute(async (req, res, next) => {
-  const controller = await getLoginController();
-  return controller.handle(req, res, next);
-}));
+router.post(
+  '/auth/login',
+  authLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getLoginController();
+    return controller.handle(req, res, next);
+  }),
+);
 
-router.post('/auth/token', authLimiter, asyncRoute(async (req, res, next) => {
-  const controller = await getLoginTokenController();
-  return controller.handle(req, res, next);
-}));
+router.post(
+  '/auth/token',
+  authLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getLoginTokenController();
+    return controller.handle(req, res, next);
+  }),
+);
 
-router.post('/auth/logout', authLimiter, optionalAuthMiddleware, asyncRoute(async (req, res, next) => {
-  const controller = await getLogoutController();
-  return controller.handle(req, res, next);
-}));
+router.post(
+  '/auth/logout',
+  authLimiter,
+  optionalAuthMiddleware,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getLogoutController();
+    return controller.handle(req, res, next);
+  }),
+);
 
-router.post('/auth/forgot-password', passwordResetLimiter, asyncRoute(async (req, res, next) => {
-  const controller = await getForgotPasswordController();
-  return controller.handle(req, res, next);
-}));
+router.post(
+  '/auth/forgot-password',
+  passwordResetLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getForgotPasswordController();
+    return controller.handle(req, res, next);
+  }),
+);
 
-router.post('/auth/reset-password', passwordResetLimiter, asyncRoute(async (req, res, next) => {
-  const controller = await getResetPasswordController();
-  return controller.handle(req, res, next);
-}));
+router.post(
+  '/auth/reset-password',
+  passwordResetLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getResetPasswordController();
+    return controller.handle(req, res, next);
+  }),
+);
 
 let _googleAuthController:
   | import('@interfaces/http/controllers/user/google-auth-controller').GoogleAuthController
@@ -159,19 +188,26 @@ async function getGoogleCallbackController() {
   return _googleCallbackController;
 }
 
-router.get('/auth/google', authLimiter, asyncRoute(async (req, res, next) => {
-  const controller = await getGoogleAuthController();
-  return controller.handle(req, res, next);
-}));
+router.get(
+  '/auth/google',
+  authLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getGoogleAuthController();
+    return controller.handle(req, res, next);
+  }),
+);
 
-router.get('/auth/google/callback', authLimiter, asyncRoute(async (req, res, next) => {
-  const controller = await getGoogleCallbackController();
-  return controller.handle(req, res, next);
-}));
+router.get(
+  '/auth/google/callback',
+  authLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getGoogleCallbackController();
+    return controller.handle(req, res, next);
+  }),
+);
 
-let _meController:
-  | import('@interfaces/http/controllers/user/me-controller').MeController
-  | null = null;
+let _meController: import('@interfaces/http/controllers/user/me-controller').MeController | null =
+  null;
 async function getMeController() {
   if (_meController) return _meController;
 
@@ -182,10 +218,14 @@ async function getMeController() {
   return _meController;
 }
 
-router.get('/auth/me', authMiddleware, asyncRoute(async (req, res, next) => {
-  const controller = await getMeController();
-  return controller.handle(req, res, next);
-}));
+router.get(
+  '/auth/me',
+  authMiddleware,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getMeController();
+    return controller.handle(req, res, next);
+  }),
+);
 
 router.get('/auth/csrf', (req, res) => {
   if (!env.CSRF_ENABLED) return res.sendStatus(204);

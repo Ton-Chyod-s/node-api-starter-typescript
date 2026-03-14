@@ -1,5 +1,11 @@
 import type { User as UserEntity } from '@domain/entities/user';
-import { loadApp, startServer, getSetCookies, pickCookie, type FetchLikeResponse } from '../../setup/test-helpers';
+import {
+  loadApp,
+  startServer,
+  getSetCookies,
+  pickCookie,
+  type FetchLikeResponse,
+} from '../../setup/test-helpers';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
 
 jest.setTimeout(30000);
@@ -189,10 +195,7 @@ jest.mock('@infrastructure/repositories/password-reset-token-repository', () => 
       if (token) token.usedAt = usedAt;
     }
 
-    async consumeByTokenHash(
-      tokenHash: string,
-      now: Date = new Date(),
-    ): Promise<string | null> {
+    async consumeByTokenHash(tokenHash: string, now: Date = new Date()): Promise<string | null> {
       const store = getStore();
 
       for (const token of store.resetTokens.values()) {
@@ -230,7 +233,6 @@ function extractTokenFromResetLink(html: string): string {
 
   return token;
 }
-
 
 describe('E2E /auth flows (HTTP)', () => {
   beforeEach(() => {

@@ -93,7 +93,13 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
 
   if (isAppErrorLike(err)) {
     const appErr = err as { statusCode: number; message: string; code: string; data?: unknown };
-    const response = createResponse(appErr.statusCode, appErr.message, appErr.data, undefined, appErr.code);
+    const response = createResponse(
+      appErr.statusCode,
+      appErr.message,
+      appErr.data,
+      undefined,
+      appErr.code,
+    );
     return res.status(appErr.statusCode).json(response);
   }
 

@@ -23,15 +23,12 @@ const colors = {
 
 function getCurrentLevel(): LogLevel {
   const raw = String(
-    process.env.LOG_LEVEL ??
-      (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+    process.env.LOG_LEVEL ?? (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
   )
     .toLowerCase()
     .trim();
 
-  return raw === 'debug' || raw === 'info' || raw === 'warn' || raw === 'error'
-    ? raw
-    : 'info';
+  return raw === 'debug' || raw === 'info' || raw === 'warn' || raw === 'error' ? raw : 'info';
 }
 
 function isProduction(): boolean {

@@ -62,10 +62,7 @@ export class PrismaPasswordResetTokenRepository implements IPasswordResetTokenRe
     });
   }
 
-  async consumeByTokenHash(
-    tokenHash: string,
-    now: Date = new Date(),
-  ): Promise<string | null> {
+  async consumeByTokenHash(tokenHash: string, now: Date = new Date()): Promise<string | null> {
     return prisma.$transaction(async (tx) => {
       const token = await tx.passwordResetToken.findFirst({
         where: {
@@ -92,5 +89,4 @@ export class PrismaPasswordResetTokenRepository implements IPasswordResetTokenRe
       return token.userId;
     });
   }
-
 }

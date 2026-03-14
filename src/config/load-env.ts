@@ -26,7 +26,9 @@ for (const envFile of envFiles) {
 }
 
 if (!envFileLoaded) {
-  console.warn(`Nenhum arquivo .env encontrado. Tentei: ${envFiles.map((f) => `config/${f}`).join(', ')}`);
+  console.warn(
+    `Nenhum arquivo .env encontrado. Tentei: ${envFiles.map((f) => `config/${f}`).join(', ')}`,
+  );
 }
 
 export {};

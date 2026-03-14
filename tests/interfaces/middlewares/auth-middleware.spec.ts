@@ -64,7 +64,11 @@ describe('auth-middleware', () => {
     tokenService.verify.mockReturnValue({ sub: '1', role: 'USER', tokenVersion: 0 });
     userRepo.findById.mockResolvedValue(makeUserStub({ id: '1', tokenVersion: 0 }));
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'cookie-token' },
@@ -89,7 +93,11 @@ describe('auth-middleware', () => {
     tokenService.verify.mockReturnValue({ sub: '2', role: 'USER', tokenVersion: 3 });
     userRepo.findById.mockResolvedValue(makeUserStub({ id: '2', tokenVersion: 3 }));
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
 
     const req = {
       cookies: {},
@@ -111,10 +119,14 @@ describe('auth-middleware', () => {
     const tokenService = makeTokenServiceMock();
     const userRepo = makeUserRepoMock();
     tokenService.verify.mockReturnValue({ sub: '1', role: 'USER', tokenVersion: 0 });
-    
+
     userRepo.findById.mockResolvedValue(makeUserStub({ id: '1', tokenVersion: 1 }));
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'stale-token' },
@@ -128,7 +140,10 @@ describe('auth-middleware', () => {
 
     expect(res.status).toHaveBeenCalledWith(httpStatusCodes.UNAUTHORIZED);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ statusCode: httpStatusCodes.UNAUTHORIZED, message: 'Unauthorized' }),
+      expect.objectContaining({
+        statusCode: httpStatusCodes.UNAUTHORIZED,
+        message: 'Unauthorized',
+      }),
     );
     expect(next).not.toHaveBeenCalled();
   });
@@ -139,7 +154,11 @@ describe('auth-middleware', () => {
     tokenService.verify.mockReturnValue({ sub: 'ghost', role: 'USER', tokenVersion: 0 });
     userRepo.findById.mockResolvedValue(null);
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'valid-sig-but-deleted-user' },
@@ -158,7 +177,11 @@ describe('auth-middleware', () => {
   it('deve retornar 401 quando não houver token', async () => {
     const tokenService = makeTokenServiceMock();
     const userRepo = makeUserRepoMock();
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
 
     const req = {
       cookies: {},
@@ -177,7 +200,11 @@ describe('auth-middleware', () => {
   it('deve retornar 401 quando authorization não for Bearer', async () => {
     const tokenService = makeTokenServiceMock();
     const userRepo = makeUserRepoMock();
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
 
     const req = {
       cookies: {},
@@ -200,7 +227,11 @@ describe('auth-middleware', () => {
       throw new Error('invalid');
     });
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'bad-token' },
@@ -220,7 +251,11 @@ describe('auth-middleware', () => {
   it('deve chamar next(err) quando ocorrer erro inesperado ao ler req', async () => {
     const tokenService = makeTokenServiceMock();
     const userRepo = makeUserRepoMock();
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, makeCacheServiceMock());
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      makeCacheServiceMock(),
+    );
 
     const req = {
       get cookies() {
@@ -246,7 +281,11 @@ describe('auth-middleware', () => {
 
     cacheService.get.mockResolvedValue({ id: '1', role: 'USER', tokenVersion: 2 });
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, cacheService);
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      cacheService,
+    );
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'cached-token' },
@@ -273,7 +312,11 @@ describe('auth-middleware', () => {
 
     cacheService.get.mockResolvedValue({ id: '1', role: 'USER', tokenVersion: 2 });
 
-    const middleware = makeAuthMiddleware(tokenService, userRepo as unknown as IUserRepository, cacheService);
+    const middleware = makeAuthMiddleware(
+      tokenService,
+      userRepo as unknown as IUserRepository,
+      cacheService,
+    );
 
     const req = {
       cookies: { [AUTH_COOKIE_NAME]: 'stale-cached-token' },
@@ -351,7 +394,6 @@ describe('auth-middleware', () => {
     expect(next).toHaveBeenCalledTimes(1);
     expect(res.status).not.toHaveBeenCalled();
   });
-
 
   it('deve permitir logout anônimo quando não houver token no optional auth', async () => {
     const tokenService = makeTokenServiceMock();
@@ -432,5 +474,4 @@ describe('auth-middleware', () => {
     expect(next).toHaveBeenCalledTimes(1);
     expect(res.status).not.toHaveBeenCalled();
   });
-
 });

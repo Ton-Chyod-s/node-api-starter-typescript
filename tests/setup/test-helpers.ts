@@ -36,7 +36,9 @@ export async function loadApp(): Promise<Express> {
   return createApp() as unknown as Express;
 }
 
-export function startServer(app: Express): Promise<{ baseUrl: string; close: () => Promise<void> }> {
+export function startServer(
+  app: Express,
+): Promise<{ baseUrl: string; close: () => Promise<void> }> {
   return new Promise((resolve) => {
     const server = app.listen(0, '127.0.0.1', () => {
       const address = server.address();

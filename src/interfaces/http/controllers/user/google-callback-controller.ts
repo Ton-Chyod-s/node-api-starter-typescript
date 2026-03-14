@@ -70,9 +70,9 @@ export class GoogleCallbackController {
         return res.redirect(env.FRONTEND_URL);
       }
 
-      return res.status(httpStatusCodes.OK).json(
-        createResponse(httpStatusCodes.OK, 'Google login successful', { user: result.user }),
-      );
+      return res
+        .status(httpStatusCodes.OK)
+        .json(createResponse(httpStatusCodes.OK, 'Google login successful', { user: result.user }));
     } catch (err) {
       return next(err);
     }

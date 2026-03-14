@@ -100,6 +100,4 @@ describe('env parsing', () => {
     expect(env.NODE_ENV).toBe('production');
     expect(env.REDIS_URL).toBe('redis://localhost:6379');
   });
-
-
 });

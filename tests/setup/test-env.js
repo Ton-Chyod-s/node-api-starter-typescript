@@ -13,7 +13,5 @@ process.env.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 process.env.CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 process.env.SENTRY_DSN = process.env.SENTRY_DSN || '';
 process.env.FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3001';
-process.env.PASSWORD_RESET_PATH =
-  process.env.PASSWORD_RESET_PATH || '/reset-password/{token}';
-process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES =
-  process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES || '15';
+process.env.PASSWORD_RESET_PATH = process.env.PASSWORD_RESET_PATH || '/reset-password/{token}';
+process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES = process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES || '15';

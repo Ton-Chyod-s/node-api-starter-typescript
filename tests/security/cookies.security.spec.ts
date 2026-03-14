@@ -68,4 +68,3 @@ describe('Security: cookies', () => {
     expect(() => mod2.authCookieOptions()).toThrow(/COOKIE_SAMESITE=none/i);
   });
 });
-

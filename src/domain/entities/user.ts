@@ -28,7 +28,8 @@ export class User {
     if (!name) throw new Error('name is required');
     if (!email) throw new Error('email is invalid');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('email is invalid');
-    if (!props.passwordHash && !props.googleId) throw new Error('passwordHash or googleId is required');
+    if (!props.passwordHash && !props.googleId)
+      throw new Error('passwordHash or googleId is required');
     if (props.role !== 'USER' && props.role !== 'ADMIN') throw new Error('role is invalid');
 
     const normalized = {

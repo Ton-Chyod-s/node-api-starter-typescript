@@ -9,7 +9,6 @@ import cookieParser from 'cookie-parser';
 import * as jwt from 'jsonwebtoken';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
 
-
 jest.mock('express-rate-limit', () => {
   return () => (_req: Request, _res: Response, next: NextFunction) => next();
 });

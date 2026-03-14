@@ -1,6 +1,5 @@
 import type { Express } from 'express';
 
-
 async function startServer(app: Express): Promise<{ baseUrl: string; close: () => Promise<void> }> {
   return new Promise((resolve) => {
     const server = app.listen(0, () => {

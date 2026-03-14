@@ -88,9 +88,7 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
-  async upsertByGoogleId(
-    data: UpsertGoogleUserData,
-  ): Promise<{ user: User; created: boolean }> {
+  async upsertByGoogleId(data: UpsertGoogleUserData): Promise<{ user: User; created: boolean }> {
     const existing = await prisma.user.findUnique({ where: { googleId: data.googleId } });
 
     const record = await prisma.user.upsert({

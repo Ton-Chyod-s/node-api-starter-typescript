@@ -7,13 +7,7 @@
       "name": "Debug Express (TSX)",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "node",
-      "runtimeArgs": [
-        "--inspect=9229",
-        "--enable-source-maps",
-        "--watch",
-        "--import",
-        "tsx"
-      ],
+      "runtimeArgs": ["--inspect=9229", "--enable-source-maps", "--watch", "--import", "tsx"],
       "args": ["src/main/server.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",

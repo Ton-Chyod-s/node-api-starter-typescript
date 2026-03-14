@@ -13,7 +13,9 @@ import { User } from '@domain/entities/user';
 jest.mock('@infrastructure/prisma/client', () => ({ prisma: {} }));
 
 jest.mock('@infrastructure/repositories/user-repositories', () => {
-  const { User } = jest.requireActual('@domain/entities/user') as typeof import('@domain/entities/user');
+  const { User } = jest.requireActual(
+    '@domain/entities/user',
+  ) as typeof import('@domain/entities/user');
 
   return {
     PrismaUserRepository: jest.fn().mockImplementation(() => {
@@ -223,6 +225,4 @@ describe('routes /auth', () => {
       await close();
     }
   });
-
-
 });

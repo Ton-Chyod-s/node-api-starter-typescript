@@ -12,20 +12,20 @@ API RESTful com autenticação baseada em cookie + JWT, proteção CSRF, rate li
 
 ### 1.2 Módulos Principais
 
-| Módulo | Descrição |
-|--------|-----------|
-| Auth | Registro, login, logout, me, CSRF token |
-| Credentials | Forgot password, reset password |
-| Admin | Rotas protegidas por role ADMIN |
-| Health | Healthcheck público |
+| Módulo      | Descrição                               |
+| ----------- | --------------------------------------- |
+| Auth        | Registro, login, logout, me, CSRF token |
+| Credentials | Forgot password, reset password         |
+| Admin       | Rotas protegidas por role ADMIN         |
+| Health      | Healthcheck público                     |
 
 ### 1.3 Ambientes
 
-| Ambiente | NODE_ENV | Arquivo de env |
-|----------|----------|----------------|
+| Ambiente        | NODE_ENV      | Arquivo de env            |
+| --------------- | ------------- | ------------------------- |
 | Desenvolvimento | `development` | `config/.env.development` |
-| Teste | `test` | `config/.env.test` |
-| Produção | `production` | Injeção via container/CI |
+| Teste           | `test`        | `config/.env.test`        |
+| Produção        | `production`  | Injeção via container/CI  |
 
 ---
 
@@ -33,25 +33,25 @@ API RESTful com autenticação baseada em cookie + JWT, proteção CSRF, rate li
 
 ### 2.1 Runtime
 
-| Item | Versão |
-|------|--------|
-| Node.js | 20.x (`.nvmrc` na raiz) |
-| TypeScript | 5.x |
+| Item       | Versão                  |
+| ---------- | ----------------------- |
+| Node.js    | 20.x (`.nvmrc` na raiz) |
+| TypeScript | 5.x                     |
 
 ### 2.2 Bibliotecas Principais
 
-| Biblioteca | Uso |
-|------------|-----|
-| express 4 | Framework HTTP |
-| prisma 7 | ORM (PostgreSQL) |
-| zod 4 | Validação e parse de entrada |
-| argon2 | Hash de senha |
-| jsonwebtoken | Geração e verificação de JWT |
-| ioredis + rate-limit-redis | Cache e rate limiting |
-| helmet | Headers de segurança HTTP |
-| express-rate-limit | Rate limiting por rota |
-| nodemailer | Envio de e-mail |
-| @sentry/node | Monitoramento de erros |
+| Biblioteca                 | Uso                          |
+| -------------------------- | ---------------------------- |
+| express 4                  | Framework HTTP               |
+| prisma 7                   | ORM (PostgreSQL)             |
+| zod 4                      | Validação e parse de entrada |
+| argon2                     | Hash de senha                |
+| jsonwebtoken               | Geração e verificação de JWT |
+| ioredis + rate-limit-redis | Cache e rate limiting        |
+| helmet                     | Headers de segurança HTTP    |
+| express-rate-limit         | Rate limiting por rota       |
+| nodemailer                 | Envio de e-mail              |
+| @sentry/node               | Monitoramento de erros       |
 
 ### 2.3 Scripts Disponíveis
 
@@ -131,19 +131,19 @@ npm run check            # lint + format + openapi + test (usar antes do PR)
 
 ### 3.1 Ordem de Criação para Novas Features
 
-| Ordem | Tipo | Localização |
-|-------|------|-------------|
-| 1 | Migration Prisma | `prisma/schema/{entidade}.prisma` + `npx prisma migrate dev` |
-| 2 | Entidade de domínio | `src/domain/entities/` |
-| 3 | Interface de repositório | `src/domain/repositories/` |
-| 4 | DTO / schema Zod | `src/domain/dtos/` |
-| 5 | Implementação de repositório | `src/infrastructure/repositories/` |
-| 6 | Use case | `src/usecases/{modulo}/` |
-| 7 | Controller | `src/interfaces/http/controllers/{modulo}/` |
-| 8 | Factory | `src/interfaces/http/factories/controllers/{modulo}/` |
-| 9 | Rota | `src/interfaces/http/routes/{modulo}.routes.ts` |
-| 10 | Spec OpenAPI | `docs/openapi/paths/` |
-| 11 | Testes | `tests/` nas pastas correspondentes |
+| Ordem | Tipo                         | Localização                                                  |
+| ----- | ---------------------------- | ------------------------------------------------------------ |
+| 1     | Migration Prisma             | `prisma/schema/{entidade}.prisma` + `npx prisma migrate dev` |
+| 2     | Entidade de domínio          | `src/domain/entities/`                                       |
+| 3     | Interface de repositório     | `src/domain/repositories/`                                   |
+| 4     | DTO / schema Zod             | `src/domain/dtos/`                                           |
+| 5     | Implementação de repositório | `src/infrastructure/repositories/`                           |
+| 6     | Use case                     | `src/usecases/{modulo}/`                                     |
+| 7     | Controller                   | `src/interfaces/http/controllers/{modulo}/`                  |
+| 8     | Factory                      | `src/interfaces/http/factories/controllers/{modulo}/`        |
+| 9     | Rota                         | `src/interfaces/http/routes/{modulo}.routes.ts`              |
+| 10    | Spec OpenAPI                 | `docs/openapi/paths/`                                        |
+| 11    | Testes                       | `tests/` nas pastas correspondentes                          |
 
 ---
 
@@ -151,18 +151,18 @@ npm run check            # lint + format + openapi + test (usar antes do PR)
 
 ### 4.1 Nomenclatura
 
-| Elemento | Convenção | Exemplo |
-|----------|-----------|---------|
-| Arquivos | kebab-case | `login-controller.ts`, `user-repository.ts` |
-| Classes | PascalCase | `LoginController`, `PrismaUserRepository` |
-| Interfaces | PascalCase com `I` prefix | `IUserRepository`, `ICacheService` |
-| Funções/métodos | camelCase | `execute()`, `hashPassword()` |
-| Variáveis | camelCase | `const userId`, `const tokenHash` |
-| Constantes de módulo | UPPER_SNAKE_CASE | `const AUTH_COOKIE_NAME` |
-| Tipos | PascalCase | `type UserRole`, `type LoginInput` |
-| Tabelas Prisma | PascalCase singular | `User`, `PasswordResetToken` |
-| Colunas Prisma | camelCase | `passwordHash`, `tokenVersion` |
-| Rotas HTTP | kebab-case | `/auth/forgot-password`, `/auth/reset-password` |
+| Elemento             | Convenção                 | Exemplo                                         |
+| -------------------- | ------------------------- | ----------------------------------------------- |
+| Arquivos             | kebab-case                | `login-controller.ts`, `user-repository.ts`     |
+| Classes              | PascalCase                | `LoginController`, `PrismaUserRepository`       |
+| Interfaces           | PascalCase com `I` prefix | `IUserRepository`, `ICacheService`              |
+| Funções/métodos      | camelCase                 | `execute()`, `hashPassword()`                   |
+| Variáveis            | camelCase                 | `const userId`, `const tokenHash`               |
+| Constantes de módulo | UPPER_SNAKE_CASE          | `const AUTH_COOKIE_NAME`                        |
+| Tipos                | PascalCase                | `type UserRole`, `type LoginInput`              |
+| Tabelas Prisma       | PascalCase singular       | `User`, `PasswordResetToken`                    |
+| Colunas Prisma       | camelCase                 | `passwordHash`, `tokenVersion`                  |
+| Rotas HTTP           | kebab-case                | `/auth/forgot-password`, `/auth/reset-password` |
 
 ### 4.2 Path Aliases (tsconfig)
 
@@ -179,14 +179,14 @@ import { LoginUseCase } from '@usecases/user/login-use-case';
 import { AppError } from '../../../utils/app-error';
 ```
 
-| Alias | Resolve para |
-|-------|-------------|
-| `@config/*` | `src/config/*` |
-| `@domain/*` | `src/domain/*` |
+| Alias               | Resolve para           |
+| ------------------- | ---------------------- |
+| `@config/*`         | `src/config/*`         |
+| `@domain/*`         | `src/domain/*`         |
 | `@infrastructure/*` | `src/infrastructure/*` |
-| `@interfaces/*` | `src/interfaces/*` |
-| `@usecases/*` | `src/usecases/*` |
-| `@utils/*` | `src/utils/*` |
+| `@interfaces/*`     | `src/interfaces/*`     |
+| `@usecases/*`       | `src/usecases/*`       |
+| `@utils/*`          | `src/utils/*`          |
 
 ### 4.3 TypeScript
 
@@ -274,15 +274,23 @@ export class ExampleController {
     try {
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json(
-          createResponse(400, 'Invalid request body', { issues: parsed.error.issues }, undefined, 'VALIDATION_ERROR')
-        );
+        return res
+          .status(400)
+          .json(
+            createResponse(
+              400,
+              'Invalid request body',
+              { issues: parsed.error.issues },
+              undefined,
+              'VALIDATION_ERROR',
+            ),
+          );
       }
 
       const result = await this.useCase.execute(parsed.data);
       return res.status(200).json(createResponse(200, 'Success', result));
     } catch (err) {
-      return next(err);  // deixa o errorMiddleware tratar
+      return next(err); // deixa o errorMiddleware tratar
     }
   }
 }
@@ -311,13 +319,13 @@ Implementações concretas dos contratos do domain: `PrismaUserRepository`, `Jwt
 
 ### 6.1 Autenticação
 
-| Item | Valor |
-|------|-------|
-| Método | JWT assinado com HS256 |
-| Transporte primário | Cookie `httpOnly` (nome: `${APP_NAME}_token`) |
-| Transporte alternativo | Header `Authorization: Bearer {token}` |
-| Claims obrigatórios | `sub` (userId), `role`, `tokenVersion`, `iss`, `aud` |
-| Invalidação | `tokenVersion` incrementado no logout e reset de senha |
+| Item                   | Valor                                                  |
+| ---------------------- | ------------------------------------------------------ |
+| Método                 | JWT assinado com HS256                                 |
+| Transporte primário    | Cookie `httpOnly` (nome: `${APP_NAME}_token`)          |
+| Transporte alternativo | Header `Authorization: Bearer {token}`                 |
+| Claims obrigatórios    | `sub` (userId), `role`, `tokenVersion`, `iss`, `aud`   |
+| Invalidação            | `tokenVersion` incrementado no logout e reset de senha |
 
 **Fluxo de autenticação:**
 
@@ -337,10 +345,10 @@ Rotas **isentas** de CSRF (sem cookie de auth): `/auth/register`, `/auth/forgot-
 
 ### 6.3 Roles
 
-| Role | Acesso |
-|------|--------|
-| `USER` | Rotas autenticadas padrão |
-| `ADMIN` | Rotas em `/admin/*` |
+| Role    | Acesso                    |
+| ------- | ------------------------- |
+| `USER`  | Rotas autenticadas padrão |
+| `ADMIN` | Rotas em `/admin/*`       |
 
 ```typescript
 // Rota protegida por role
@@ -352,14 +360,14 @@ router.get('/recurso', authMiddleware, requireRole(['ADMIN', 'USER']), handler);
 
 ### 6.4 Convenção de Rotas
 
-| Padrão | Exemplo |
-|--------|---------|
-| Prefixo | `/api/{modulo}` |
-| Listagem | `GET /api/users` |
-| Detalhe | `GET /api/users/:id` |
-| Criação | `POST /api/users` |
-| Atualização | `PUT /api/users/:id` |
-| Exclusão | `DELETE /api/users/:id` |
+| Padrão      | Exemplo                 |
+| ----------- | ----------------------- |
+| Prefixo     | `/api/{modulo}`         |
+| Listagem    | `GET /api/users`        |
+| Detalhe     | `GET /api/users/:id`    |
+| Criação     | `POST /api/users`       |
+| Atualização | `PUT /api/users/:id`    |
+| Exclusão    | `DELETE /api/users/:id` |
 
 ### 6.5 Formato de Resposta
 
@@ -368,7 +376,7 @@ router.get('/recurso', authMiddleware, requireRole(['ADMIN', 'USER']), handler);
 type ApiResponse<T> = {
   statusCode: number;
   message: string;
-  code?: string;       // código de erro/sucesso em UPPER_SNAKE_CASE
+  code?: string; // código de erro/sucesso em UPPER_SNAKE_CASE
   data?: T;
   elapsedTime?: string;
 };
@@ -379,6 +387,7 @@ createResponse(400, 'Invalid request body', { issues }, undefined, 'VALIDATION_E
 ```
 
 **Sucesso:**
+
 ```json
 {
   "statusCode": 200,
@@ -388,6 +397,7 @@ createResponse(400, 'Invalid request body', { issues }, undefined, 'VALIDATION_E
 ```
 
 **Erro:**
+
 ```json
 {
   "statusCode": 400,
@@ -399,18 +409,18 @@ createResponse(400, 'Invalid request body', { issues }, undefined, 'VALIDATION_E
 
 ### 6.6 HTTP Status Codes
 
-| Código | Uso |
-|--------|-----|
-| 200 | Sucesso |
-| 201 | Recurso criado |
-| 204 | Sucesso sem corpo |
-| 400 | Dados inválidos / bad request |
-| 401 | Não autenticado |
-| 403 | Não autorizado (forbidden) / CSRF inválido |
-| 404 | Não encontrado |
-| 409 | Conflito (recurso já existe) |
-| 429 | Rate limit atingido |
-| 500 | Erro interno |
+| Código | Uso                                        |
+| ------ | ------------------------------------------ |
+| 200    | Sucesso                                    |
+| 201    | Recurso criado                             |
+| 204    | Sucesso sem corpo                          |
+| 400    | Dados inválidos / bad request              |
+| 401    | Não autenticado                            |
+| 403    | Não autorizado (forbidden) / CSRF inválido |
+| 404    | Não encontrado                             |
+| 409    | Conflito (recurso já existe)               |
+| 429    | Rate limit atingido                        |
+| 500    | Erro interno                               |
 
 ### 6.7 Rate Limiting
 
@@ -435,12 +445,12 @@ router.post('/auth/forgot-password', passwordResetLimiter, asyncRoute(...));
 
 **Limites de referência:**
 
-| Tipo de rota | windowMs | limit |
-|-------------|----------|-------|
-| Global API | 15 min | 300 |
-| Auth (login, register, token) | 15 min | 20 |
-| Reset de senha | 15 min | 10 |
-| Rotas admin | 15 min | 50 (sugestão) |
+| Tipo de rota                  | windowMs | limit         |
+| ----------------------------- | -------- | ------------- |
+| Global API                    | 15 min   | 300           |
+| Auth (login, register, token) | 15 min   | 20            |
+| Reset de senha                | 15 min   | 10            |
+| Rotas admin                   | 15 min   | 50 (sugestão) |
 
 > Em produção, Redis é obrigatório para o rate limiter. Em desenvolvimento, usa memória com warning no log.
 
@@ -475,8 +485,8 @@ import crypto from 'crypto';
 import { sha256Hex } from '@utils/hash';
 
 // ✅ correto — token criptograficamente seguro
-const rawToken = crypto.randomBytes(32).toString('hex');  // 64 chars hex
-const tokenHash = sha256Hex(rawToken);  // armazene apenas o hash no banco
+const rawToken = crypto.randomBytes(32).toString('hex'); // 64 chars hex
+const tokenHash = sha256Hex(rawToken); // armazene apenas o hash no banco
 
 // ✅ correto — código numérico de 6 dígitos
 const code = crypto.randomInt(100000, 1000000).toString();
@@ -516,21 +526,37 @@ if (tokenFromUser === tokenFromDb) { ... }
 
 ```typescript
 const schema = z.object({
-  email: z.string().email().transform(v => v.trim().toLowerCase()),
-  password: passwordSchema,  // use o schema compartilhado de @domain/dtos/shared/password-schema
-  name: z.string().min(2).max(100).transform(v => v.trim()),
+  email: z
+    .string()
+    .email()
+    .transform((v) => v.trim().toLowerCase()),
+  password: passwordSchema, // use o schema compartilhado de @domain/dtos/shared/password-schema
+  name: z
+    .string()
+    .min(2)
+    .max(100)
+    .transform((v) => v.trim()),
 });
 
 const parsed = schema.safeParse(req.body);
 if (!parsed.success) {
-  return res.status(400).json(
-    createResponse(400, 'Invalid request body', { issues: parsed.error.issues }, undefined, 'VALIDATION_ERROR')
-  );
+  return res
+    .status(400)
+    .json(
+      createResponse(
+        400,
+        'Invalid request body',
+        { issues: parsed.error.issues },
+        undefined,
+        'VALIDATION_ERROR',
+      ),
+    );
 }
 // use parsed.data — tipo seguro e sanitizado
 ```
 
 **Schema de senha compartilhado** (`@domain/dtos/shared/password-schema`):
+
 - mínimo 8 caracteres, máximo 72 (limite do argon2)
 - importe e reutilize — não crie schemas de senha inline
 
@@ -552,26 +578,28 @@ O `errorMiddleware` em `app.ts` intercepta automaticamente e retorna a resposta 
 
 ### 7.6 Logs — O que Nunca Logar
 
-| Dado | Motivo |
-|------|--------|
-| Senha em texto puro | Segurança |
-| `passwordHash` | Segurança |
-| Token JWT completo | Segurança |
-| `KEY_JWT` | Segurança |
-| Chaves SMTP, Sentry DSN | Segurança |
+| Dado                                 | Motivo            |
+| ------------------------------------ | ----------------- |
+| Senha em texto puro                  | Segurança         |
+| `passwordHash`                       | Segurança         |
+| Token JWT completo                   | Segurança         |
+| `KEY_JWT`                            | Segurança         |
+| Chaves SMTP, Sentry DSN              | Segurança         |
 | `req.body` completo em rotas de auth | Pode conter senha |
-| Token de reset completo | Segurança |
+| Token de reset completo              | Segurança         |
 
 **Do:**
+
 ```typescript
 logger.info('Password reset requested', { userId: user.id });
 logger.warn('Cache miss on auth', { userId });
 ```
 
 **Don't:**
+
 ```typescript
-logger.info('Login attempt', { email, password });  // ❌ nunca
-logger.debug('Token generated', { token });         // ❌ nunca
+logger.info('Login attempt', { email, password }); // ❌ nunca
+logger.debug('Token generated', { token }); // ❌ nunca
 ```
 
 ### 7.7 Exposição Condicional por Ambiente
@@ -692,28 +720,28 @@ Todas as variáveis são validadas via Zod no boot em `src/config/env.ts`. Se um
 
 ### 10.1 Variáveis Obrigatórias
 
-| Variável | Descrição |
-|----------|-----------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `KEY_JWT` | Chave secreta do JWT (mínimo 32 chars recomendado) |
-| `JWT_ISSUER` | Identificador do emissor do JWT |
-| `JWT_AUDIENCE` | Audience esperada no JWT |
-| `CORS_ORIGIN` | Origem permitida (nunca `*` em produção) |
-| `REDIS_URL` | URL do Redis (**obrigatória em produção**) |
+| Variável       | Descrição                                          |
+| -------------- | -------------------------------------------------- |
+| `DATABASE_URL` | PostgreSQL connection string                       |
+| `KEY_JWT`      | Chave secreta do JWT (mínimo 32 chars recomendado) |
+| `JWT_ISSUER`   | Identificador do emissor do JWT                    |
+| `JWT_AUDIENCE` | Audience esperada no JWT                           |
+| `CORS_ORIGIN`  | Origem permitida (nunca `*` em produção)           |
+| `REDIS_URL`    | URL do Redis (**obrigatória em produção**)         |
 
 ### 10.2 Variáveis Importantes
 
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| `NODE_ENV` | `development` | `development`, `test`, `production` |
-| `PORT` | — | Porta do servidor |
-| `JWT_EXPIRES_IN` | — | Ex: `1d`, `2h`, `3600` |
-| `COOKIE_SECURE` | — | `true` em produção (HTTPS) |
-| `COOKIE_SAMESITE` | `lax` | `lax`, `strict`, `none` |
-| `CSRF_ENABLED` | `true` | Proteção CSRF |
-| `TRUST_PROXY` | `0` | `1` atrás de NGINX/Cloudflare |
-| `FRONTEND_URL` | — | URL do frontend (links de e-mail) |
-| `PASSWORD_RESET_TOKEN_TTL_MINUTES` | `15` | Validade do token de reset |
+| Variável                           | Padrão        | Descrição                           |
+| ---------------------------------- | ------------- | ----------------------------------- |
+| `NODE_ENV`                         | `development` | `development`, `test`, `production` |
+| `PORT`                             | —             | Porta do servidor                   |
+| `JWT_EXPIRES_IN`                   | —             | Ex: `1d`, `2h`, `3600`              |
+| `COOKIE_SECURE`                    | —             | `true` em produção (HTTPS)          |
+| `COOKIE_SAMESITE`                  | `lax`         | `lax`, `strict`, `none`             |
+| `CSRF_ENABLED`                     | `true`        | Proteção CSRF                       |
+| `TRUST_PROXY`                      | `0`           | `1` atrás de NGINX/Cloudflare       |
+| `FRONTEND_URL`                     | —             | URL do frontend (links de e-mail)   |
+| `PASSWORD_RESET_TOKEN_TTL_MINUTES` | `15`          | Validade do token de reset          |
 
 ### 10.3 Segredos — Regras
 
@@ -789,6 +817,7 @@ npm run check  # lint + format + openapi + tests
 ### 12.1 Checklist de PR
 
 **Código:**
+
 - [ ] Segue a ordem de camadas (domain → usecase → interface)
 - [ ] Sem `any` no TypeScript
 - [ ] Validação Zod em todo input externo
@@ -797,6 +826,7 @@ npm run check  # lint + format + openapi + tests
 - [ ] `npm run format:check` passou
 
 **Segurança:**
+
 - [ ] Senhas: apenas via `hashPassword`/`verifyPassword` de `@utils/password-generator`
 - [ ] Tokens de uso único: `crypto.randomBytes(32)`, hash no banco, raw para o usuário
 - [ ] Códigos numéricos: `crypto.randomInt()` — nunca `Math.random()`
@@ -806,20 +836,24 @@ npm run check  # lint + format + openapi + tests
 - [ ] Invalidação de `tokenVersion` + cache após alterar credenciais ou logout
 
 **Banco de dados:**
+
 - [ ] Migration gerada via `prisma migrate dev`
 - [ ] Tokens sensíveis armazenados como hash (sha256)
 - [ ] Índices criados para campos de busca
 
 **Testes:**
+
 - [ ] Use cases cobertos por testes unitários
 - [ ] Controllers cobertos (mocked)
 - [ ] `npm test` passou
 
 **Documentação:**
+
 - [ ] OpenAPI (`docs/openapi/`) atualizado para novos endpoints
 - [ ] `.env.example` atualizado para novas variáveis
 
 **Antes de Mergear:**
+
 - [ ] `npm run check` passou completamente
 - [ ] Code review aprovado
 - [ ] Branch atualizada com base (main/develop)
@@ -849,9 +883,9 @@ export interface ITokenService {
 export interface ITokenService {
   sign(payload: TokenPayload): string;
   verify(token: string): TokenPayload;
-  refresh(token: string): string;      // não existe caso de uso para isso ainda
+  refresh(token: string): string; // não existe caso de uso para isso ainda
   revoke(token: string): Promise<void>; // idem
-  decode(token: string): TokenPayload;  // idem
+  decode(token: string): TokenPayload; // idem
 }
 ```
 
@@ -890,7 +924,9 @@ export interface ICacheService {
 //    com zero complexidade: implementa a interface, não faz nada
 export class NullCacheService implements ICacheService {
   async set(_key: string, _value: unknown, _ttlSeconds: number): Promise<void> {}
-  async get<T>(_key: string): Promise<T | null> { return null; }
+  async get<T>(_key: string): Promise<T | null> {
+    return null;
+  }
   async del(_key: string): Promise<void> {}
 }
 
@@ -912,7 +948,9 @@ export class NullCacheService implements ICacheService {
 // ✅ correto — ForgotPasswordController sempre retorna 200
 //    independente de o e-mail existir (não vaza informação)
 await this.useCase.execute(parsed.data.email);
-return res.status(200).json(createResponse(200, 'If the email exists, you will receive instructions...'));
+return res
+  .status(200)
+  .json(createResponse(200, 'If the email exists, you will receive instructions...'));
 
 // ❌ complexidade que cria vulnerabilidade
 const user = await this.useCase.execute(parsed.data.email);
@@ -972,15 +1010,15 @@ const schema = z.object({ password: z.string().min(8).max(100) }); // max difere
 
 **Mapeamento neste projeto:**
 
-| Camada | Responsabilidade única |
-|--------|----------------------|
-| Entidade (`User`) | Garantir invariantes de domínio |
-| Use case (`LoginUseCase`) | Orquestrar um caso de uso específico |
-| Controller (`LoginController`) | Receber HTTP, validar input, retornar resposta |
-| Repository (`PrismaUserRepository`) | Persistência de usuários |
-| Factory (`makeLoginController`) | Montar e conectar dependências |
-| Middleware (`authMiddleware`) | Verificar autenticação |
-| Middleware (`requireRole`) | Verificar autorização |
+| Camada                              | Responsabilidade única                         |
+| ----------------------------------- | ---------------------------------------------- |
+| Entidade (`User`)                   | Garantir invariantes de domínio                |
+| Use case (`LoginUseCase`)           | Orquestrar um caso de uso específico           |
+| Controller (`LoginController`)      | Receber HTTP, validar input, retornar resposta |
+| Repository (`PrismaUserRepository`) | Persistência de usuários                       |
+| Factory (`makeLoginController`)     | Montar e conectar dependências                 |
+| Middleware (`authMiddleware`)       | Verificar autenticação                         |
+| Middleware (`requireRole`)          | Verificar autorização                          |
 
 ```typescript
 // ✅ correto — authMiddleware só autentica, requireRole só autoriza
@@ -1006,7 +1044,7 @@ export class MeUseCase {
   async execute(userId: string): Promise<User> {
     const user = await this.userRepository.findById(userId);
     await this.userRepository.updateLastSeen(userId); // outro motivo para mudar
-    await this.mailer.sendWelcomeBack(user.email);     // outro motivo para mudar
+    await this.mailer.sendWelcomeBack(user.email); // outro motivo para mudar
     return user;
   }
 }
@@ -1164,19 +1202,18 @@ app.use(cors({ origin: env.CORS_ORIGIN })); // se * e credentials=true, vai falh
 
 Ao gerar código para este projeto, verifique:
 
-| Princípio | Pergunta |
-|-----------|----------|
-| YAGNI | Há um caso de uso real chamando isso agora? |
-| KISS | Existe uma solução mais simples que resolve o mesmo problema? |
-| DRY | Esse conhecimento já está definido em outro lugar (`passwordSchema`, `cache-keys`, etc.)? |
-| SRP | Esse módulo tem mais de um motivo para mudar? |
-| DIP | O use case ou controller depende de uma classe concreta em vez de uma interface? |
-| Null Object | Estou espalhando `if (redis)` / `if (mailer)` em vez de usar `NullCacheService`/`ConsoleMailerService`? |
-| Guard Clauses | O fluxo feliz está enterrado dentro de ifs aninhados? |
-| Fail Fast | Essa validação deveria ocorrer no boot em vez de em runtime? |
+| Princípio     | Pergunta                                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| YAGNI         | Há um caso de uso real chamando isso agora?                                                             |
+| KISS          | Existe uma solução mais simples que resolve o mesmo problema?                                           |
+| DRY           | Esse conhecimento já está definido em outro lugar (`passwordSchema`, `cache-keys`, etc.)?               |
+| SRP           | Esse módulo tem mais de um motivo para mudar?                                                           |
+| DIP           | O use case ou controller depende de uma classe concreta em vez de uma interface?                        |
+| Null Object   | Estou espalhando `if (redis)` / `if (mailer)` em vez de usar `NullCacheService`/`ConsoleMailerService`? |
+| Guard Clauses | O fluxo feliz está enterrado dentro de ifs aninhados?                                                   |
+| Fail Fast     | Essa validação deveria ocorrer no boot em vez de em runtime?                                            |
 
 ---
-
 
 ---
 
@@ -1188,23 +1225,23 @@ Esta seção contém templates **completos e funcionais** baseados nos testes re
 
 ### 14.1 Filosofia
 
-| Camada | O que testar | Como |
-|--------|-------------|------|
-| Entidade | Invariantes do construtor, normalização, métodos de domínio | Instanciação direta, sem mocks |
-| Use case | Toda lógica de negócio | Mocks das interfaces (`IUserRepository`, `ICacheService`, etc.) |
-| Controller | Validação de input (Zod), status HTTP, cookie, propagação de erro via `next` | Mocks do use case + `req`/`res`/`next` simulados |
-| Middleware | Autenticação, autorização, comportamento com cache | Mocks de `ITokenService`, `IUserRepository`, `ICacheService` |
+| Camada     | O que testar                                                                 | Como                                                            |
+| ---------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Entidade   | Invariantes do construtor, normalização, métodos de domínio                  | Instanciação direta, sem mocks                                  |
+| Use case   | Toda lógica de negócio                                                       | Mocks das interfaces (`IUserRepository`, `ICacheService`, etc.) |
+| Controller | Validação de input (Zod), status HTTP, cookie, propagação de erro via `next` | Mocks do use case + `req`/`res`/`next` simulados                |
+| Middleware | Autenticação, autorização, comportamento com cache                           | Mocks de `ITokenService`, `IUserRepository`, `ICacheService`    |
 
 **Regra:** nunca acesse banco, Redis ou sistema de arquivos em testes unitários. Use mocks das interfaces.
 
 **Casos obrigatórios por feature:**
 
-| Tipo | Casos mínimos |
-|------|--------------|
-| Use case com busca | feliz + entidade não encontrada + regra de negócio violada |
-| Use case com criação | feliz + conflito de unicidade + dependências não chamadas antes da validação |
-| Use case com token | feliz + token vazio + token não encontrado + invalidação de sessão verificada |
-| Controller | body válido + body inválido (use case não chamado) + use case lançando erro (propagado via `next`) |
+| Tipo                 | Casos mínimos                                                                                      |
+| -------------------- | -------------------------------------------------------------------------------------------------- |
+| Use case com busca   | feliz + entidade não encontrada + regra de negócio violada                                         |
+| Use case com criação | feliz + conflito de unicidade + dependências não chamadas antes da validação                       |
+| Use case com token   | feliz + token vazio + token não encontrado + invalidação de sessão verificada                      |
+| Controller           | body válido + body inválido (use case não chamado) + use case lançando erro (propagado via `next`) |
 
 ---
 
@@ -1216,6 +1253,7 @@ não deve [ação] quando [condição]
 ```
 
 Exemplos:
+
 ```
 deve retornar token e user quando credenciais forem válidas
 deve lançar 401 quando o usuário não existir
@@ -1335,7 +1373,9 @@ describe('User entity', () => {
   });
 
   it('deve lançar erro quando email for inválido', () => {
-    expect(() => new User({ ...makeValidProps(), email: 'nao-e-email' })).toThrow('email is invalid');
+    expect(() => new User({ ...makeValidProps(), email: 'nao-e-email' })).toThrow(
+      'email is invalid',
+    );
   });
 
   it('deve lançar erro quando email não tiver domínio', () => {
@@ -1343,11 +1383,15 @@ describe('User entity', () => {
   });
 
   it('deve lançar erro quando passwordHash for vazio', () => {
-    expect(() => new User({ ...makeValidProps(), passwordHash: '' })).toThrow('passwordHash is required');
+    expect(() => new User({ ...makeValidProps(), passwordHash: '' })).toThrow(
+      'passwordHash is required',
+    );
   });
 
   it('deve lançar erro quando role for inválida', () => {
-    expect(() => new User({ ...makeValidProps(), role: 'SUPERUSER' as 'USER' })).toThrow('role is invalid');
+    expect(() => new User({ ...makeValidProps(), role: 'SUPERUSER' as 'USER' })).toThrow(
+      'role is invalid',
+    );
   });
 });
 ```
@@ -1486,7 +1530,13 @@ describe('LoginUseCase', () => {
     const tokenService = makeTokenMock();
     const useCase = new LoginUseCase(repo, tokenService);
 
-    const user = new User({ id: 'u1', name: 'John', email: 'john@example.com', passwordHash: 'hash', role: 'USER' });
+    const user = new User({
+      id: 'u1',
+      name: 'John',
+      email: 'john@example.com',
+      passwordHash: 'hash',
+      role: 'USER',
+    });
     repo.findByEmail.mockResolvedValue(user);
     (verifyPassword as jest.Mock).mockResolvedValue(true);
     tokenService.sign.mockReturnValue('token-123');
@@ -1510,7 +1560,7 @@ describe('LoginUseCase', () => {
     repo.findByEmail.mockResolvedValue(null);
 
     await expect(
-      useCase.execute({ email: 'noone@example.com', password: '12345678' })
+      useCase.execute({ email: 'noone@example.com', password: '12345678' }),
     ).rejects.toMatchObject({ statusCode: 401, code: 'AUTH_INVALID_CREDENTIALS' });
 
     // Garante que não avançou para verificar senha
@@ -1524,12 +1574,18 @@ describe('LoginUseCase', () => {
     const tokenService = makeTokenMock();
     const useCase = new LoginUseCase(repo, tokenService);
 
-    const user = new User({ id: 'u1', name: 'John', email: 'john@example.com', passwordHash: 'hash', role: 'USER' });
+    const user = new User({
+      id: 'u1',
+      name: 'John',
+      email: 'john@example.com',
+      passwordHash: 'hash',
+      role: 'USER',
+    });
     repo.findByEmail.mockResolvedValue(user);
     (verifyPassword as jest.Mock).mockResolvedValue(false);
 
     await expect(
-      useCase.execute({ email: 'john@example.com', password: 'wrong' })
+      useCase.execute({ email: 'john@example.com', password: 'wrong' }),
     ).rejects.toMatchObject({ statusCode: 401, code: 'AUTH_INVALID_CREDENTIALS' });
 
     expect(verifyPassword).toHaveBeenCalledWith('wrong', 'hash');
@@ -1613,11 +1669,13 @@ describe('ResetPasswordUseCase', () => {
   // ❌ CASO TRISTE — token vazio ou whitespace
   it('deve lançar 400 para token vazio', async () => {
     const useCase = new ResetPasswordUseCase(
-      makeUserRepoMock(), makeResetTokenRepoMock(), makeCacheServiceMock()
+      makeUserRepoMock(),
+      makeResetTokenRepoMock(),
+      makeCacheServiceMock(),
     );
 
     await expect(
-      useCase.execute({ token: '   ', newPassword: 'SenhaForte123' })
+      useCase.execute({ token: '   ', newPassword: 'SenhaForte123' }),
     ).rejects.toMatchObject({ statusCode: 400, code: 'PASSWORD_RESET_INVALID_TOKEN' });
   });
 
@@ -1627,11 +1685,13 @@ describe('ResetPasswordUseCase', () => {
     resetTokenRepo.consumeByTokenHash.mockResolvedValue(null);
 
     const useCase = new ResetPasswordUseCase(
-      makeUserRepoMock(), resetTokenRepo, makeCacheServiceMock()
+      makeUserRepoMock(),
+      resetTokenRepo,
+      makeCacheServiceMock(),
     );
 
     await expect(
-      useCase.execute({ token: 'token-inexistente', newPassword: 'SenhaForte123' })
+      useCase.execute({ token: 'token-inexistente', newPassword: 'SenhaForte123' }),
     ).rejects.toMatchObject({ statusCode: 400, code: 'PASSWORD_RESET_INVALID_TOKEN' });
 
     expect(resetTokenRepo.consumeByTokenHash).toHaveBeenCalledWith('sha256:token-inexistente');
@@ -1665,7 +1725,7 @@ const makeResponseMock = () => {
 };
 
 const makeNextMock = () => jest.fn() as unknown as NextFunction;
-const makeUseCaseMock = () => ({ execute: jest.fn() } as unknown as CreateUserUseCase);
+const makeUseCaseMock = () => ({ execute: jest.fn() }) as unknown as CreateUserUseCase;
 
 describe('RegisterController', () => {
   beforeEach(() => jest.clearAllMocks());
@@ -1680,7 +1740,13 @@ describe('RegisterController', () => {
       body: { name: '  John Doe  ', email: 'John.DOE@Example.com', password: '12345678' },
     } as Request;
 
-    const user = new User({ id: '1', name: 'John Doe', email: 'john.doe@example.com', passwordHash: 'hash', role: 'USER' });
+    const user = new User({
+      id: '1',
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      passwordHash: 'hash',
+      role: 'USER',
+    });
     (useCase.execute as jest.Mock).mockResolvedValue(user);
 
     const res = makeResponseMock();
@@ -1720,7 +1786,11 @@ describe('RegisterController', () => {
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         code: 'VALIDATION_ERROR',
-        data: { issues: expect.arrayContaining([expect.objectContaining({ message: expect.any(String) })]) },
+        data: {
+          issues: expect.arrayContaining([
+            expect.objectContaining({ message: expect.any(String) }),
+          ]),
+        },
       }),
     );
     expect(next).not.toHaveBeenCalled();
@@ -1731,7 +1801,9 @@ describe('RegisterController', () => {
     const useCase = makeUseCaseMock();
     const controller = new RegisterController(useCase);
 
-    const req = { body: { name: 'John Doe', email: 'john@example.com', password: '12345678' } } as Request;
+    const req = {
+      body: { name: 'John Doe', email: 'john@example.com', password: '12345678' },
+    } as Request;
     const error = new Error('unexpected');
     (useCase.execute as jest.Mock).mockRejectedValue(error);
 
@@ -1763,14 +1835,15 @@ import { httpStatusCodes } from '@utils/httpConstants';
 import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
 
 // res inclui cookie: jest.fn() — obrigatório para controllers que setam cookie
-const makeResponseMock = () => ({
-  status: jest.fn().mockReturnThis(),
-  json: jest.fn(),
-  cookie: jest.fn(),
-} as unknown as Response);
+const makeResponseMock = () =>
+  ({
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+    cookie: jest.fn(),
+  }) as unknown as Response;
 
 const makeNextMock = () => jest.fn() as unknown as NextFunction;
-const makeUseCaseMock = () => ({ execute: jest.fn() } as unknown as LoginUseCase);
+const makeUseCaseMock = () => ({ execute: jest.fn() }) as unknown as LoginUseCase;
 
 describe('LoginController', () => {
   beforeEach(() => jest.clearAllMocks());
@@ -1794,9 +1867,7 @@ describe('LoginController', () => {
     // Verifica que o cookie de auth foi setado com o token
     expect(res.cookie).toHaveBeenCalledWith(AUTH_COOKIE_NAME, 'fake-token', expect.any(Object));
     expect(res.status).toHaveBeenCalledWith(httpStatusCodes.OK);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ message: 'Login successful' }),
-    );
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Login successful' }));
   });
 
   // ❌ CASO TRISTE — body inválido não seta cookie
@@ -1820,7 +1891,11 @@ describe('LoginController', () => {
     const useCase = makeUseCaseMock();
     const controller = new LoginController(useCase);
 
-    const error = { statusCode: 401, code: 'AUTH_INVALID_CREDENTIALS', message: 'Invalid credentials' };
+    const error = {
+      statusCode: 401,
+      code: 'AUTH_INVALID_CREDENTIALS',
+      message: 'Invalid credentials',
+    };
     (useCase.execute as jest.Mock).mockRejectedValue(error);
 
     const req = { body: { email: 'john@example.com', password: '12345678' } } as Request;
@@ -1851,13 +1926,14 @@ import { MeUseCase } from '@usecases/user/me-use-case';
 import { User } from '@domain/entities/user';
 import { httpStatusCodes } from '@utils/httpConstants';
 
-const makeResponseMock = () => ({
-  status: jest.fn().mockReturnThis(),
-  json: jest.fn(),
-} as unknown as Response);
+const makeResponseMock = () =>
+  ({
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+  }) as unknown as Response;
 
 const makeNextMock = () => jest.fn() as unknown as NextFunction;
-const makeUseCaseMock = () => ({ execute: jest.fn() } as unknown as MeUseCase);
+const makeUseCaseMock = () => ({ execute: jest.fn() }) as unknown as MeUseCase;
 
 describe('MeController', () => {
   beforeEach(() => jest.clearAllMocks());
@@ -1867,7 +1943,14 @@ describe('MeController', () => {
     const useCase = makeUseCaseMock();
     const controller = new MeController(useCase);
 
-    const user = new User({ id: 'u1', name: 'John Doe', email: 'john@example.com', passwordHash: 'hash', role: 'USER', tokenVersion: 0 });
+    const user = new User({
+      id: 'u1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      passwordHash: 'hash',
+      role: 'USER',
+      tokenVersion: 0,
+    });
     (useCase.execute as jest.Mock).mockResolvedValue(user);
 
     const req = { user: { id: 'u1', role: 'USER', tokenVersion: 0 } } as unknown as Request;

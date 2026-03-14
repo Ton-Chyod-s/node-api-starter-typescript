@@ -135,11 +135,11 @@ export function makeGetProductController() {
 
 Use o padrão `entidade:identificador` para evitar colisões:
 
-| Entidade | Padrão | Exemplo |
-|----------|--------|---------|
-| Usuário | `user:{id}` | `user:abc123` |
-| Produto | `product:{id}` | `product:xyz789` |
-| Carrinho | `cart:{userId}` | `cart:abc123` |
+| Entidade | Padrão              | Exemplo           |
+| -------- | ------------------- | ----------------- |
+| Usuário  | `user:{id}`         | `user:abc123`     |
+| Produto  | `product:{id}`      | `product:xyz789`  |
+| Carrinho | `cart:{userId}`     | `cart:abc123`     |
 | Listagem | `products:page:{n}` | `products:page:1` |
 
 ---

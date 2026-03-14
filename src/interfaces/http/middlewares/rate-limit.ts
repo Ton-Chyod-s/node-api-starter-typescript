@@ -40,12 +40,7 @@ function getRateLimitStore(prefix: string): RedisStore | undefined {
   });
 }
 
-export function makeRateLimiter({
-  windowMs,
-  limit,
-  skip,
-  prefix,
-}: MakeRateLimiterOptions) {
+export function makeRateLimiter({ windowMs, limit, skip, prefix }: MakeRateLimiterOptions) {
   const storePrefix = prefix ?? `rl:${++prefixCounter}:`;
 
   return rateLimit({
@@ -59,10 +54,7 @@ export function makeRateLimiter({
     handler: (_req, res) => {
       const status = httpStatusCodes.TOO_MANY_REQUESTS ?? 429;
 
-      const response = createResponse(
-        status,
-        'Too many requests, please try again later',
-      );
+      const response = createResponse(status, 'Too many requests, please try again later');
 
       return res.status(status).json(response);
     },

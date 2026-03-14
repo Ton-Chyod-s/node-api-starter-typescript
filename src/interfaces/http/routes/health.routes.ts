@@ -37,7 +37,9 @@ async function checkDatabase(timeoutMs = 300): Promise<DbHealth> {
     const { prisma } = await import('../../../infrastructure/prisma/client');
 
     await prisma.$transaction(async (tx) => {
-      await tx.$executeRawUnsafe(`SET LOCAL statement_timeout = ${Math.max(1, Math.trunc(timeoutMs))}`);
+      await tx.$executeRawUnsafe(
+        `SET LOCAL statement_timeout = ${Math.max(1, Math.trunc(timeoutMs))}`,
+      );
       await tx.$queryRaw`SELECT 1`;
     });
 
