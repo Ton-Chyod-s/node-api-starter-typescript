@@ -11,6 +11,7 @@ export type UserListItemRepository = {
 export type CreateUserData = Omit<RegisterRequestDTO, 'password'> & {
   passwordHash?: string | null;
   googleId?: string | null;
+  facebookId?: string | null;
   role?: UserRole;
 };
 
