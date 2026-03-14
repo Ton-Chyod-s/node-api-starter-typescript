@@ -80,6 +80,19 @@ async function getLoginTokenController() {
   return _loginTokenController;
 }
 
+let _refreshTokenController:
+  | import('@interfaces/http/controllers/user/refresh-token-controller').RefreshTokenController
+  | null = null;
+async function getRefreshTokenController() {
+  if (_refreshTokenController) return _refreshTokenController;
+
+  const { makeRefreshTokenController } =
+    await import('@interfaces/http/factories/controllers/user/refresh-token-controller.factory');
+
+  _refreshTokenController = makeRefreshTokenController();
+  return _refreshTokenController;
+}
+
 const passwordResetLimiter = makeRateLimiter({
   windowMs: 15 * 60 * 1000,
   limit: 10,
@@ -134,6 +147,15 @@ router.post(
   authLimiter,
   asyncRoute(async (req, res, next) => {
     const controller = await getLoginTokenController();
+    return controller.handle(req, res, next);
+  }),
+);
+
+router.post(
+  '/auth/refresh',
+  authLimiter,
+  asyncRoute(async (req, res, next) => {
+    const controller = await getRefreshTokenController();
     return controller.handle(req, res, next);
   }),
 );
@@ -295,4 +317,5 @@ export function resetControllersForTesting(): void {
   _googleCallbackController = null;
   _facebookAuthController = null;
   _facebookCallbackController = null;
+  _refreshTokenController = null;
 }

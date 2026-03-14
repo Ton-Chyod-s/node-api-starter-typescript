@@ -1,16 +1,21 @@
 import { PrismaUserRepository } from '@infrastructure/repositories/user-repositories';
 import { PrismaRefreshTokenRepository } from '@infrastructure/repositories/refresh-token-repository';
-import { LoginUseCase } from '@usecases/user/login-use-case';
 import { makeTokenService } from '@interfaces/http/factories/jwt/container';
-import { LoginTokenController } from '@interfaces/http/controllers/user/login-token-controller';
+import { RefreshTokenUseCase } from '@usecases/user/refresh-token-use-case';
+import { RefreshTokenController } from '@interfaces/http/controllers/user/refresh-token-controller';
 import { env } from '@config/env';
 
-export function makeLoginTokenController() {
+export function makeRefreshTokenController() {
   const userRepository = new PrismaUserRepository();
   const refreshTokenRepository = new PrismaRefreshTokenRepository();
   const tokenService = makeTokenService();
 
-  const loginUseCase = new LoginUseCase(userRepository, tokenService);
+  const useCase = new RefreshTokenUseCase(
+    userRepository,
+    refreshTokenRepository,
+    tokenService,
+    env.REFRESH_TOKEN_EXPIRES_IN_DAYS,
+  );
 
-  return new LoginTokenController(loginUseCase, refreshTokenRepository, env.REFRESH_TOKEN_EXPIRES_IN_DAYS);
+  return new RefreshTokenController(useCase);
 }

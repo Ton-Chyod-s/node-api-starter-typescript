@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { IUserRepository } from '@domain/repositories/user-repository';
+import { IRefreshTokenRepository } from '@domain/repositories/refresh-token-repository';
 import { ICacheService } from '@domain/services/cache-service';
 import { logger } from '@infrastructure/logging/logger';
 import { createResponse } from '@utils/createResponse';
@@ -11,6 +12,7 @@ export class LogoutController {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly cacheService: ICacheService,
+    private readonly refreshTokenRepository: IRefreshTokenRepository,
   ) {}
 
   async handle(req: Request, res: Response, next: NextFunction) {
@@ -19,6 +21,8 @@ export class LogoutController {
 
       if (userId) {
         await this.userRepository.incrementTokenVersion(userId);
+
+        await this.refreshTokenRepository.deleteByUserId(userId);
 
         try {
           await this.cacheService.del(userCacheKey(userId));

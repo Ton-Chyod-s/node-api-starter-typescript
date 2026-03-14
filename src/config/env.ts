@@ -100,6 +100,12 @@ const schema = z.object({
     .preprocess(preprocessOptional, z.coerce.number().int().min(10).max(3600))
     .optional()
     .default(60),
+
+  REFRESH_TOKEN_EXPIRES_IN_DAYS: z
+    .preprocess(preprocessOptional, z.coerce.number().int().min(1).max(365))
+    .optional()
+    .default(30)
+    .transform((days) => days * 24 * 60 * 60 * 1000),
 });
 
 const parsedEnv = schema.superRefine((data, ctx) => {

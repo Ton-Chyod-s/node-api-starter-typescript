@@ -1,0 +1,17 @@
+model RefreshToken {
+  id String @id @default(uuid())
+
+  /**
+   * SHA-256 do token bruto enviado ao cliente
+   */
+  tokenHash String @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+
+  @@index([userId])
+}
