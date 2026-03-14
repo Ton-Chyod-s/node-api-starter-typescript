@@ -70,7 +70,7 @@ export class FacebookCallbackController {
       const { id: facebookId, name, email } = (await profileRes.json()) as {
         id: string;
         name: string;
-        email: string;
+        email?: string;
       };
 
       if (!facebookId || !email || !name) {

@@ -24,6 +24,7 @@ export class PrismaUserRepository implements IUserRepository {
       email: user.email,
       passwordHash: user.passwordHash,
       googleId: user.googleId,
+      facebookId: user.facebookId,
       role: normalizeRole(user.role),
       tokenVersion: user.tokenVersion,
       createdAt: user.createdAt,
@@ -41,6 +42,7 @@ export class PrismaUserRepository implements IUserRepository {
       email: user.email,
       passwordHash: user.passwordHash,
       googleId: user.googleId,
+      facebookId: user.facebookId,
       role: normalizeRole(user.role),
       tokenVersion: user.tokenVersion,
       createdAt: user.createdAt,
@@ -58,6 +60,7 @@ export class PrismaUserRepository implements IUserRepository {
       email: user.email,
       passwordHash: user.passwordHash,
       googleId: user.googleId,
+      facebookId: user.facebookId,
       role: normalizeRole(user.role),
       tokenVersion: user.tokenVersion,
       createdAt: user.createdAt,
@@ -92,17 +95,21 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async upsertByGoogleId(data: UpsertGoogleUserData): Promise<{ user: User; created: boolean }> {
-    const existing = await prisma.user.findUnique({ where: { googleId: data.googleId } });
+    const { record, created } = await prisma.$transaction(async (tx) => {
+      const existing = await tx.user.findUnique({ where: { googleId: data.googleId } });
 
-    const record = await prisma.user.upsert({
-      where: { googleId: data.googleId },
-      update: {},
-      create: {
-        name: data.name,
-        email: data.email.trim().toLowerCase(),
-        googleId: data.googleId,
-        role: 'USER',
-      },
+      const record = await tx.user.upsert({
+        where: { googleId: data.googleId },
+        update: {},
+        create: {
+          name: data.name,
+          email: data.email.trim().toLowerCase(),
+          googleId: data.googleId,
+          role: 'USER',
+        },
+      });
+
+      return { record, created: existing === null };
     });
 
     const user = new User({
@@ -118,7 +125,7 @@ export class PrismaUserRepository implements IUserRepository {
       updatedAt: record.updatedAt,
     });
 
-    return { user, created: existing === null };
+    return { user, created };
   }
 
   async findByFacebookId(facebookId: string): Promise<User | null> {
@@ -140,17 +147,21 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async upsertByFacebookId(data: UpsertFacebookUserData): Promise<{ user: User; created: boolean }> {
-    const existing = await prisma.user.findUnique({ where: { facebookId: data.facebookId } });
+    const { record, created } = await prisma.$transaction(async (tx) => {
+      const existing = await tx.user.findUnique({ where: { facebookId: data.facebookId } });
 
-    const record = await prisma.user.upsert({
-      where: { facebookId: data.facebookId },
-      update: {},
-      create: {
-        name: data.name,
-        email: data.email.trim().toLowerCase(),
-        facebookId: data.facebookId,
-        role: 'USER',
-      },
+      const record = await tx.user.upsert({
+        where: { facebookId: data.facebookId },
+        update: {},
+        create: {
+          name: data.name,
+          email: data.email.trim().toLowerCase(),
+          facebookId: data.facebookId,
+          role: 'USER',
+        },
+      });
+
+      return { record, created: existing === null };
     });
 
     const user = new User({
@@ -166,7 +177,7 @@ export class PrismaUserRepository implements IUserRepository {
       updatedAt: record.updatedAt,
     });
 
-    return { user, created: existing === null };
+    return { user, created };
   }
 
   async updatePasswordHash(userId: string, passwordHash: string): Promise<void> {

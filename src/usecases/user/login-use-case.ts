@@ -12,7 +12,7 @@ export class LoginUseCase {
   ) {}
 
   async execute({ email, password }: LoginInput) {
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmail(email.trim().toLowerCase());
     if (!user || !user.passwordHash) {
       throw AppError.unauthorized('Invalid credentials', 'AUTH_INVALID_CREDENTIALS');
     }
