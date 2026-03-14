@@ -364,7 +364,7 @@ describe('E2E /auth flows (HTTP)', () => {
       const resetRes = await fetch(`${baseUrl}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword: 'NewPass123' }),
+        body: JSON.stringify({ token, newPassword: 'NewPass@123' }),
       });
 
       const resetBody = await resetRes.json();
@@ -389,7 +389,7 @@ describe('E2E /auth flows (HTTP)', () => {
           Cookie: csrfCookie!,
           'x-csrf-token': csrfBody.data.csrfToken,
         },
-        body: JSON.stringify({ email: 'klay@example.com', password: 'OldPass123' }),
+        body: JSON.stringify({ email: 'klay@example.com', password: 'OldPass@123' }),
       });
 
       expect(oldLoginRes.status).toBe(401);

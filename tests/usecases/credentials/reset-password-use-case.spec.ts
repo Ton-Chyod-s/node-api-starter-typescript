@@ -16,7 +16,9 @@ function makeUserRepoMock(): jest.Mocked<IUserRepository> {
   return {
     findByEmail: jest.fn(),
     findById: jest.fn(),
+    findByGoogleId: jest.fn(),
     create: jest.fn(),
+    upsertByGoogleId: jest.fn(),
     updatePasswordHash: jest.fn().mockResolvedValue(undefined),
     findAll: jest.fn(),
     incrementTokenVersion: jest.fn().mockResolvedValue(undefined),

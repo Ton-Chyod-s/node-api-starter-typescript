@@ -65,7 +65,7 @@ describe('PrismaUserRepository', () => {
     });
 
     expect(prisma.user.create).toHaveBeenCalledWith({
-      data: { name: 'Novo', email: 'n@n.com', passwordHash: 'hash2', role: 'USER' },
+      data: { name: 'Novo', email: 'n@n.com', passwordHash: 'hash2', googleId: null, role: 'USER' },
     });
 
     expect(result).toBeInstanceOf(User);
