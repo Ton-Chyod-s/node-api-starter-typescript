@@ -1,0 +1,56 @@
+post:
+  tags: [Auth Mobile]
+  summary: Renovar access token (refresh)
+  operationId: refreshToken
+  description: >
+    Troca um refresh token válido por um novo par access_token + refresh_token.
+    O refresh token anterior é invalidado imediatamente após o uso (rotação).
+    Se o usuário tiver feito logout, o refresh token já terá sido deletado e este endpoint retornará 401.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../openapi.yaml#/components/schemas/RefreshTokenRequest
+        examples:
+          ok:
+            value:
+              refresh_token: 'a1b2c3d4e5f6...'
+  responses:
+    '200':
+      description: Novo par de tokens emitido
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/RefreshTokenResponseData
+          examples:
+            ok:
+              value:
+                statusCode: 200
+                message: 'Token refreshed'
+                data:
+                  access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                  refresh_token: 'f6e5d4c3b2a1...'
+    '400':
+      $ref: ../openapi.yaml#/components/responses/BadRequestValidation
+    '401':
+      description: Refresh token inválido, expirado ou já utilizado
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+          examples:
+            invalid:
+              value:
+                statusCode: 401
+                message: 'Invalid or expired refresh token'
+                errorCode: 'REFRESH_TOKEN_INVALID'
+    '429':
+      $ref: ../openapi.yaml#/components/responses/TooManyRequests
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

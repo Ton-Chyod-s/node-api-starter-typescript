@@ -229,13 +229,39 @@ MeResponseData:
 LoginTokenResponseData:
   type: object
   properties:
-    token:
+    access_token:
       type: string
-      description: JWT (Bearer)
+      description: JWT de curta duração para autenticar requests
       example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    refresh_token:
+      type: string
+      description: Token opaco de longa duração para renovar o access_token
+      example: 'a1b2c3d4e5f6...'
     user:
       $ref: ../openapi.yaml#/components/schemas/PublicUser
-  required: [token, user]
+  required: [access_token, refresh_token, user]
+
+RefreshTokenRequest:
+  type: object
+  properties:
+    refresh_token:
+      type: string
+      description: Refresh token recebido no login ou no último refresh
+      example: 'a1b2c3d4e5f6...'
+  required: [refresh_token]
+
+RefreshTokenResponseData:
+  type: object
+  properties:
+    access_token:
+      type: string
+      description: Novo JWT de curta duração
+      example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    refresh_token:
+      type: string
+      description: Novo refresh token (o anterior foi invalidado)
+      example: 'f6e5d4c3b2a1...'
+  required: [access_token, refresh_token]
 
 ForgotPasswordRequest:
   type: object

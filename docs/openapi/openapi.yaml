@@ -68,6 +68,10 @@ components:
       $ref: ./components/schemas.yaml#/ForgotPasswordRequest
     ResetPasswordRequest:
       $ref: ./components/schemas.yaml#/ResetPasswordRequest
+    RefreshTokenRequest:
+      $ref: ./components/schemas.yaml#/RefreshTokenRequest
+    RefreshTokenResponseData:
+      $ref: ./components/schemas.yaml#/RefreshTokenResponseData
 
   responses:
     BadRequestInvalidJson:
@@ -99,6 +103,9 @@ paths:
 
   /auth/token:
     $ref: ./paths/auth.token.yaml
+
+  /auth/refresh:
+    $ref: ./paths/auth.refresh.yaml
 
   /auth/logout:
     $ref: ./paths/auth.logout.yaml
