@@ -2,8 +2,11 @@ import crypto from 'crypto';
 import { IUserRepository } from '@domain/repositories/user-repository';
 import { IRefreshTokenRepository } from '@domain/repositories/refresh-token-repository';
 import { ITokenService } from '@domain/services/token-service';
+import { ICacheService } from '@domain/services/cache-service';
 import { AppError } from '@utils/app-error';
 import { sha256Hex } from '@utils/hash';
+import { userCacheKey } from '@utils/cache-keys';
+import { logger } from '@infrastructure/logging/logger';
 
 type RefreshTokenInput = {
   refreshToken: string;
@@ -20,6 +23,7 @@ export class RefreshTokenUseCase {
     private readonly refreshTokenRepository: IRefreshTokenRepository,
     private readonly tokenService: ITokenService,
     private readonly refreshTokenTtlMs: number,
+    private readonly cacheService: ICacheService,
   ) {}
 
   async execute({ refreshToken }: RefreshTokenInput): Promise<RefreshTokenOutput> {
@@ -49,6 +53,15 @@ export class RefreshTokenUseCase {
       tokenHash: newTokenHash,
       expiresAt,
     });
+
+    try {
+      await this.cacheService.del(userCacheKey(user.id));
+    } catch (err) {
+      logger.warn('Falha ao invalidar cache após refresh de token.', {
+        userId: user.id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
 
     return {
       accessToken,

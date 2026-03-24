@@ -30,67 +30,49 @@ const authLimiter = makeRateLimiter({
   limit: 20,
 });
 
-let _logoutController:
-  | import('@interfaces/http/controllers/user/logout-controller').LogoutController
-  | null = null;
+let _logoutController: Promise<
+  import('@interfaces/http/controllers/user/logout-controller').LogoutController
+> | null = null;
 async function getLogoutController() {
-  if (_logoutController) return _logoutController;
-  const { makeLogoutController } =
-    await import('@interfaces/http/factories/controllers/user/logout-controller.factory');
-  _logoutController = makeLogoutController();
-  return _logoutController;
+  return (_logoutController ??= import(
+    '@interfaces/http/factories/controllers/user/logout-controller.factory'
+  ).then((m) => m.makeLogoutController()));
 }
 
-let _registerController:
-  | import('@interfaces/http/controllers/user/register-controller').RegisterController
-  | null = null;
+let _registerController: Promise<
+  import('@interfaces/http/controllers/user/register-controller').RegisterController
+> | null = null;
 async function getRegisterController() {
-  if (_registerController) return _registerController;
-
-  const { makeRegisterController } =
-    await import('@interfaces/http/factories/controllers/user/register-controller.factory');
-
-  _registerController = makeRegisterController();
-  return _registerController;
+  return (_registerController ??= import(
+    '@interfaces/http/factories/controllers/user/register-controller.factory'
+  ).then((m) => m.makeRegisterController()));
 }
 
-let _loginController:
-  | import('@interfaces/http/controllers/user/login-controller').LoginController
-  | null = null;
+let _loginController: Promise<
+  import('@interfaces/http/controllers/user/login-controller').LoginController
+> | null = null;
 async function getLoginController() {
-  if (_loginController) return _loginController;
-
-  const { makeLoginController } =
-    await import('@interfaces/http/factories/controllers/user/login-controller.factory');
-
-  _loginController = makeLoginController();
-  return _loginController;
+  return (_loginController ??= import(
+    '@interfaces/http/factories/controllers/user/login-controller.factory'
+  ).then((m) => m.makeLoginController()));
 }
 
-let _loginTokenController:
-  | import('@interfaces/http/controllers/user/login-token-controller').LoginTokenController
-  | null = null;
+let _loginTokenController: Promise<
+  import('@interfaces/http/controllers/user/login-token-controller').LoginTokenController
+> | null = null;
 async function getLoginTokenController() {
-  if (_loginTokenController) return _loginTokenController;
-
-  const { makeLoginTokenController } =
-    await import('../factories/controllers/user/login-token-controller.factory');
-
-  _loginTokenController = makeLoginTokenController();
-  return _loginTokenController;
+  return (_loginTokenController ??= import(
+    '../factories/controllers/user/login-token-controller.factory'
+  ).then((m) => m.makeLoginTokenController()));
 }
 
-let _refreshTokenController:
-  | import('@interfaces/http/controllers/user/refresh-token-controller').RefreshTokenController
-  | null = null;
+let _refreshTokenController: Promise<
+  import('@interfaces/http/controllers/user/refresh-token-controller').RefreshTokenController
+> | null = null;
 async function getRefreshTokenController() {
-  if (_refreshTokenController) return _refreshTokenController;
-
-  const { makeRefreshTokenController } =
-    await import('@interfaces/http/factories/controllers/user/refresh-token-controller.factory');
-
-  _refreshTokenController = makeRefreshTokenController();
-  return _refreshTokenController;
+  return (_refreshTokenController ??= import(
+    '@interfaces/http/factories/controllers/user/refresh-token-controller.factory'
+  ).then((m) => m.makeRefreshTokenController()));
 }
 
 const passwordResetLimiter = makeRateLimiter({
@@ -98,30 +80,22 @@ const passwordResetLimiter = makeRateLimiter({
   limit: 10,
 });
 
-let _forgotPasswordController:
-  | import('@interfaces/http/controllers/credentials/forgot-password-controller').ForgotPasswordController
-  | null = null;
+let _forgotPasswordController: Promise<
+  import('@interfaces/http/controllers/credentials/forgot-password-controller').ForgotPasswordController
+> | null = null;
 async function getForgotPasswordController() {
-  if (_forgotPasswordController) return _forgotPasswordController;
-
-  const { makeForgotPasswordController } =
-    await import('@interfaces/http/factories/controllers/credentials/forgot-password-controller.factory');
-
-  _forgotPasswordController = makeForgotPasswordController();
-  return _forgotPasswordController;
+  return (_forgotPasswordController ??= import(
+    '@interfaces/http/factories/controllers/credentials/forgot-password-controller.factory'
+  ).then((m) => m.makeForgotPasswordController()));
 }
 
-let _resetPasswordController:
-  | import('@interfaces/http/controllers/credentials/reset-password-controller').ResetPasswordController
-  | null = null;
+let _resetPasswordController: Promise<
+  import('@interfaces/http/controllers/credentials/reset-password-controller').ResetPasswordController
+> | null = null;
 async function getResetPasswordController() {
-  if (_resetPasswordController) return _resetPasswordController;
-
-  const { makeResetPasswordController } =
-    await import('@interfaces/http/factories/controllers/credentials/reset-password-controller.factory');
-
-  _resetPasswordController = makeResetPasswordController();
-  return _resetPasswordController;
+  return (_resetPasswordController ??= import(
+    '@interfaces/http/factories/controllers/credentials/reset-password-controller.factory'
+  ).then((m) => m.makeResetPasswordController()));
 }
 
 router.post(
@@ -188,48 +162,40 @@ router.post(
   }),
 );
 
-let _googleAuthController:
-  | import('@interfaces/http/controllers/user/google-auth-controller').GoogleAuthController
-  | null = null;
+let _googleAuthController: Promise<
+  import('@interfaces/http/controllers/user/google-auth-controller').GoogleAuthController
+> | null = null;
 async function getGoogleAuthController() {
-  if (_googleAuthController) return _googleAuthController;
-  const { makeGoogleAuthController } =
-    await import('@interfaces/http/factories/controllers/user/google-auth-controller.factory');
-  _googleAuthController = makeGoogleAuthController();
-  return _googleAuthController;
+  return (_googleAuthController ??= import(
+    '@interfaces/http/factories/controllers/user/google-auth-controller.factory'
+  ).then((m) => m.makeGoogleAuthController()));
 }
 
-let _googleCallbackController:
-  | import('@interfaces/http/controllers/user/google-callback-controller').GoogleCallbackController
-  | null = null;
+let _googleCallbackController: Promise<
+  import('@interfaces/http/controllers/user/google-callback-controller').GoogleCallbackController
+> | null = null;
 async function getGoogleCallbackController() {
-  if (_googleCallbackController) return _googleCallbackController;
-  const { makeGoogleCallbackController } =
-    await import('@interfaces/http/factories/controllers/user/google-callback-controller.factory');
-  _googleCallbackController = makeGoogleCallbackController();
-  return _googleCallbackController;
+  return (_googleCallbackController ??= import(
+    '@interfaces/http/factories/controllers/user/google-callback-controller.factory'
+  ).then((m) => m.makeGoogleCallbackController()));
 }
 
-let _facebookAuthController:
-  | import('@interfaces/http/controllers/user/facebook-auth-controller').FacebookAuthController
-  | null = null;
+let _facebookAuthController: Promise<
+  import('@interfaces/http/controllers/user/facebook-auth-controller').FacebookAuthController
+> | null = null;
 async function getFacebookAuthController() {
-  if (_facebookAuthController) return _facebookAuthController;
-  const { makeFacebookAuthController } =
-    await import('@interfaces/http/factories/controllers/user/facebook-auth-controller.factory');
-  _facebookAuthController = makeFacebookAuthController();
-  return _facebookAuthController;
+  return (_facebookAuthController ??= import(
+    '@interfaces/http/factories/controllers/user/facebook-auth-controller.factory'
+  ).then((m) => m.makeFacebookAuthController()));
 }
 
-let _facebookCallbackController:
-  | import('@interfaces/http/controllers/user/facebook-callback-controller').FacebookCallbackController
-  | null = null;
+let _facebookCallbackController: Promise<
+  import('@interfaces/http/controllers/user/facebook-callback-controller').FacebookCallbackController
+> | null = null;
 async function getFacebookCallbackController() {
-  if (_facebookCallbackController) return _facebookCallbackController;
-  const { makeFacebookCallbackController } =
-    await import('@interfaces/http/factories/controllers/user/facebook-callback-controller.factory');
-  _facebookCallbackController = makeFacebookCallbackController();
-  return _facebookCallbackController;
+  return (_facebookCallbackController ??= import(
+    '@interfaces/http/factories/controllers/user/facebook-callback-controller.factory'
+  ).then((m) => m.makeFacebookCallbackController()));
 }
 
 router.get(
@@ -268,16 +234,13 @@ router.get(
   }),
 );
 
-let _meController: import('@interfaces/http/controllers/user/me-controller').MeController | null =
-  null;
+let _meController: Promise<
+  import('@interfaces/http/controllers/user/me-controller').MeController
+> | null = null;
 async function getMeController() {
-  if (_meController) return _meController;
-
-  const { makeMeController } =
-    await import('@interfaces/http/factories/controllers/user/me-controller.factory');
-
-  _meController = makeMeController();
-  return _meController;
+  return (_meController ??= import(
+    '@interfaces/http/factories/controllers/user/me-controller.factory'
+  ).then((m) => m.makeMeController()));
 }
 
 router.get(

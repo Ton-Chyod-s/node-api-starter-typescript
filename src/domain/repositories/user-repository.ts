@@ -27,6 +27,11 @@ export type UpsertFacebookUserData = {
   name: string;
 };
 
+export type FindAllParams = {
+  take?: number;
+  cursor?: string;
+};
+
 export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
   findById(id: string): Promise<User | null>;
@@ -36,6 +41,6 @@ export interface IUserRepository {
   upsertByGoogleId(data: UpsertGoogleUserData): Promise<{ user: User; created: boolean }>;
   upsertByFacebookId(data: UpsertFacebookUserData): Promise<{ user: User; created: boolean }>;
   updatePasswordHash(userId: string, passwordHash: string): Promise<void>;
-  findAll(): Promise<UserListItemRepository[]>;
+  findAll(params?: FindAllParams): Promise<UserListItemRepository[]>;
   incrementTokenVersion(userId: string): Promise<void>;
 }

@@ -8,7 +8,21 @@ import { AppError } from '@utils/app-error';
 import { env } from '@config/env';
 
 export class FacebookCallbackController {
-  constructor(private readonly facebookLoginUseCase: FacebookLoginUseCase) {}
+  private readonly appId: string;
+  private readonly appSecret: string;
+  private readonly redirectUri: string;
+
+  constructor(private readonly facebookLoginUseCase: FacebookLoginUseCase) {
+    if (!env.FACEBOOK_APP_ID || !env.FACEBOOK_APP_SECRET || !env.FACEBOOK_REDIRECT_URI) {
+      throw new Error(
+        'Facebook OAuth não está configurado. Defina FACEBOOK_APP_ID, FACEBOOK_APP_SECRET e FACEBOOK_REDIRECT_URI.',
+      );
+    }
+
+    this.appId = env.FACEBOOK_APP_ID;
+    this.appSecret = env.FACEBOOK_APP_SECRET;
+    this.redirectUri = env.FACEBOOK_REDIRECT_URI;
+  }
 
   async handle(req: Request, res: Response, next: NextFunction) {
     try {
@@ -33,9 +47,9 @@ export class FacebookCallbackController {
 
       // 1. Troca code por access_token
       const tokenParams = new URLSearchParams({
-        client_id: env.FACEBOOK_APP_ID!,
-        client_secret: env.FACEBOOK_APP_SECRET!,
-        redirect_uri: env.FACEBOOK_REDIRECT_URI!,
+        client_id: this.appId,
+        client_secret: this.appSecret,
+        redirect_uri: this.redirectUri,
         code,
       });
 

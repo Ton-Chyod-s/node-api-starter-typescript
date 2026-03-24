@@ -19,7 +19,9 @@ export class RefreshTokenController {
         const response = createResponse(
           httpStatusCodes.BAD_REQUEST,
           'Invalid request body',
-          { issues: parsed.error.issues },
+          {
+            issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+          },
           undefined,
           'VALIDATION_ERROR',
         );

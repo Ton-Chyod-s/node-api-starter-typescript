@@ -12,6 +12,12 @@ export class GoogleCallbackController {
   private readonly client: OAuth2Client;
 
   constructor(private readonly googleLoginUseCase: GoogleLoginUseCase) {
+    if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET || !env.GOOGLE_REDIRECT_URI) {
+      throw new Error(
+        'Google OAuth não está configurado. Defina GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET e GOOGLE_REDIRECT_URI.',
+      );
+    }
+
     this.client = new OAuth2Client(
       env.GOOGLE_CLIENT_ID,
       env.GOOGLE_CLIENT_SECRET,

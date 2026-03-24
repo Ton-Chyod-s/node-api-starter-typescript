@@ -3,12 +3,11 @@ import { ZodError } from 'zod';
 import { JsonWebTokenError, NotBeforeError, TokenExpiredError } from 'jsonwebtoken';
 import { Prisma } from '@prisma/client';
 
+import { AppError } from '@utils/app-error';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
 import { env } from '@config/env';
-
-const RESET = '\x1b[0m';
-const RED = '\x1b[31m';
+import { logger } from '@infrastructure/logging/logger';
 
 function isBodyParserJsonError(err: unknown): boolean {
   if (!(err instanceof SyntaxError)) return false;
@@ -22,23 +21,6 @@ function isJwtError(err: unknown): boolean {
     err instanceof JsonWebTokenError ||
     err instanceof TokenExpiredError ||
     err instanceof NotBeforeError
-  );
-}
-
-function isAppErrorLike(
-  err: unknown,
-): err is { statusCode: number; message: string; code: string; data?: unknown } {
-  if (!err || typeof err !== 'object') return false;
-
-  const maybe = err as Record<string, unknown>;
-
-  return (
-    typeof maybe.statusCode === 'number' &&
-    Number.isInteger(maybe.statusCode) &&
-    typeof maybe.message === 'string' &&
-    maybe.message.length > 0 &&
-    typeof maybe.code === 'string' &&
-    maybe.code.trim().length > 0
   );
 }
 
@@ -91,16 +73,15 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
     }
   }
 
-  if (isAppErrorLike(err)) {
-    const appErr = err as { statusCode: number; message: string; code: string; data?: unknown };
+  if (err instanceof AppError) {
     const response = createResponse(
-      appErr.statusCode,
-      appErr.message,
-      appErr.data,
+      err.statusCode,
+      err.message,
+      err.data,
       undefined,
-      appErr.code,
+      err.code,
     );
-    return res.status(appErr.statusCode).json(response);
+    return res.status(err.statusCode).json(response);
   }
 
   const isProd = env.NODE_ENV === 'production';
@@ -122,13 +103,13 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
   const message =
     isServerError && isProd ? 'Internal server error' : legacy.message || 'Internal server error';
 
-  const logMessage = `[${RED}ERROR${RESET}] ${status} - ${req.method} ${req.originalUrl} - ${message}`;
-
   if (env.NODE_ENV !== 'test') {
-    console.error(logMessage);
-    if (!isProd && legacy.stack) {
-      console.error(legacy.stack);
-    }
+    logger.error(`${status} - ${req.method} ${req.originalUrl} - ${message}`, {
+      status,
+      method: req.method,
+      url: req.originalUrl,
+      ...((!isProd && legacy.stack) ? { stack: legacy.stack } : {}),
+    });
   }
 
   const legacyCode =
