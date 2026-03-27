@@ -38,6 +38,15 @@ function ttlMinutes(): number {
   return env.PASSWORD_RESET_TOKEN_TTL_MINUTES;
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 export class ForgotPasswordUseCase {
   constructor(
     private readonly userRepo: IUserRepository,
@@ -68,10 +77,11 @@ export class ForgotPasswordUseCase {
   }
 
   private emailHtml(resetLink: string, ttlMinutes: number): string {
+    const safeLink = escapeHtml(resetLink);
     return `
       <p>Olá,</p>
       <p>Você solicitou a recuperação de senha. Clique no link abaixo para redefinir sua senha:</p>
-      <p><a href="${resetLink}">Redefinir senha</a></p>
+      <p><a href="${safeLink}">Redefinir senha</a></p>
       <p>Este link expira em ${ttlMinutes} minuto(s).</p>
       <p>Se você não solicitou essa alteração, ignore este e-mail.</p>
     `;

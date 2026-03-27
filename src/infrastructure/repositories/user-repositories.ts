@@ -8,6 +8,7 @@ import {
   FindAllParams,
 } from '@domain/repositories/user-repository';
 import { User, type UserRole } from '@domain/entities/user';
+import { AppError } from '@utils/app-error';
 
 type PrismaUserRecord = {
   id: string;
@@ -95,7 +96,6 @@ export class PrismaUserRepository implements IUserRepository {
         });
 
         if (existingByEmail) {
-          const { AppError } = await import('@utils/app-error');
           throw AppError.conflict(
             'An account with this email already exists. Please log in with your original method.',
             'AUTH_EMAIL_ALREADY_REGISTERED',
@@ -138,7 +138,6 @@ export class PrismaUserRepository implements IUserRepository {
         });
 
         if (existingByEmail) {
-          const { AppError } = await import('@utils/app-error');
           throw AppError.conflict(
             'An account with this email already exists. Please log in with your original method.',
             'AUTH_EMAIL_ALREADY_REGISTERED',
@@ -178,7 +177,8 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async findAll(params?: FindAllParams): Promise<UserListItemRepository[]> {
-    const take = params?.take ?? 100;
+    const MAX_TAKE = 100;
+    const take = Math.min(params?.take ?? MAX_TAKE, MAX_TAKE);
     const cursor = params?.cursor;
 
     const users = await prisma.user.findMany({

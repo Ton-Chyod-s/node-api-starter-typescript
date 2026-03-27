@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import { errorMiddleware } from '@interfaces/http/middlewares/error-middleware';
 import * as Sentry from '@sentry/node';
 import { env } from '@config/env';
+import { logger } from '@infrastructure/logging/logger';
 import router from '@interfaces/http/routes';
 import { csrfMiddleware } from '@interfaces/http/middlewares/csrf-middleware';
 import { globalApiLimiter } from '@interfaces/http/middlewares/global-rate-limit';
@@ -29,6 +30,17 @@ export function createApp(): Application {
   app.set('trust proxy', env.TRUST_PROXY ?? false);
 
   app.use(cookieParser());
+
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+      logger.info(`${req.method} ${req.originalUrl}`, {
+        status: res.statusCode,
+        durationMs: Date.now() - start,
+      });
+    });
+    next();
+  });
 
   const corsOrigin = env.CORS_ORIGIN;
   if (!corsOrigin) throw new Error('CORS_ORIGIN not set in environment variables');

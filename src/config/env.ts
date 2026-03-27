@@ -96,6 +96,8 @@ const schema = z.object({
 
   APP_NAME: z.string().optional().default('app'),
 
+  LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).optional().default('info'),
+
   USER_CACHE_TTL_SECONDS: z
     .preprocess(preprocessOptional, z.coerce.number().int().min(10).max(3600))
     .optional()

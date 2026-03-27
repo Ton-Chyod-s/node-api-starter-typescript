@@ -1,29 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
-import { z } from 'zod';
 import { CreateUserUseCase } from '@usecases/user/create-use-case';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
-import { passwordSchema } from '@domain/dtos/shared/password-schema';
-
-const registerSchema = z.object({
-  name: z
-    .string()
-    .min(2)
-    .max(100)
-    .transform((v) => v.trim()),
-  email: z
-    .string()
-    .email()
-    .transform((v) => v.trim().toLowerCase()),
-  password: passwordSchema,
-});
+import { registerRequestSchema } from '@domain/dtos/user/register-request-dto';
 
 export class RegisterController {
   constructor(private createUserUseCase: CreateUserUseCase) {}
 
   async handle(req: Request, res: Response, next: NextFunction) {
     try {
-      const parsed = registerSchema.safeParse(req.body);
+      const parsed = registerRequestSchema.safeParse(req.body);
 
       if (!parsed.success) {
         const response = createResponse(

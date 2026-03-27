@@ -1,24 +1,12 @@
-import crypto from 'crypto';
 import { IUserRepository } from '@domain/repositories/user-repository';
 import { IRefreshTokenRepository } from '@domain/repositories/refresh-token-repository';
 import { ITokenService } from '@domain/services/token-service';
-import { sha256Hex } from '@utils/hash';
+import { createOAuthSession, OAuthSessionOutput } from './oauth-session';
 
 type FacebookUserInfo = {
   facebookId: string;
   email: string;
   name: string;
-};
-
-type FacebookLoginOutput = {
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
 };
 
 export class FacebookLoginUseCase {
@@ -29,30 +17,14 @@ export class FacebookLoginUseCase {
     private readonly refreshTokenTtlMs: number,
   ) {}
 
-  async execute({ facebookId, email, name }: FacebookUserInfo): Promise<FacebookLoginOutput> {
+  async execute({ facebookId, email, name }: FacebookUserInfo): Promise<OAuthSessionOutput> {
     const { user } = await this.userRepository.upsertByFacebookId({ facebookId, email, name });
 
-    const accessToken = this.tokenService.sign({
-      sub: user.id,
-      role: user.role,
-      tokenVersion: user.tokenVersion,
-    });
-
-    const rawRefreshToken = crypto.randomBytes(64).toString('hex');
-    const tokenHash = sha256Hex(rawRefreshToken);
-    const expiresAt = new Date(Date.now() + this.refreshTokenTtlMs);
-
-    await this.refreshTokenRepository.replaceTokenForUser(user.id, { tokenHash, expiresAt });
-
-    return {
-      accessToken,
-      refreshToken: rawRefreshToken,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    };
+    return createOAuthSession(
+      user,
+      this.tokenService,
+      this.refreshTokenRepository,
+      this.refreshTokenTtlMs,
+    );
   }
 }

@@ -1,3 +1,5 @@
+import { env } from '@config/env';
+
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 type LogMeta = Record<string, unknown> | Error | undefined;
@@ -22,17 +24,11 @@ const colors = {
 };
 
 function getCurrentLevel(): LogLevel {
-  const raw = String(
-    process.env.LOG_LEVEL ?? (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
-  )
-    .toLowerCase()
-    .trim();
-
-  return raw === 'debug' || raw === 'info' || raw === 'warn' || raw === 'error' ? raw : 'info';
+  return env.LOG_LEVEL;
 }
 
 function isProduction(): boolean {
-  return process.env.NODE_ENV === 'production';
+  return env.NODE_ENV === 'production';
 }
 
 function shouldLog(level: LogLevel): boolean {
