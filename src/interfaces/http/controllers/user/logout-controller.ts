@@ -5,7 +5,12 @@ import { ICacheService } from '@domain/services/cache-service';
 import { logger } from '@infrastructure/logging/logger';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
-import { AUTH_COOKIE_NAME, authCookieOptions } from '@interfaces/http/cookies/auth-cookie';
+import {
+  AUTH_COOKIE_NAME,
+  authCookieOptions,
+  REFRESH_COOKIE_NAME,
+  refreshCookieOptions,
+} from '@interfaces/http/cookies/auth-cookie';
 import { userCacheKey } from '@utils/cache-keys';
 
 export class LogoutController {
@@ -35,6 +40,8 @@ export class LogoutController {
       }
 
       res.clearCookie(AUTH_COOKIE_NAME, authCookieOptions());
+      res.clearCookie(REFRESH_COOKIE_NAME, refreshCookieOptions());
+
       const response = createResponse(httpStatusCodes.OK, 'Logout successful');
       return res.status(httpStatusCodes.OK).json(response);
     } catch (err) {

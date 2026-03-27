@@ -1,12 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
-import { LoginUseCase } from '@usecases/user/login-use-case';
+import { LoginTokenUseCase } from '@usecases/user/login-token-use-case';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
-import { AUTH_COOKIE_NAME, authCookieOptions } from '@interfaces/http/cookies/auth-cookie';
+import {
+  AUTH_COOKIE_NAME,
+  authCookieOptions,
+  REFRESH_COOKIE_NAME,
+  refreshCookieOptions,
+} from '@interfaces/http/cookies/auth-cookie';
 import { loginCredentialsSchema } from '@domain/dtos/shared/login-schema';
 
 export class LoginController {
-  constructor(private readonly loginUseCase: LoginUseCase) {}
+  constructor(private readonly loginTokenUseCase: LoginTokenUseCase) {}
 
   async handle(req: Request, res: Response, next: NextFunction) {
     try {
@@ -24,9 +29,10 @@ export class LoginController {
         return res.status(httpStatusCodes.BAD_REQUEST).json(response);
       }
 
-      const result = await this.loginUseCase.execute(parsed.data);
+      const result = await this.loginTokenUseCase.execute(parsed.data);
 
-      res.cookie(AUTH_COOKIE_NAME, result.token, authCookieOptions());
+      res.cookie(AUTH_COOKIE_NAME, result.accessToken, authCookieOptions());
+      res.cookie(REFRESH_COOKIE_NAME, result.refreshToken, refreshCookieOptions());
 
       const response = createResponse(httpStatusCodes.OK, 'Login successful', {
         user: result.user,

@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { env } from '@config/env';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
-import { AUTH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
+import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME } from '@interfaces/http/cookies/auth-cookie';
 
 function safeEqual(a: string, b: string): boolean {
   try {
@@ -67,11 +67,16 @@ export function csrfMiddleware(req: Request, res: Response, next: NextFunction) 
   if (hasBearer) return next();
 
   const hasAuthCookie = Boolean(req.cookies?.[AUTH_COOKIE_NAME]);
+  const hasRefreshCookie = Boolean(req.cookies?.[REFRESH_COOKIE_NAME]);
 
   const isLogin = url.startsWith('/api/auth/login');
   const isLogout = url.startsWith('/api/auth/logout');
+  const isRefresh = url.startsWith('/api/auth/refresh');
 
-  const isCookieAuthRoute = isLogin || (isLogout && hasAuthCookie);
+  const isCookieAuthRoute =
+    isLogin ||
+    (isLogout && hasAuthCookie) ||
+    (isRefresh && hasRefreshCookie);
 
   if (!hasAuthCookie && !isCookieAuthRoute) return next();
 
