@@ -27,7 +27,8 @@ export function createApp(): Application {
 
   app.disable('x-powered-by');
 
-  app.set('trust proxy', env.TRUST_PROXY ?? false);
+  const trustProxy = env.TRUST_PROXY ?? false;
+  app.set('trust proxy', trustProxy);
 
   app.use(cookieParser());
 

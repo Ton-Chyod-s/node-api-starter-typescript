@@ -118,6 +118,23 @@ const parsedEnv = schema.superRefine((data, ctx) => {
       message: 'REDIS_URL is required in production',
     });
   }
+
+  if (data.NODE_ENV === 'production' && data.CSRF_ENABLED === false) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['CSRF_ENABLED'],
+      message: 'CSRF_ENABLED cannot be false in production. Remove the variable or set it to true.',
+    });
+  }
+
+  if (data.NODE_ENV === 'production' && data.TRUST_PROXY === false) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['TRUST_PROXY'],
+      message:
+        'TRUST_PROXY is not set in production. If running behind a load balancer or reverse proxy, set TRUST_PROXY=1 (or the appropriate value) to ensure correct client IP detection for rate limiting.',
+    });
+  }
 });
 
 export const env = parsedEnv.parse(process.env);
