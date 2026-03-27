@@ -3,24 +3,10 @@ import { createApp } from './app';
 import { env } from '@config/env';
 import { prisma } from '@infrastructure/prisma/client';
 import { logger } from '@infrastructure/logging/logger';
-import { PrismaRefreshTokenRepository } from '@infrastructure/repositories/refresh-token-repository';
+import { startScheduler, stopScheduler } from './scheduler';
 
 const app = createApp();
 const port = env.PORT || 3000;
-
-async function cleanupExpiredTokens() {
-  try {
-    const repo = new PrismaRefreshTokenRepository();
-    const deleted = await repo.deleteExpired();
-    if (deleted > 0) {
-      logger.info('Expired refresh tokens removed on startup', { count: deleted });
-    }
-  } catch (err) {
-    logger.warn('Failed to clean up expired refresh tokens on startup', {
-      error: err instanceof Error ? err.message : String(err),
-    });
-  }
-}
 
 const server = app.listen(port, () => {
   const baseUrl = `http://localhost:${port}`;
@@ -31,7 +17,7 @@ const server = app.listen(port, () => {
     logger.info('OpenAPI available', { url: `${baseUrl}/api/openapi.yaml` });
   }
 
-  void cleanupExpiredTokens();
+  startScheduler();
 });
 
 let isShuttingDown = false;
@@ -47,6 +33,8 @@ async function shutdown(signal: string) {
     process.exit(1);
   }, 10_000);
   forceExitTimeout.unref();
+
+  stopScheduler();
 
   server.closeAllConnections();
   server.close(async (err) => {

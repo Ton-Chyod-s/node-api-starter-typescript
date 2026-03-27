@@ -132,6 +132,11 @@ const schema = z.object({
     .optional()
     .default(30)
     .transform((days) => days * 24 * 60 * 60 * 1000),
+
+  REFRESH_TOKEN_CLEANUP_INTERVAL_MINUTES: z
+    .preprocess(preprocessOptional, z.coerce.number().int().min(0).max(60 * 24 * 7))
+    .optional()
+    .default(60),
 });
 
 const parsedEnv = schema.superRefine((data, ctx) => {
