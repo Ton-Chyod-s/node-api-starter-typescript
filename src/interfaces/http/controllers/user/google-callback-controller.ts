@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { GoogleLoginUseCase } from '@usecases/user/google-login-use-case';
-import { AUTH_COOKIE_NAME, authCookieOptions } from '@interfaces/http/cookies/auth-cookie';
+import {
+  AUTH_COOKIE_NAME,
+  authCookieOptions,
+  REFRESH_COOKIE_NAME,
+  refreshCookieOptions,
+} from '@interfaces/http/cookies/auth-cookie';
 import { OAUTH_STATE_COOKIE } from '@interfaces/http/controllers/user/google-auth-controller';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
@@ -70,7 +75,8 @@ export class GoogleCallbackController {
         name: payload.name,
       });
 
-      res.cookie(AUTH_COOKIE_NAME, result.token, authCookieOptions());
+      res.cookie(AUTH_COOKIE_NAME, result.accessToken, authCookieOptions());
+      res.cookie(REFRESH_COOKIE_NAME, result.refreshToken, refreshCookieOptions());
 
       if (env.FRONTEND_URL) {
         return res.redirect(env.FRONTEND_URL);
@@ -84,3 +90,4 @@ export class GoogleCallbackController {
     }
   }
 }
+

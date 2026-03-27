@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { FacebookLoginUseCase } from '@usecases/user/facebook-login-use-case';
-import { AUTH_COOKIE_NAME, authCookieOptions } from '@interfaces/http/cookies/auth-cookie';
+import {
+  AUTH_COOKIE_NAME,
+  authCookieOptions,
+  REFRESH_COOKIE_NAME,
+  refreshCookieOptions,
+} from '@interfaces/http/cookies/auth-cookie';
 import { FACEBOOK_OAUTH_STATE_COOKIE } from '@interfaces/http/controllers/user/facebook-auth-controller';
 import { createResponse } from '@utils/createResponse';
 import { httpStatusCodes } from '@utils/httpConstants';
@@ -45,7 +50,6 @@ export class FacebookCallbackController {
         throw AppError.badRequest('Missing authorization code', 'AUTH_MISSING_CODE');
       }
 
-      // 1. Troca code por access_token
       const tokenParams = new URLSearchParams({
         client_id: this.appId,
         client_secret: this.appSecret,
@@ -66,7 +70,6 @@ export class FacebookCallbackController {
 
       const { access_token: accessToken } = (await tokenRes.json()) as { access_token: string };
 
-      // 2. Busca dados do usuário na Graph API
       const profileParams = new URLSearchParams({
         fields: 'id,name,email',
         access_token: accessToken,
@@ -96,7 +99,8 @@ export class FacebookCallbackController {
 
       const result = await this.facebookLoginUseCase.execute({ facebookId, email, name });
 
-      res.cookie(AUTH_COOKIE_NAME, result.token, authCookieOptions());
+      res.cookie(AUTH_COOKIE_NAME, result.accessToken, authCookieOptions());
+      res.cookie(REFRESH_COOKIE_NAME, result.refreshToken, refreshCookieOptions());
 
       if (env.FRONTEND_URL) {
         return res.redirect(env.FRONTEND_URL);
@@ -112,3 +116,4 @@ export class FacebookCallbackController {
     }
   }
 }
+

@@ -81,19 +81,36 @@ export class PrismaUserRepository implements IUserRepository {
     let created = false;
 
     const record = await prisma.$transaction(async (tx) => {
-      const existing = await tx.user.findUnique({
+      const normalizedEmail = data.email.trim().toLowerCase();
+
+      const existingByGoogle = await tx.user.findUnique({
         where: { googleId: data.googleId },
         select: { id: true },
       });
 
-      created = existing === null;
+      if (!existingByGoogle) {
+        const existingByEmail = await tx.user.findUnique({
+          where: { email: normalizedEmail },
+          select: { id: true, googleId: true },
+        });
+
+        if (existingByEmail) {
+          const { AppError } = await import('@utils/app-error');
+          throw AppError.conflict(
+            'An account with this email already exists. Please log in with your original method.',
+            'AUTH_EMAIL_ALREADY_REGISTERED',
+          );
+        }
+      }
+
+      created = existingByGoogle === null;
 
       return tx.user.upsert({
         where: { googleId: data.googleId },
         update: {},
         create: {
           name: data.name,
-          email: data.email.trim().toLowerCase(),
+          email: normalizedEmail,
           googleId: data.googleId,
           role: 'USER',
         },
@@ -107,19 +124,36 @@ export class PrismaUserRepository implements IUserRepository {
     let created = false;
 
     const record = await prisma.$transaction(async (tx) => {
-      const existing = await tx.user.findUnique({
+      const normalizedEmail = data.email.trim().toLowerCase();
+
+      const existingByFacebook = await tx.user.findUnique({
         where: { facebookId: data.facebookId },
         select: { id: true },
       });
 
-      created = existing === null;
+      if (!existingByFacebook) {
+        const existingByEmail = await tx.user.findUnique({
+          where: { email: normalizedEmail },
+          select: { id: true, facebookId: true },
+        });
+
+        if (existingByEmail) {
+          const { AppError } = await import('@utils/app-error');
+          throw AppError.conflict(
+            'An account with this email already exists. Please log in with your original method.',
+            'AUTH_EMAIL_ALREADY_REGISTERED',
+          );
+        }
+      }
+
+      created = existingByFacebook === null;
 
       return tx.user.upsert({
         where: { facebookId: data.facebookId },
         update: {},
         create: {
           name: data.name,
-          email: data.email.trim().toLowerCase(),
+          email: normalizedEmail,
           facebookId: data.facebookId,
           role: 'USER',
         },

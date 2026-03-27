@@ -17,6 +17,13 @@ function buildResetLink(rawToken: string): string {
     : `${template.replace(/\/$/, '')}/${rawToken}`;
 
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+  if (normalizedPath.split('/').some((segment) => segment === '..')) {
+    throw new Error(
+      `PASSWORD_RESET_PATH gerou um path com traversal inválido: ${normalizedPath}`,
+    );
+  }
+
   const link = `${base}${normalizedPath}`;
 
   const url = new URL(link);
