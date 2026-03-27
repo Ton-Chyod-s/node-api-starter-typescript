@@ -54,13 +54,14 @@ export function csrfMiddleware(req: Request, res: Response, next: NextFunction) 
   if (!isUnsafe) return next();
 
   const url = req.originalUrl || '';
+  const path = url.split('?')[0];
 
-  if (url.startsWith('/api/auth/register')) return next();
-  if (url.startsWith('/api/auth/forgot-password')) return next();
-  if (url.startsWith('/api/auth/reset-password')) return next();
+  if (path === '/api/auth/register') return next();
+  if (path === '/api/auth/forgot-password') return next();
+  if (path === '/api/auth/reset-password') return next();
 
-  if (url.startsWith('/api/health')) return next();
-  if (url.startsWith('/api/auth/token')) return next();
+  if (path.startsWith('/api/health')) return next();
+  if (path === '/api/auth/token') return next();
 
   const authHeader = req.headers.authorization;
   const hasBearer = typeof authHeader === 'string' && authHeader.startsWith('Bearer ');
@@ -69,9 +70,9 @@ export function csrfMiddleware(req: Request, res: Response, next: NextFunction) 
   const hasAuthCookie = Boolean(req.cookies?.[AUTH_COOKIE_NAME]);
   const hasRefreshCookie = Boolean(req.cookies?.[REFRESH_COOKIE_NAME]);
 
-  const isLogin = url.startsWith('/api/auth/login');
-  const isLogout = url.startsWith('/api/auth/logout');
-  const isRefresh = url.startsWith('/api/auth/refresh');
+  const isLogin = path === '/api/auth/login';
+  const isLogout = path === '/api/auth/logout';
+  const isRefresh = path === '/api/auth/refresh';
 
   const isCookieAuthRoute =
     isLogin ||

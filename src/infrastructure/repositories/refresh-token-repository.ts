@@ -10,16 +10,16 @@ export class PrismaRefreshTokenRepository implements IRefreshTokenRepository {
     userId: string,
     input: Omit<CreateRefreshTokenInput, 'userId'>,
   ): Promise<RefreshTokenRecord> {
-    const [, token] = await prisma.$transaction([
-      prisma.refreshToken.deleteMany({ where: { userId } }),
-      prisma.refreshToken.create({
+    const token = await prisma.$transaction(async (tx) => {
+      await tx.refreshToken.deleteMany({ where: { userId } });
+      return tx.refreshToken.create({
         data: {
           userId,
           tokenHash: input.tokenHash,
           expiresAt: input.expiresAt,
         },
-      }),
-    ]);
+      });
+    });
 
     return {
       id: token.id,
@@ -84,5 +84,12 @@ export class PrismaRefreshTokenRepository implements IRefreshTokenRepository {
 
   async deleteByUserId(userId: string): Promise<void> {
     await prisma.refreshToken.deleteMany({ where: { userId } });
+  }
+
+  async deleteExpired(now: Date = new Date()): Promise<number> {
+    const result = await prisma.refreshToken.deleteMany({
+      where: { expiresAt: { lt: now } },
+    });
+    return result.count;
   }
 }

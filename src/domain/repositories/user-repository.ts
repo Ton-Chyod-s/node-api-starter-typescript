@@ -43,4 +43,5 @@ export interface IUserRepository {
   updatePasswordHash(userId: string, passwordHash: string): Promise<void>;
   findAll(params?: FindAllParams): Promise<UserListItemRepository[]>;
   incrementTokenVersion(userId: string): Promise<void>;
+  updateRole(userId: string, role: UserRole): Promise<void>;
 }

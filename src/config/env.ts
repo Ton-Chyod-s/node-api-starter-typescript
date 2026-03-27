@@ -73,16 +73,40 @@ const schema = z.object({
   // ------------------------------------------------------------------------------
   // GOOGLE OAUTH
   // ------------------------------------------------------------------------------
-  GOOGLE_CLIENT_ID: z.string().min(1).optional().transform(normalizeOptionalString),
-  GOOGLE_CLIENT_SECRET: z.string().min(1).optional().transform(normalizeOptionalString),
-  GOOGLE_REDIRECT_URI: z.string().url().optional().transform(normalizeOptionalString),
+  GOOGLE_CLIENT_ID: z
+    .string()
+    .optional()
+    .transform(normalizeOptionalString)
+    .pipe(z.string().min(1).optional()),
+  GOOGLE_CLIENT_SECRET: z
+    .string()
+    .optional()
+    .transform(normalizeOptionalString)
+    .pipe(z.string().min(1).optional()),
+  GOOGLE_REDIRECT_URI: z
+    .string()
+    .optional()
+    .transform(normalizeOptionalString)
+    .pipe(z.string().url().optional()),
 
   // ------------------------------------------------------------------------------
   // FACEBOOK OAUTH
   // ------------------------------------------------------------------------------
-  FACEBOOK_APP_ID: z.string().min(1).optional().transform(normalizeOptionalString),
-  FACEBOOK_APP_SECRET: z.string().min(1).optional().transform(normalizeOptionalString),
-  FACEBOOK_REDIRECT_URI: z.string().url().optional().transform(normalizeOptionalString),
+  FACEBOOK_APP_ID: z
+    .string()
+    .optional()
+    .transform(normalizeOptionalString)
+    .pipe(z.string().min(1).optional()),
+  FACEBOOK_APP_SECRET: z
+    .string()
+    .optional()
+    .transform(normalizeOptionalString)
+    .pipe(z.string().min(1).optional()),
+  FACEBOOK_REDIRECT_URI: z
+    .string()
+    .optional()
+    .transform(normalizeOptionalString)
+    .pipe(z.string().url().optional()),
 
   SMTP_HOST: z.string().optional().transform(normalizeOptionalString),
   SMTP_PORT: z

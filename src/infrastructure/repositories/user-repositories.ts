@@ -176,6 +176,13 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
+  async updateRole(userId: string, role: UserRole): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { role, tokenVersion: { increment: 1 } },
+    });
+  }
+
   async findAll(params?: FindAllParams): Promise<UserListItemRepository[]> {
     const MAX_TAKE = 100;
     const take = Math.min(params?.take ?? MAX_TAKE, MAX_TAKE);

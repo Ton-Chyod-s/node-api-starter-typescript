@@ -24,4 +24,6 @@ export interface IRefreshTokenRepository {
   consumeByTokenHash(tokenHash: string, now?: Date): Promise<string | null>;
 
   deleteByUserId(userId: string): Promise<void>;
+
+  deleteExpired(now?: Date): Promise<number>;
 }
