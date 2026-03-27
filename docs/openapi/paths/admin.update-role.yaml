@@ -1,0 +1,66 @@
+patch:
+  tags: [Admin]
+  summary: Update user role (ADMIN)
+  operationId: adminUpdateUserRole
+  security:
+    - cookieAuth: []
+    - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Target user ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            role:
+              type: string
+              enum: [USER, ADMIN]
+          required: [role]
+        examples:
+          promote:
+            value:
+              role: ADMIN
+  responses:
+    '200':
+      description: User role updated successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    $ref: ../openapi.yaml#/components/schemas/PublicUser
+          examples:
+            ok:
+              value:
+                statusCode: 200
+                message: User role updated successfully
+                data:
+                  id: 'u1'
+                  name: 'João Silva'
+                  email: 'joao@exemplo.com'
+                  role: ADMIN
+    '400':
+      $ref: ../openapi.yaml#/components/responses/BadRequestValidation
+    '401':
+      $ref: ../openapi.yaml#/components/responses/Unauthorized
+    '403':
+      $ref: ../openapi.yaml#/components/responses/Forbidden
+    '404':
+      description: User not found
+      content:
+        application/json:
+          schema:
+            $ref: ../openapi.yaml#/components/schemas/ApiResponse
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

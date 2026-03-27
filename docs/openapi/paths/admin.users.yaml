@@ -1,0 +1,66 @@
+get:
+  tags: [Admin]
+  summary: List users (ADMIN)
+  operationId: adminListUsers
+  security:
+    - cookieAuth: []
+    - bearerAuth: []
+  parameters:
+    - name: take
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Number of users to return (max 100)
+    - name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Cursor (last user id) for pagination
+  responses:
+    '200':
+      description: Users retrieved successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../openapi.yaml#/components/schemas/ApiResponse
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          $ref: ../openapi.yaml#/components/schemas/PublicUser
+                      nextCursor:
+                        type: string
+                        format: uuid
+                        nullable: true
+                    required: [users, nextCursor]
+          examples:
+            ok:
+              value:
+                statusCode: 200
+                message: Users retrieved successfully
+                data:
+                  users:
+                    - id: 'u1'
+                      name: 'João Silva'
+                      email: 'joao@exemplo.com'
+                      role: USER
+                  nextCursor: 'u1'
+    '400':
+      $ref: ../openapi.yaml#/components/responses/BadRequestValidation
+    '401':
+      $ref: ../openapi.yaml#/components/responses/Unauthorized
+    '403':
+      $ref: ../openapi.yaml#/components/responses/Forbidden
+    '500':
+      $ref: ../openapi.yaml#/components/responses/InternalServerError

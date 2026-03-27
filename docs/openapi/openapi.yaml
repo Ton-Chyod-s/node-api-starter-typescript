@@ -137,5 +137,11 @@ paths:
   /debug-sentry:
     $ref: ./paths/debug-sentry.yaml
 
+  /admin/users:
+    $ref: ./paths/admin.users.yaml
+
+  /admin/users/{id}/role:
+    $ref: ./paths/admin.update-role.yaml
+
   /admin/ping:
     $ref: ./paths/admin.ping.yaml
